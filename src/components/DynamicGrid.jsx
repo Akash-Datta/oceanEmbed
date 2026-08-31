@@ -69,7 +69,11 @@ export default function DynamicGrid() {
           />
           <div
             className="longitude-label"
-            style={{ left: `${item.x}%` }}
+            style={{ 
+              left: `${item.x}%`, 
+              bottom: "5px", /* Pushes the label to the bottom */
+              top: "auto"    /* Prevents CSS from pulling it back to the top */
+            }}
           >
             {formatLongitude(item.longitude)}
           </div>

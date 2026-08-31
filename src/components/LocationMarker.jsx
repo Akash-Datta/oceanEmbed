@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { Marker, Popup, useMap, useMapEvents } from "react-leaflet";
 import L from "leaflet";
+import { snapToNearestOcean } from "../utils/coordinateUtils";
 
 // ============================================================
 // POINTER ICON
@@ -35,9 +36,13 @@ export default function LocationMarker({ position, setPosition }) {
 
   useMapEvents({
     click(event) {
+      // 1. Pass the raw click through the ocean snapper
+      const snapped = snapToNearestOcean(event.latlng.lat, event.latlng.lng);
+      
+      // 2. Set the pin at the ocean coordinate
       setPosition({
-        lat: event.latlng.lat,
-        lng: event.latlng.lng,
+        lat: snapped.lat,
+        lng: snapped.lng,
       });
     },
   });

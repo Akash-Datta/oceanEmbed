@@ -1,6 +1,11 @@
+
 import "leaflet/dist/leaflet.css";
 
-import React, { useEffect, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 
 import {
   MapContainer,
@@ -8,6 +13,7 @@ import {
 } from "react-leaflet";
 
 import ControlBar from "../components/ControlBar";
+
 import DynamicGrid from "../components/DynamicGrid";
 
 import LocationMarker, {
@@ -16,10 +22,10 @@ import LocationMarker, {
 } from "../components/LocationMarker";
 
 import DataSidePanel from "../components/DataSidePanel";
-import SpatialDistribution from "../components/SpatialDistribution";
-import IntroAnimation from "../components/IntroAnimation";
 
-import ParticlesBackground from "../components/ParticlesTemp";
+import SpatialDistribution from "../components/SpatialDistribution";
+
+import IntroAnimation from "../components/IntroAnimation";
 
 import {
   parseCoordinate,
@@ -31,41 +37,36 @@ import {
 import "../styles/ocean.css";
 
 
-// ============================================================
-// INTERACTIVE MAP
-// ============================================================
-
-export default function InteractiveMap() {
+export default function InteractiveMap({ onMapLoaded }) {
 
   // ==========================================================
-  // LOCATION
+  // STATE
   // ==========================================================
 
   const [position, setPosition] = useState(null);
 
-  const [targetPosition, setTargetPosition] = useState(null);
+  const [targetPosition, setTargetPosition] =
+    useState(null);
 
-  const [currentSeaName, setCurrentSeaName] = useState("");
-
-
-  // ==========================================================
-  // DATE / DEPTH / COORDINATES
-  // ==========================================================
-
-  const [startDate, setStartDate] = useState("");
-
-  const [endDate, setEndDate] = useState("");
-
-  const [depth, setDepth] = useState("");
-
-  const [latitude, setLatitude] = useState("");
-
-  const [longitude, setLongitude] = useState("");
+  const [currentSeaName, setCurrentSeaName] =
+    useState("");
 
 
-  // ==========================================================
-  // VISUALIZATION
-  // ==========================================================
+  const [startDate, setStartDate] =
+    useState("");
+
+  const [endDate, setEndDate] =
+    useState("");
+
+  const [depth, setDepth] =
+    useState("");
+
+  const [latitude, setLatitude] =
+    useState("");
+
+  const [longitude, setLongitude] =
+    useState("");
+
 
   const [showVisualization, setShowVisualization] =
     useState(false);
@@ -77,80 +78,113 @@ export default function InteractiveMap() {
     useState(null);
 
 
-  // ==========================================================
-  // INTRO / MAP LOADING
-  // ==========================================================
+  /*
+   * This becomes TRUE when Leaflet's actual
+   * map instance reports that it is ready.
+   */
+  const [isMapLoaded, setIsMapLoaded] =
+    useState(false);
 
+
+  // ==========================================================
+  // BOOT LOADER
+  // ==========================================================
+  /*
+   * index.html contains the very first boot screen.
+   *
+   * As soon as React has mounted, remove that HTML loader.
+   *
+   * IntroAnimation then becomes the only visible intro.
+   */
+
+  useEffect(() => {
+
+    if (
+      typeof window !== "undefined" &&
+      typeof window.finishOceanBootLoader === "function"
+    ) {
+
+      window.finishOceanBootLoader();
+
+    }
+
+  }, []);
+
+
+  // ==========================================================
+  // ACTUAL LEAFLET MAP READY HANDLER
+  // ==========================================================
   /*
    * IMPORTANT:
    *
-   * The IntroAnimation is controlled by ONE state only.
+   * There is NO artificial setTimeout here.
    *
-   * We do NOT use:
-   * - minimumIntroTimePassed
-   * - introFinished
-   * - multiple timers
-   *
-   * IntroAnimation itself decides when the sequence is finished.
+   * MapContainer calls this when the Leaflet map has
+   * actually initialized.
    */
 
-  const [mapReady, setMapReady] = useState(false);
+  const handleMapReady = useCallback(() => {
 
-  const [showIntro, setShowIntro] = useState(true);
+    console.log("Ocean map is ready.");
 
+    setIsMapLoaded(true);
 
-  // ==========================================================
-  // CONTROL STATES
-  // ==========================================================
+    if (onMapLoaded) {
+      onMapLoaded();
+    }
 
-  const isLocationDisabled =
-    !startDate || Boolean(depth);
-
-  const showSidePanel =
-    Boolean(
-      position &&
-      startDate &&
-      !position.isOnLand
-    );
+  }, [onMapLoaded]);
 
 
   // ==========================================================
-  // DATE LOGIC
-  // START DATE + 4 DAYS
+  // START DATE -> END DATE
   // ==========================================================
+  /*
+   * End date is automatically set to
+   * start date + 4 days.
+   */
 
   useEffect(() => {
 
     if (!startDate) {
+
       setEndDate("");
+
       return;
     }
 
-    const date = new Date(
-      `${startDate}T00:00:00`
-    );
+
+    const date =
+      new Date(`${startDate}T00:00:00`);
+
 
     if (Number.isNaN(date.getTime())) {
+
       setEndDate("");
+
       return;
     }
+
 
     date.setDate(
       date.getDate() + 4
     );
 
+
     setEndDate(
-      date
-        .toISOString()
-        .split("T")[0]
+      date.toISOString().split("T")[0]
     );
 
   }, [startDate]);
 
 
   // ==========================================================
-  // UPDATE COORDINATE INPUTS WHEN MARKER CHANGES
+  // SYNCHRONIZE COORDINATE INPUTS
   // ==========================================================
+  /*
+   * Whenever the marker position changes,
+   * update latitude and longitude fields.
+   */
 
   useEffect(() => {
 
@@ -158,9 +192,11 @@ export default function InteractiveMap() {
       return;
     }
 
+
     setLatitude(
       formatLatitude(position.lat)
     );
+
 
     setLongitude(
       formatLongitude(position.lng)
@@ -170,7 +206,19 @@ export default function InteractiveMap() {
 
 
   // ==========================================================
-  // OPEN SPATIAL DASHBOARD
+  // SEA NAME
+  // ==========================================================
+
+  const handleSeaNameResolved =
+    useCallback((name) => {
+
+      setCurrentSeaName(name);
+
+    }, []);
+
+
+  // ==========================================================
+  // OPEN VISUALIZATION DASHBOARD
   // ==========================================================
 
   const openDashboard = (focusType) => {
@@ -185,50 +233,29 @@ export default function InteractiveMap() {
 
 
   // ==========================================================
-  // BACK TO INTERACTIVE MAP
+  // BACK TO MAP
   // ==========================================================
 
   const handleBackToMap = () => {
-
-    /*
-     * Return completely to the original map state.
-     */
 
     setShowVisualization(false);
 
     setActiveLayerMode(false);
 
-    setInitialFocus(null);
-
-
     /*
-     * IMPORTANT:
-     *
-     * Depth must become empty again.
+     * Reset depth so the user returns to
+     * the depth-selection stage.
      */
 
     setDepth("");
 
-
-    /*
-     * Clear selected location.
-     */
-
-    setPosition(null);
-
-    setTargetPosition(null);
-
-    setLatitude("");
-
-    setLongitude("");
-
-    setCurrentSeaName("");
+    setInitialFocus(null);
 
   };
 
 
   // ==========================================================
-  // CLOSE SIDE PANEL
+  // CLOSE DATA SIDE PANEL
   // ==========================================================
 
   const handleClosePanel = () => {
@@ -250,16 +277,14 @@ export default function InteractiveMap() {
   // GO BUTTON
   // ==========================================================
 
-  const handleGo = () => {
+  const handleGo = async () => {
 
     /*
      * --------------------------------------------------------
-     * CASE 1:
-     *
-     * Depth is selected but no coordinates are entered.
-     *
-     * Open the three-map selection buttons.
+     * DEPTH SELECTED BUT NO COORDINATES
      * --------------------------------------------------------
+     *
+     * Activate the three visualization buttons.
      */
 
     if (
@@ -272,17 +297,15 @@ export default function InteractiveMap() {
 
       setPosition(null);
 
+      setTargetPosition(null);
+
       return;
     }
 
 
-    /*
-     * --------------------------------------------------------
-     * CASE 2:
-     *
-     * Coordinates are provided.
-     * --------------------------------------------------------
-     */
+    // --------------------------------------------------------
+    // PARSE LATITUDE
+    // --------------------------------------------------------
 
     const lat =
       parseCoordinate(
@@ -290,12 +313,21 @@ export default function InteractiveMap() {
         "latitude"
       );
 
+
+    // --------------------------------------------------------
+    // PARSE LONGITUDE
+    // --------------------------------------------------------
+
     const lng =
       parseCoordinate(
         longitude,
         "longitude"
       );
 
+
+    // --------------------------------------------------------
+    // VALIDATION
+    // --------------------------------------------------------
 
     if (
       lat === null ||
@@ -310,101 +342,103 @@ export default function InteractiveMap() {
     }
 
 
-    /*
-     * --------------------------------------------------------
-     * LAND DETECTION + OCEAN REDIRECTION
-     * --------------------------------------------------------
-     */
+    // --------------------------------------------------------
+    // SNAP LAND COORDINATES TO NEAREST OCEAN
+    // --------------------------------------------------------
 
-    const snapped =
-      snapToNearestOcean(
-        lat,
-        lng
-      );
+    try {
+
+      const snapped =
+        await snapToNearestOcean(
+          lat,
+          lng
+        );
 
 
-    /*
-     * If the algorithm could not find a valid ocean
-     * location, don't create a fake location.
-     */
+      /*
+       * If the user entered land,
+       * inform them about the redirection.
+       */
 
-    if (snapped.failed) {
+      if (snapped.redirected) {
 
-      alert(
-        "The entered location appears to be on land, but a nearby ocean location could not be found. Please enter a nearby sea coordinate."
-      );
+        alert(
+          "You entered land coordinates. Redirecting location to the nearest sea coordinates."
+        );
 
-      return;
+      }
+
+
+      const newPos = {
+
+        lat: snapped.lat,
+
+        lng: snapped.lng,
+
+        isOnLand: false,
+
+      };
+
+
+      setPosition(newPos);
+
+      setTargetPosition(newPos);
+
     }
 
+    catch (error) {
 
-    /*
-     * If the entered coordinate was land and was
-     * successfully redirected.
-     */
+      console.error(
+        "Ocean redirection failed:",
+        error
+      );
 
-    if (snapped.redirected) {
+
+      /*
+       * Never allow the ocean-search failure
+       * to crash the application.
+       */
 
       alert(
-        "You entered land coordinates. Redirecting location to the nearest safe ocean coordinates."
+        "Unable to find a nearby ocean location. Please try another coordinate."
       );
 
     }
 
-
-    /*
-     * Create the final position.
-     */
-
-    const newPosition = {
-
-      lat: snapped.lat,
-
-      lng: snapped.lng,
-
-      isOnLand: false,
-
-    };
-
-
-    setPosition(newPosition);
-
-    setTargetPosition(newPosition);
-
   };
 
 
   // ==========================================================
-  // MAP READY
+  // CONTROL STATES
   // ==========================================================
 
-  const handleMapReady = () => {
+  /*
+   * Location inputs remain disabled until
+   * a start date is selected.
+   *
+   * Once depth is selected, they become disabled
+   * according to your existing workflow.
+   */
 
-    /*
-     * This only tells the intro that Leaflet has initialized.
-     *
-     * IntroAnimation will decide when to actually disappear.
-     */
-
-    setMapReady(true);
-
-  };
+  const isLocationDisabled =
+    !startDate ||
+    Boolean(depth);
 
 
-  // ==========================================================
-  // INTRO FINISHED
-  // ==========================================================
+  /*
+   * Show the data panel only when:
+   *
+   * 1. A position exists
+   * 2. A start date exists
+   * 3. Position is not land
+   */
 
-  const handleIntroFinish = () => {
-
-    /*
-     * This is intentionally called only once by
-     * IntroAnimation.
-     */
-
-    setShowIntro(false);
-
-  };
+  const showSidePanel =
+    Boolean(
+      position &&
+      startDate &&
+      !position.isOnLand
+    );
 
 
   // ==========================================================
@@ -415,102 +449,128 @@ export default function InteractiveMap() {
 
     <div className="ocean-page">
 
-      {/* =====================================================
-          PARTICLE BACKGROUND
-          ===================================================== */}
 
-      <ParticlesBackground />
+      {/* ====================================================
+          REACT INTRO ANIMATION
+          ==================================================== */}
 
-
-      {/* =====================================================
-          INTRO ANIMATION
-          =====================================================
-
-          IMPORTANT:
-          The intro is rendered directly inside InteractiveMap.
-
-          It is NOT rendered from App.jsx.
-
-          It appears immediately when this component mounts.
-          ===================================================== */}
-
-      {showIntro && (
-
-        <IntroAnimation
-          isLoaded={mapReady}
-          onFinish={handleIntroFinish}
-        />
-
-      )}
+      <IntroAnimation
+        isLoaded={isMapLoaded}
+        onFinish={() => {}}
+      />
 
 
-      {/* =====================================================
-          MAIN TITLE
-          ===================================================== */}
+      {/* ====================================================
+          PAGE TITLE
+          ==================================================== */}
 
       <h2 className="ocean-title">
 
-        Spatiotemporal Ocean
-        Temperature Profiling
+        Spatiotemporal Ocean Temperature Profiling
 
       </h2>
 
 
+      {/* ====================================================
+          PAGE SUBTITLE
+          ==================================================== */}
+
       <div className="ocean-subtitle">
 
-        Interactive marine temperature
-        intelligence • Spatial mapping •
-        Depth-wise profiling
+        Interactive marine temperature intelligence •
+        Spatial mapping • Depth-wise profiling
 
       </div>
 
 
-      {/* =====================================================
-          MAP / SPATIAL VISUALIZATION
-          ===================================================== */}
+      {/* ====================================================
+          MAP / VISUALIZATION SWITCH
+          ==================================================== */}
 
       {!showVisualization ? (
 
         <div className="ocean-map-wrapper">
 
+
+          {/* ==================================================
+              LEAFLET MAP
+              ================================================== */}
+
           <MapContainer
 
             className="ocean-map"
+
+
+            /*
+             * Default view:
+             * Arabian Sea + Bay of Bengal
+             */
 
             bounds={[
               [6, 56],
               [27, 98],
             ]}
 
+
             minZoom={3}
 
             maxZoom={12}
 
+
             attributionControl={false}
 
+
             worldCopyJump={true}
+
 
             maxBounds={[
               [-90, -Infinity],
               [90, Infinity],
             ]}
 
+
             maxBoundsViscosity={1.0}
+
+
+            /*
+             * ------------------------------------------------
+             * ACTUAL LEAFLET READY EVENT
+             * ------------------------------------------------
+             *
+             * This replaces the old setTimeout().
+             */
 
             whenReady={handleMapReady}
 
           >
+
+
+            {/* =================================================
+                BASE MAP
+                ================================================= */}
 
             <TileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
 
 
+            {/* =================================================
+                MAP TOUCH CONTROLLER
+                ================================================= */}
+
             <MapTouchController />
 
 
+            {/* =================================================
+                LATITUDE / LONGITUDE GRID
+                ================================================= */}
+
             <DynamicGrid />
 
+
+            {/* =================================================
+                LOCATION MARKER
+                ================================================= */}
 
             <LocationMarker
 
@@ -518,12 +578,16 @@ export default function InteractiveMap() {
 
               setPosition={setPosition}
 
-              onSeaNameResolved={(name) =>
-                setCurrentSeaName(name)
+              onSeaNameResolved={
+                handleSeaNameResolved
               }
 
             />
 
+
+            {/* =================================================
+                MAP CONTROLLER
+                ================================================= */}
 
             <MapController
               targetPosition={targetPosition}
@@ -533,13 +597,18 @@ export default function InteractiveMap() {
           </MapContainer>
 
 
-          {/* =================================================
-              LAYER CONTROLS
-              ================================================= */}
+          {/* ==================================================
+              VISUALIZATION LAYER CONTROLS
+              ================================================== */}
 
           {activeLayerMode ? (
 
             <div className="map-layer-controls">
+
+
+              {/* =================================================
+                  LAYER BUTTONS
+                  ================================================= */}
 
               <div className="layer-buttons">
 
@@ -565,7 +634,7 @@ export default function InteractiveMap() {
                 </button>
 
 
-                {/* PREDICTION */}
+                {/* CONVFORMER */}
 
                 <button
 
@@ -575,7 +644,9 @@ export default function InteractiveMap() {
 
                     e.stopPropagation();
 
-                    openDashboard("convformer");
+                    openDashboard(
+                      "convformer"
+                    );
 
                   }}
 
@@ -610,7 +681,9 @@ export default function InteractiveMap() {
               </div>
 
 
-              {/* CANCEL */}
+              {/* =================================================
+                  CANCEL BUTTON
+                  ================================================= */}
 
               <button
 
@@ -635,29 +708,43 @@ export default function InteractiveMap() {
 
           ) : (
 
+
+            /* =================================================
+               NORMAL CONTROL BAR
+               ================================================= */
+
             <ControlBar
 
               startDate={startDate}
 
               setStartDate={setStartDate}
 
+
               endDate={endDate}
+
 
               depth={depth}
 
               setDepth={setDepth}
 
+
               latitude={latitude}
+
               setLatitude={setLatitude}
 
+
               longitude={longitude}
+
               setLongitude={setLongitude}
 
+
               handleGo={handleGo}
+
 
               isLocationDisabled={
                 isLocationDisabled
               }
+
 
               showSidePanel={
                 showSidePanel
@@ -668,9 +755,9 @@ export default function InteractiveMap() {
           )}
 
 
-          {/* =================================================
+          {/* ==================================================
               DATA SIDE PANEL
-              ================================================= */}
+              ================================================== */}
 
           {showSidePanel && (
 
@@ -688,13 +775,15 @@ export default function InteractiveMap() {
 
           )}
 
+
         </div>
 
       ) : (
 
-        /* ===================================================
-           SPATIAL DISTRIBUTION
-           =================================================== */
+
+        /* ====================================================
+           SPATIAL DISTRIBUTION DASHBOARD
+           ==================================================== */
 
         <SpatialDistribution
 
@@ -713,3 +802,4 @@ export default function InteractiveMap() {
   );
 
 }
+

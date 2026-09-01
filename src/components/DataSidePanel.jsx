@@ -4,7 +4,6 @@ import React, {
 } from "react";
 
 import TemperatureProfile from "./TemperatureProfile";
-
 import {
   getLocationMetrics,
 } from "../data/dummyOceanData";
@@ -15,20 +14,8 @@ export default function DataSidePanel({
   seaName,
   onClose,
 }) {
-  const [
-    isExpanded,
-    setIsExpanded,
-  ] = useState(false);
-
-  /*
-  ============================================================
-  LOCATION METRICS
-  ============================================================
-
-  Depend on actual coordinates rather than the entire
-  position object.
-  ============================================================
-  */
+  const [isExpanded, setIsExpanded] =
+    useState(false);
 
   const metrics = useMemo(() => {
     if (!position) {
@@ -44,20 +31,22 @@ export default function DataSidePanel({
     position?.lng,
   ]);
 
-  if (
-    !position ||
-    !metrics
-  ) {
+  if (!position || !metrics) {
     return null;
   }
 
-  const toggleExpand =
-    () => {
-      setIsExpanded(
-        (previous) =>
-          !previous
-      );
-    };
+  const toggleExpand = () => {
+    setIsExpanded(
+      (previous) => !previous
+    );
+  };
+
+  const displaySeaName =
+    seaName || "Loading sea name...";
+
+  const isLoading =
+    displaySeaName ===
+    "Loading sea name...";
 
   return (
     <div
@@ -67,26 +56,14 @@ export default function DataSidePanel({
           : ""
       }`}
     >
-
-      {/* =====================================================
-          HEADER
-          ===================================================== */}
-
       <div className="panel-header">
-
-        <h4>
-          Location Data
-        </h4>
+        <h4>Location Data</h4>
 
         <div className="panel-actions">
 
           <button
-            onClick={
-              toggleExpand
-            }
-
+            onClick={toggleExpand}
             className="action-btn expand-btn"
-
             title={
               isExpanded
                 ? "Collapse"
@@ -99,12 +76,8 @@ export default function DataSidePanel({
           </button>
 
           <button
-            onClick={
-              onClose
-            }
-
+            onClick={onClose}
             className="action-btn close-btn"
-
             title="Close"
           >
             ×
@@ -113,46 +86,26 @@ export default function DataSidePanel({
         </div>
       </div>
 
-      {/* =====================================================
-          CONTENT
-          ===================================================== */}
-
       <div className="panel-content">
 
         {/* WATER BODY */}
-
         <div
           style={{
-            marginBottom:
-              "12px",
-
-            padding:
-              "8px 10px",
-
+            marginBottom: "12px",
+            padding: "8px 10px",
             background:
               "rgba(14, 165, 233, 0.08)",
-
-            borderRadius:
-              "6px",
-
+            borderRadius: "6px",
             borderLeft:
               "3px solid #0ea5e9",
           }}
         >
           <span
             style={{
-              fontSize:
-                "10px",
-
-              color:
-                "#64748b",
-
-              display:
-                "block",
-
-              fontWeight:
-                "bold",
-
+              fontSize: "10px",
+              color: "#64748b",
+              display: "block",
+              fontWeight: "bold",
               textTransform:
                 "uppercase",
             }}
@@ -162,57 +115,37 @@ export default function DataSidePanel({
 
           <strong
             style={{
-              color:
-                "#0369a1",
-
-              fontSize:
-                "13px",
-
+              color: isLoading
+                ? "#64748b"
+                : "#0369a1",
+              fontSize: "13px",
               letterSpacing:
                 "0.3px",
             }}
           >
-            {seaName ||
-              "Open Ocean"}
+            {displaySeaName}
           </strong>
         </div>
 
         {/* COORDINATES */}
-
         <p>
-          <strong>
-            Lat:
-          </strong>{" "}
-          {position.lat.toFixed(
-            6
-          )}
-          °
+          <strong>Lat:</strong>{" "}
+          {position.lat.toFixed(6)}°
         </p>
 
         <p>
-          <strong>
-            Lng:
-          </strong>{" "}
-          {position.lng.toFixed(
-            6
-          )}
-          °
+          <strong>Lng:</strong>{" "}
+          {position.lng.toFixed(6)}°
         </p>
 
         {depth && (
           <p>
-            <strong>
-              Depth:
-            </strong>{" "}
+            <strong>Depth:</strong>{" "}
             {depth} m
           </p>
         )}
 
         <hr />
-
-        {/* =================================================
-            SURFACE PARAMETERS
-            ================================================= */}
 
         <h5>
           Surface Parameters
@@ -220,47 +153,28 @@ export default function DataSidePanel({
 
         <div
           style={{
-            display:
-              "grid",
-
+            display: "grid",
             gridTemplateColumns:
               "1fr 1fr",
-
-            gap:
-              "10px",
-
-            marginBottom:
-              "20px",
+            gap: "10px",
+            marginBottom: "20px",
           }}
         >
-
-          {/* SST */}
 
           <div
             style={{
               background:
                 "rgba(14, 165, 233, 0.1)",
-
-              padding:
-                "10px",
-
-              borderRadius:
-                "8px",
+              padding: "10px",
+              borderRadius: "8px",
             }}
           >
             <span
               style={{
-                fontSize:
-                  "11px",
-
-                color:
-                  "#64748b",
-
-                display:
-                  "block",
-
-                fontWeight:
-                  "bold",
+                fontSize: "11px",
+                color: "#64748b",
+                display: "block",
+                fontWeight: "bold",
               }}
             >
               SST (Temp)
@@ -268,49 +182,28 @@ export default function DataSidePanel({
 
             <strong
               style={{
-                color:
-                  "#0f172a",
-
-                fontSize:
-                  "15px",
+                color: "#0f172a",
+                fontSize: "15px",
               }}
             >
-              {
-                metrics
-                  .surfaceData
-                  .sst
-              }{" "}
-              °C
+              {metrics.surfaceData.sst} °C
             </strong>
           </div>
-
-          {/* SSS */}
 
           <div
             style={{
               background:
                 "rgba(14, 165, 233, 0.1)",
-
-              padding:
-                "10px",
-
-              borderRadius:
-                "8px",
+              padding: "10px",
+              borderRadius: "8px",
             }}
           >
             <span
               style={{
-                fontSize:
-                  "11px",
-
-                color:
-                  "#64748b",
-
-                display:
-                  "block",
-
-                fontWeight:
-                  "bold",
+                fontSize: "11px",
+                color: "#64748b",
+                display: "block",
+                fontWeight: "bold",
               }}
             >
               SSS (Salinity)
@@ -318,49 +211,28 @@ export default function DataSidePanel({
 
             <strong
               style={{
-                color:
-                  "#0f172a",
-
-                fontSize:
-                  "15px",
+                color: "#0f172a",
+                fontSize: "15px",
               }}
             >
-              {
-                metrics
-                  .surfaceData
-                  .sss
-              }{" "}
-              PSU
+              {metrics.surfaceData.sss} PSU
             </strong>
           </div>
-
-          {/* SSH */}
 
           <div
             style={{
               background:
                 "rgba(14, 165, 233, 0.1)",
-
-              padding:
-                "10px",
-
-              borderRadius:
-                "8px",
+              padding: "10px",
+              borderRadius: "8px",
             }}
           >
             <span
               style={{
-                fontSize:
-                  "11px",
-
-                color:
-                  "#64748b",
-
-                display:
-                  "block",
-
-                fontWeight:
-                  "bold",
+                fontSize: "11px",
+                color: "#64748b",
+                display: "block",
+                fontWeight: "bold",
               }}
             >
               SSH (Height)
@@ -368,49 +240,28 @@ export default function DataSidePanel({
 
             <strong
               style={{
-                color:
-                  "#0f172a",
-
-                fontSize:
-                  "15px",
+                color: "#0f172a",
+                fontSize: "15px",
               }}
             >
-              {
-                metrics
-                  .surfaceData
-                  .ssh
-              }{" "}
-              m
+              {metrics.surfaceData.ssh} m
             </strong>
           </div>
-
-          {/* SLA */}
 
           <div
             style={{
               background:
                 "rgba(14, 165, 233, 0.1)",
-
-              padding:
-                "10px",
-
-              borderRadius:
-                "8px",
+              padding: "10px",
+              borderRadius: "8px",
             }}
           >
             <span
               style={{
-                fontSize:
-                  "11px",
-
-                color:
-                  "#64748b",
-
-                display:
-                  "block",
-
-                fontWeight:
-                  "bold",
+                fontSize: "11px",
+                color: "#64748b",
+                display: "block",
+                fontWeight: "bold",
               }}
             >
               SLA (Anomaly)
@@ -418,19 +269,11 @@ export default function DataSidePanel({
 
             <strong
               style={{
-                color:
-                  "#0f172a",
-
-                fontSize:
-                  "15px",
+                color: "#0f172a",
+                fontSize: "15px",
               }}
             >
-              {
-                metrics
-                  .surfaceData
-                  .sla
-              }{" "}
-              m
+              {metrics.surfaceData.sla} m
             </strong>
           </div>
 
@@ -438,30 +281,21 @@ export default function DataSidePanel({
 
         <hr />
 
-        {/* =================================================
-            TEMPERATURE PROFILE
-            ================================================= */}
-
         <h5>
           Vertical Temperature Profile
         </h5>
 
         <div
           style={{
-            height:
-              isExpanded
-                ? "400px"
-                : "220px",
-
+            height: isExpanded
+              ? "400px"
+              : "220px",
             transition:
               "height 0.3s",
           }}
         >
           <TemperatureProfile
-            selectedDepth={
-              depth
-            }
-
+            selectedDepth={depth}
             profileData={
               metrics.profileData
             }

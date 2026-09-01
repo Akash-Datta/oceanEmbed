@@ -167,24 +167,50 @@ function normalizeLongitude(lng) {
 }
 
 // ============================================================
-// LAND DETECTION
+// LAND MASK HELPERS
 // ============================================================
 
-/*
- * IMPORTANT:
- *
- * The previous implementation used:
- *
- * turf.pointsWithinPolygon(point, landGeoJSON)
- *
- * That function is for finding POINT FEATURES inside polygons.
- *
- * Here we already have one point and want to ask:
- *
- * "Is this point inside the land polygon?"
- *
- * Therefore booleanPointInPolygon() is the correct Turf function.
- */
+function getLandFeatures() {
+  if (!landGeoJSON) {
+    return [];
+  }
+
+  if (landGeoJSON.type === "FeatureCollection") {
+    return (landGeoJSON.features || []).filter(
+      (feature) =>
+        feature &&
+        feature.geometry &&
+        (
+          feature.geometry.type === "Polygon" ||
+          feature.geometry.type === "MultiPolygon"
+        )
+    );
+  }
+
+  if (
+    landGeoJSON.type === "Feature" &&
+    landGeoJSON.geometry
+  ) {
+    return [landGeoJSON];
+  }
+
+  if (
+    landGeoJSON.type === "Polygon" ||
+    landGeoJSON.type === "MultiPolygon"
+  ) {
+    return [
+      turf.feature(landGeoJSON),
+    ];
+  }
+
+  return [];
+}
+
+const landFeatures = getLandFeatures();
+
+// ============================================================
+// LAND DETECTION
+// ============================================================
 
 export function checkIfLand(lat, lng) {
   const latitude = Number(lat);
@@ -199,47 +225,32 @@ export function checkIfLand(lat, lng) {
     return false;
   }
 
+  if (!landFeatures.length) {
+    console.error("High-resolution land mask is unavailable.");
+    return false;
+  }
+
+  const point = turf.point([
+    longitude,
+    latitude,
+  ]);
+
   try {
-    const point = turf.point([longitude, latitude]);
-
-    /*
-     * landGeoJSON can be either:
-     * - Feature
-     * - FeatureCollection
-     * - Polygon
-     * - MultiPolygon
-     */
-
-    if (!landGeoJSON) {
-      console.warn("Land mask is unavailable.");
-      return false;
-    }
-
-    // FeatureCollection
-    if (landGeoJSON.type === "FeatureCollection") {
-      for (const feature of landGeoJSON.features || []) {
-        if (!feature || !feature.geometry) {
-          continue;
-        }
-
-        if (
-          turf.booleanPointInPolygon(
-            point,
-            feature
-          )
-        ) {
-          return true;
-        }
+    for (const feature of landFeatures) {
+      if (
+        turf.booleanPointInPolygon(
+          point,
+          feature,
+          {
+            ignoreBoundary: false,
+          }
+        )
+      ) {
+        return true;
       }
-
-      return false;
     }
 
-    // Single Feature / Polygon / MultiPolygon
-    return turf.booleanPointInPolygon(
-      point,
-      landGeoJSON
-    );
+    return false;
   } catch (error) {
     console.error(
       "Land detection failed:",
@@ -247,24 +258,124 @@ export function checkIfLand(lat, lng) {
     );
 
     /*
-     * If the geometry itself fails, do NOT falsely
-     * classify every coordinate as land.
+     * Never classify an invalid coordinate as
+     * ocean merely because the geometry failed.
      */
-    return false;
+    return true;
   }
 }
 
 // ============================================================
-// SNAP LAND LOCATION TO NEAREST OCEAN
+// SAFE OCEAN TEST
 // ============================================================
 
+function isSafeOceanPoint(
+  lat,
+  lng,
+  safetyRadiusKm = 35
+) {
+  /*
+   * First and most important test:
+   * candidate itself MUST be water.
+   */
+  if (checkIfLand(lat, lng)) {
+    return false;
+  }
+
+  /*
+   * Check a complete ring around the candidate.
+   *
+   * This prevents a marker from being placed:
+   * - on a coastline
+   * - on a peninsula
+   * - on an island
+   * - inside a tiny coastal water gap
+   * - visually almost on land
+   */
+
+  const directions = 16;
+
+  for (
+    let angle = 0;
+    angle < 360;
+    angle += 360 / directions
+  ) {
+    const destination = turf.destination(
+      turf.point([lng, lat]),
+      safetyRadiusKm,
+      angle,
+      {
+        units: "kilometers",
+      }
+    );
+
+    const [checkLng, checkLat] =
+      destination.geometry.coordinates;
+
+    if (
+      checkIfLand(
+        checkLat,
+        checkLng
+      )
+    ) {
+      return false;
+    }
+  }
+
+  /*
+   * Extra inner ring.
+   *
+   * This makes the test even stricter near complicated
+   * coastlines and islands.
+   */
+
+  const innerRadiusKm = 15;
+
+  for (
+    let angle = 0;
+    angle < 360;
+    angle += 45
+  ) {
+    const destination = turf.destination(
+      turf.point([lng, lat]),
+      innerRadiusKm,
+      angle,
+      {
+        units: "kilometers",
+      }
+    );
+
+    const [checkLng, checkLat] =
+      destination.geometry.coordinates;
+
+    if (
+      checkIfLand(
+        checkLat,
+        checkLng
+      )
+    ) {
+      return false;
+    }
+  }
+
+  /*
+   * Final direct verification.
+   */
+  if (checkIfLand(lat, lng)) {
+    return false;
+  }
+
+  return true;
+}
+
 // ============================================================
-// SNAP LAND LOCATION TO A SAFE OCEAN LOCATION
+// SNAP LAND LOCATION TO SAFE OCEAN
 // ============================================================
 
 export function snapToNearestOcean(lat, lng) {
   const originalLat = Number(lat);
-  const originalLng = normalizeLongitude(lng);
+  const originalLng =
+    normalizeLongitude(lng);
 
   if (
     !Number.isFinite(originalLat) ||
@@ -280,64 +391,92 @@ export function snapToNearestOcean(lat, lng) {
     };
   }
 
-  // ------------------------------------------------------------
-  // STEP 1: Check the exact entered coordinate
-  // ------------------------------------------------------------
+  // ==========================================================
+  // STEP 1
+  // Exact coordinate already in water
+  // ==========================================================
 
-  if (!checkIfLand(originalLat, originalLng)) {
+  if (
+    !checkIfLand(
+      originalLat,
+      originalLng
+    )
+  ) {
     return {
       lat: originalLat,
       lng: originalLng,
       redirected: false,
+      failed: false,
     };
   }
 
-  // ------------------------------------------------------------
-  // STEP 2: The coordinate is definitely on land.
-  //
-  // Search outward in progressively larger rings.
-  //
-  // We use 16 directions instead of only 4/8 so that coastlines
-  // and peninsulas are handled much more reliably.
-  // ------------------------------------------------------------
+  // ==========================================================
+  // STEP 2
+  // Search progressively farther from land
+  // ==========================================================
 
-  const directions = 16;
-  const angleStep = 360 / directions;
+  const directions = 24;
 
-  // Start close to the coastline.
-  const startRadius = 0.1;
+  /*
+   * Search distances in kilometres.
+   *
+   * This is deliberately larger than before.
+   * We care more about NEVER returning a land point
+   * than returning the mathematically closest point.
+   */
 
-  // 0.1° ≈ 11 km in latitude.
-  const radiusStep = 0.1;
+  const searchDistances = [
+    5,
+    10,
+    15,
+    20,
+    30,
+    40,
+    50,
+    65,
+    80,
+    100,
+    125,
+    150,
+    175,
+    200,
+    250,
+    300,
+    400,
+    500,
+    600,
+    750,
+    900,
+    1100,
+  ];
 
-  // Maximum search distance ≈ 330 km.
-  const maxRadius = 3.0;
-
-  // ------------------------------------------------------------
-  // IMPORTANT:
-  //
-  // We don't accept merely "water".
-  //
-  // A candidate must also have a water buffer around it.
-  // This prevents points sitting inside tiny coastal gaps,
-  // lagoons, islands, bays, etc.
-  // ------------------------------------------------------------
-
-  const oceanSafetyRadius = 0.25;
+  let bestCandidate = null;
 
   for (
-    let radius = startRadius;
-    radius <= maxRadius;
-    radius += radiusStep
+    const distance of searchDistances
   ) {
-    for (let angle = 0; angle < 360; angle += angleStep) {
-      const radians = (angle * Math.PI) / 180;
+    for (
+      let angle = 0;
+      angle < 360;
+      angle += 360 / directions
+    ) {
+      const destination =
+        turf.destination(
+          turf.point([
+            originalLng,
+            originalLat,
+          ]),
+          distance,
+          angle,
+          {
+            units: "kilometers",
+          }
+        );
 
-      const candidateLat =
-        originalLat + radius * Math.cos(radians);
-
-      const candidateLng =
-        originalLng + radius * Math.sin(radians);
+      const [
+        candidateLng,
+        candidateLat,
+      ] = destination.geometry.coordinates;
 
       if (
         candidateLat < -90 ||
@@ -346,197 +485,98 @@ export function snapToNearestOcean(lat, lng) {
         continue;
       }
 
-      const normalizedCandidateLng =
-        normalizeLongitude(candidateLng);
+      const normalizedLng =
+        normalizeLongitude(
+          candidateLng
+        );
 
-      // --------------------------------------------------------
-      // Candidate itself MUST be water.
-      // --------------------------------------------------------
-
+      /*
+       * Candidate MUST be water.
+       */
       if (
         checkIfLand(
           candidateLat,
-          normalizedCandidateLng
+          normalizedLng
         )
       ) {
         continue;
       }
 
-      // --------------------------------------------------------
-      // STEP 3: Verify that the candidate has water around it.
-      //
-      // Check several points around the candidate.
-      // If any of them are land, this is too close to the coast.
-      // --------------------------------------------------------
-
-      let safeOceanPoint = true;
-
-      const safetyDirections = 8;
-      const safetyAngleStep = 360 / safetyDirections;
-
-      for (
-        let safetyAngle = 0;
-        safetyAngle < 360;
-        safetyAngle += safetyAngleStep
-      ) {
-        const safetyRadians =
-          (safetyAngle * Math.PI) / 180;
-
-        const checkLat =
-          candidateLat +
-          oceanSafetyRadius * Math.cos(safetyRadians);
-
-        const checkLng =
-          normalizedCandidateLng +
-          oceanSafetyRadius * Math.sin(safetyRadians);
-
-        if (
-          checkLat < -90 ||
-          checkLat > 90
-        ) {
-          safeOceanPoint = false;
-          break;
-        }
-
-        const normalizedCheckLng =
-          normalizeLongitude(checkLng);
-
-        if (
-          checkIfLand(
-            checkLat,
-            normalizedCheckLng
-          )
-        ) {
-          safeOceanPoint = false;
-          break;
-        }
-      }
-
-      // --------------------------------------------------------
-      // If the candidate has a proper water buffer, accept it.
-      // --------------------------------------------------------
-
-      if (safeOceanPoint) {
-        return {
-          lat: parseFloat(candidateLat.toFixed(6)),
-          lng: parseFloat(
-            normalizedCandidateLng.toFixed(6)
-          ),
-          redirected: true,
-          failed: false,
-        };
-      }
-    }
-  }
-
-  // ------------------------------------------------------------
-  // STEP 4: If no properly buffered ocean point was found,
-  // perform a SECOND, wider search.
-  //
-  // This handles large land masses where 3° wasn't enough.
-  // ------------------------------------------------------------
-
-  const widerStart = 3.5;
-  const widerEnd = 10.0;
-  const widerStep = 0.25;
-
-  for (
-    let radius = widerStart;
-    radius <= widerEnd;
-    radius += widerStep
-  ) {
-    for (let angle = 0; angle < 360; angle += angleStep) {
-      const radians = (angle * Math.PI) / 180;
-
-      const candidateLat =
-        originalLat + radius * Math.cos(radians);
-
-      const candidateLng =
-        originalLng + radius * Math.sin(radians);
-
+      /*
+       * Candidate MUST have enough water around it.
+       */
       if (
-        candidateLat < -90 ||
-        candidateLat > 90
-      ) {
-        continue;
-      }
-
-      const normalizedCandidateLng =
-        normalizeLongitude(candidateLng);
-
-      if (
-        checkIfLand(
+        !isSafeOceanPoint(
           candidateLat,
-          normalizedCandidateLng
+          normalizedLng,
+          35
         )
       ) {
         continue;
       }
 
-      // Wider search still requires a safety buffer,
-      // although slightly smaller to avoid excessive rejection.
-
-      const wideSafetyRadius = 0.15;
-
-      let safeOceanPoint = true;
-
-      for (
-        let safetyAngle = 0;
-        safetyAngle < 360;
-        safetyAngle += 45
+      /*
+       * Final verification immediately before
+       * accepting the candidate.
+       */
+      if (
+        checkIfLand(
+          candidateLat,
+          normalizedLng
+        )
       ) {
-        const safetyRadians =
-          (safetyAngle * Math.PI) / 180;
-
-        const checkLat =
-          candidateLat +
-          wideSafetyRadius *
-            Math.cos(safetyRadians);
-
-        const checkLng =
-          normalizedCandidateLng +
-          wideSafetyRadius *
-            Math.sin(safetyRadians);
-
-        if (
-          checkLat < -90 ||
-          checkLat > 90
-        ) {
-          safeOceanPoint = false;
-          break;
-        }
-
-        if (
-          checkIfLand(
-            checkLat,
-            normalizeLongitude(checkLng)
-          )
-        ) {
-          safeOceanPoint = false;
-          break;
-        }
+        continue;
       }
 
-      if (safeOceanPoint) {
-        return {
-          lat: parseFloat(candidateLat.toFixed(6)),
-          lng: parseFloat(
-            normalizedCandidateLng.toFixed(6)
-          ),
-          redirected: true,
-          failed: false,
-        };
-      }
+      bestCandidate = {
+        lat: Number(
+          candidateLat.toFixed(6)
+        ),
+        lng: Number(
+          normalizedLng.toFixed(6)
+        ),
+        redirected: true,
+        failed: false,
+      };
+
+      break;
+    }
+
+    if (bestCandidate) {
+      break;
     }
   }
 
-  // ------------------------------------------------------------
-  // STEP 5: No safe ocean location found.
-  //
-  // IMPORTANT:
-  // Do NOT return 0,0.
-  // Do NOT pretend the original land coordinate is ocean.
-  // ------------------------------------------------------------
+  // ==========================================================
+  // STEP 3
+  // Return ONLY a verified ocean coordinate
+  // ==========================================================
+
+  if (bestCandidate) {
+    /*
+     * One final land-mask verification.
+     */
+    if (
+      checkIfLand(
+        bestCandidate.lat,
+        bestCandidate.lng
+      )
+    ) {
+      return {
+        lat: originalLat,
+        lng: originalLng,
+        redirected: false,
+        failed: true,
+      };
+    }
+
+    return bestCandidate;
+  }
+
+  // ==========================================================
+  // STEP 4
+  // DO NOT FAKE AN OCEAN LOCATION
+  // ==========================================================
 
   return {
     lat: originalLat,
@@ -550,21 +590,13 @@ export function snapToNearestOcean(lat, lng) {
 // REGIONAL WATER BODY DETECTION
 // ============================================================
 
-/*
- * These are regional fallbacks.
- *
- * Marine Regions is still queried by LocationMarker,
- * but if its response does not contain a useful
- * named water body, these names prevent the UI
- * from unnecessarily showing "Open Ocean".
- */
-
 export function getRegionalWaterBodyName(
   lat,
   lng
 ) {
   const latitude = Number(lat);
-  const longitude = normalizeLongitude(lng);
+  const longitude =
+    normalizeLongitude(lng);
 
   /*
    * Arabian Sea

@@ -1,5 +1,5 @@
 // ============================================================
-// SECTION 1: ARABIAN SEA & BAY OF BENGAL
+// SECTION 1: ARABIAN SEA & BAY OF BENGAL (REGIONAL)
 // ============================================================
 
 export const regionalTemperatureData = [
@@ -8,73 +8,63 @@ export const regionalTemperatureData = [
     argo: 26.2,
     convformer: 27.5,
   },
-
   {
     depth: 50,
     argo: 26.8,
     convformer: 27.2,
   },
-
   {
     depth: 100,
     argo: 25.5,
     convformer: 26.8,
   },
-
   {
     depth: 200,
     argo: 15.0,
     convformer: 14.8,
   },
-
   {
     depth: 300,
     argo: 12.1,
     convformer: 11.5,
   },
-
   {
     depth: 400,
     argo: 11.0,
     convformer: 11.8,
   },
-
   {
     depth: 500,
     argo: 10.2,
     convformer: 10.8,
   },
-
   {
     depth: 600,
     argo: 9.5,
     convformer: 10.1,
   },
-
   {
     depth: 700,
     argo: 9.0,
     convformer: 9.5,
   },
-
   {
     depth: 800,
     argo: 8.7,
     convformer: 8.9,
   },
-
   {
     depth: 900,
     argo: 8.4,
     convformer: 8.5,
   },
-
   {
     depth: 1000,
     argo: 8.2,
     convformer: 8.1,
   },
 ];
+
 
 // ============================================================
 // SECTION 2: REST OF THE WORLD
@@ -86,25 +76,21 @@ const globalDummyData = [
     argo: 15.2,
     convformer: 15.0,
   },
-
   {
     depth: 200,
     argo: 13.5,
     convformer: 13.1,
   },
-
   {
     depth: 400,
     argo: 9.1,
     convformer: 9.4,
   },
-
   {
     depth: 600,
     argo: 7.6,
     convformer: 7.9,
   },
-
   {
     depth: 1000,
     argo: 4.2,
@@ -112,14 +98,16 @@ const globalDummyData = [
   },
 ];
 
+
 // ============================================================
-// DATA FOR LOCATION SIDE PANEL
+// DATA EXPORT HELPERS
 // ============================================================
 
 export const getLocationMetrics = (
   lat,
   lng
 ) => {
+
   const isRegional =
     lat >= 0 &&
     lat <= 30 &&
@@ -147,12 +135,14 @@ export const getLocationMetrics = (
   };
 };
 
+
 // ============================================================
-// FALLBACK EXPORT FOR GRAPH
+// FALLBACK EXPORT
 // ============================================================
 
 export const dummyTemperatureData =
   regionalTemperatureData;
+
 
 // ============================================================
 // SPATIAL MAPS
@@ -161,38 +151,42 @@ export const dummyTemperatureData =
 export const fetchSpatialMaps = async (
   depth
 ) => {
+
   /*
-   * Keep the small delay so your loading state
-   * can still be displayed.
+   * Simulate backend loading.
+   *
+   * Later, replace this function with your
+   * actual ConvFormer API call.
    */
 
   await new Promise((resolve) =>
     setTimeout(resolve, 600)
   );
 
+
   /*
-   * IMPORTANT FOR VITE:
+   * IMPORTANT:
    *
-   * Files inside:
+   * These files are assumed to be inside:
    *
    * public/
    *
-   * are referenced from the browser root.
+   * Therefore Vite serves them from the root.
    *
-   * Therefore:
-   *
-   * /argo.jpeg
-   * /pred.jpeg
-   * /error.jpeg
+   * Correct:
+   *     /argo.jpeg
+   *     /pred.jpeg
+   *     /error.jpeg
    *
    * NOT:
-   *
-   * ../public/argo.jpeg
+   *     ../public/argo.jpeg
    */
 
   return {
     argo: "/argo.jpeg",
+
     convformer: "/pred.jpeg",
+
     error: "/error.jpeg",
   };
 };

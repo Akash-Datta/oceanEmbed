@@ -1,25 +1,13 @@
-import React, {
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-
+import React, { useEffect, useRef, useState } from "react";
 import {
   Marker,
   Popup,
   useMap,
   useMapEvents,
 } from "react-leaflet";
-
 import L from "leaflet";
 
-import {
-  checkIfLand,
-} from "../utils/coordinateUtils";
-
-// ============================================================
-// POINTER ICON
-// ============================================================
+import { checkIfLand } from "../utils/coordinateUtils";
 
 const pointerIcon = L.divIcon({
   className: "custom-pointer",
@@ -30,9 +18,7 @@ const pointerIcon = L.divIcon({
         font-size: 34px;
         line-height: 34px;
         transform: translate(-50%, -100%);
-        filter: drop-shadow(
-          0px 3px 3px rgba(0,0,0,0.35)
-        );
+        filter: drop-shadow(0px 3px 3px rgba(0,0,0,0.35));
         cursor: pointer;
         user-select: none;
         -webkit-tap-highlight-color: transparent;
@@ -43,247 +29,51 @@ const pointerIcon = L.divIcon({
   `,
 
   iconSize: [34, 34],
-
   iconAnchor: [17, 34],
-
   popupAnchor: [0, -34],
 });
-
-// ============================================================
-// SEA NAME CACHE
-// ============================================================
-
-const seaNameCache = new Map();
-
-// ============================================================
-// CANONICAL WATER-BODY NAME
-// ============================================================
-
-function getCanonicalSeaName(name) {
-
-  if (!name) {
-    return null;
-  }
-
-  const upperName =
-    name.toUpperCase();
-
-  /*
-   * Marine Regions sometimes returns names such as:
-   *
-   * "Indian part of the Bay of Bengal"
-   *
-   * We only want:
-   *
-   * "Bay of Bengal"
-   */
-
-  const knownBodies = [
-    "BAY OF BENGAL",
-    "ARABIAN SEA",
-    "ANDAMAN SEA",
-    "LACCADIVE SEA",
-    "LAKSHADWEEP SEA",
-    "INDIAN OCEAN",
-    "RED SEA",
-    "GULF OF ADEN",
-    "GULF OF MANNAR",
-    "PALK STRAIT",
-    "STRAIT OF MALACCA",
-    "SOUTH CHINA SEA",
-    "EAST CHINA SEA",
-    "WEST PHILIPPINE SEA",
-    "PACIFIC OCEAN",
-    "ATLANTIC OCEAN",
-    "ARCTIC OCEAN",
-    "SOUTHERN OCEAN",
-  ];
-
-  for (
-    const body of knownBodies
-  ) {
-
-    if (
-      upperName.includes(body)
-    ) {
-      return body
-        .split(" ")
-        .map(
-          word =>
-            word.charAt(0) +
-            word.slice(1).toLowerCase()
-        )
-        .join(" ");
-    }
-  }
-
-  /*
-   * If Marine Regions gives us a normal
-   * sea/bay/gulf/ocean name, use it.
-   */
-
-  return name;
-}
-
-// ============================================================
-// FETCH SEA NAME
-// ============================================================
-
-async function resolveSeaName(
-  lat,
-  lng,
-  signal
-) {
-
-  const cacheKey =
-    `${lat.toFixed(5)},${lng.toFixed(5)}`;
-
-  // ----------------------------------------------------------
-  // CACHE
-  // ----------------------------------------------------------
-
-  if (
-    seaNameCache.has(cacheKey)
-  ) {
-    return seaNameCache.get(
-      cacheKey
-    );
-  }
-
-  try {
-
-    const response =
-      await fetch(
-        `https://marineregions.org/rest/getGazetteerRecordsByLatLong.json/${lat}/${lng}/`,
-        {
-          signal,
-        }
-      );
-
-    if (!response.ok) {
-      throw new Error(
-        `HTTP ${response.status}`
-      );
-    }
-
-    const data =
-      await response.json();
-
-    let resolvedName = null;
-
-    if (
-      Array.isArray(data) &&
-      data.length > 0
-    ) {
-
-      /*
-       * First try to find an actual
-       * marine body.
-       */
-
-      const waterBody =
-        data.find(item => {
-
-          const name =
-            (
-              item?.preferredGazetteerName ||
-              ""
-            ).toUpperCase();
-
-          return (
-            name.includes("SEA") ||
-            name.includes("BAY") ||
-            name.includes("GULF") ||
-            name.includes("OCEAN") ||
-            name.includes("STRAIT") ||
-            name.includes("CHANNEL")
-          );
-        });
-
-      if (waterBody) {
-
-        resolvedName =
-          getCanonicalSeaName(
-            waterBody.preferredGazetteerName
-          );
-      }
-    }
-
-    /*
-     * Do NOT display "Open Ocean" as if it were
-     * an identified sea.
-     *
-     * It is only a fallback.
-     */
-
-    if (!resolvedName) {
-      resolvedName = "Unknown Water Body";
-    }
-
-    seaNameCache.set(
-      cacheKey,
-      resolvedName
-    );
-
-    return resolvedName;
-
-  } catch (error) {
-
-    /*
-     * AbortError is normal when the user
-     * immediately clicks another location.
-     */
-
-    if (
-      error?.name === "AbortError"
-    ) {
-      return null;
-    }
-
-    console.warn(
-      "Sea name lookup failed:",
-      error
-    );
-
-    return "Unknown Water Body";
-  }
-}
-
-// ============================================================
-// LOCATION MARKER
-// ============================================================
 
 export default function LocationMarker({
   position,
   setPosition,
   onSeaNameResolved,
 }) {
+  const markerRef = useRef(null);
 
-  const markerRef =
-    useRef(null);
+  const [seaName, setSeaName] = useState("");
 
-  const [seaName, setSeaName] =
-    useState("");
-
-  // ----------------------------------------------------------
-  // MAP CLICK
-  // ----------------------------------------------------------
+  /*
+   * Prevent an old API request from updating the current marker.
+   */
+  const requestIdRef = useRef(0);
 
   useMapEvents({
-
     click(event) {
+      const lat = event.latlng.lat;
+      const lng = event.latlng.lng;
 
-      const lat =
-        event.latlng.lat;
+      let isLand = false;
 
-      const lng =
-        event.latlng.lng;
+      try {
+        isLand = checkIfLand(lat, lng);
+      } catch (error) {
+        console.error("Land detection failed:", error);
 
-      const isLand =
-        checkIfLand(
-          lat,
-          lng
-        );
+        /*
+         * If the huge GeoJSON somehow fails, don't crash the app.
+         * Treat it as water and allow the marker to work.
+         */
+        isLand = false;
+      }
+
+      /*
+       * Reset the sea-name state immediately.
+       */
+      setSeaName(
+        isLand
+          ? "Terrestrial Region"
+          : "Loading sea name..."
+      );
 
       setPosition({
         lat,
@@ -291,134 +81,159 @@ export default function LocationMarker({
         isOnLand: isLand,
       });
     },
-
   });
 
-  // ----------------------------------------------------------
-  // RESOLVE SEA NAME
-  // ----------------------------------------------------------
-
   useEffect(() => {
-
     if (!position) {
+      setSeaName("");
       return;
     }
 
     /*
-     * Land locations don't need a
-     * Marine Regions request.
+     * Every new position gets a new request ID.
+     * This prevents an old request from overwriting a newer click.
      */
+    const currentRequestId = ++requestIdRef.current;
 
+    /*
+     * LAND:
+     * No API call is necessary.
+     */
     if (position.isOnLand) {
+      const landName = "Terrestrial Region";
 
-      const landName =
-        "Terrestrial Region";
+      setSeaName(landName);
 
-      setSeaName(
-        landName
-      );
-
-      if (
-        onSeaNameResolved
-      ) {
-        onSeaNameResolved(
-          landName
-        );
+      if (onSeaNameResolved) {
+        onSeaNameResolved(landName);
       }
 
       return;
     }
 
     /*
-     * Abort previous request if the user
-     * clicks another location quickly.
+     * WATER:
+     * Immediately show a loading message.
      */
+    const loadingText = "Loading sea name...";
 
-    const controller =
-      new AbortController();
+    setSeaName(loadingText);
 
-    /*
-     * Clear only the old name.
-     *
-     * We intentionally DO NOT display
-     * "Identifying water body..."
-     */
-
-    setSeaName("");
-
-    resolveSeaName(
-      position.lat,
-      position.lng,
-      controller.signal
-    ).then(name => {
-
-      if (!name) {
-        return;
-      }
-
-      setSeaName(name);
-
-      if (
-        onSeaNameResolved
-      ) {
-        onSeaNameResolved(
-          name
-        );
-      }
-
-    });
-
-    return () => {
-      controller.abort();
-    };
-
-  }, [
-    position?.lat,
-    position?.lng,
-    position?.isOnLand,
-    onSeaNameResolved,
-  ]);
-
-  // ----------------------------------------------------------
-  // AUTO OPEN POPUP
-  // ----------------------------------------------------------
-
-  useEffect(() => {
-
-    if (!position) {
-      return;
+    if (onSeaNameResolved) {
+      onSeaNameResolved(loadingText);
     }
 
-    const timer =
-      setTimeout(() => {
+    const controller = new AbortController();
 
-        if (
-          markerRef.current
-        ) {
-          markerRef.current.openPopup();
+    const fetchSeaName = async () => {
+      try {
+        const response = await fetch(
+          `https://marineregions.org/rest/getGazetteerRecordsByLatLong.json/${position.lat}/${position.lng}/`,
+          {
+            signal: controller.signal,
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(
+            `Marine Regions API returned ${response.status}`
+          );
         }
 
-      }, 50);
+        const data = await response.json();
 
-    return () =>
+        /*
+         * If the user clicked somewhere else while the request
+         * was running, ignore this response.
+         */
+        if (currentRequestId !== requestIdRef.current) {
+          return;
+        }
+
+        let resolvedName = "Open Ocean";
+
+        if (Array.isArray(data) && data.length > 0) {
+          const waterBody = data.find((item) => {
+            const name = (
+              item?.preferredGazetteerName || ""
+            ).toUpperCase();
+
+            return (
+              name.includes("SEA") ||
+              name.includes("BAY") ||
+              name.includes("GULF") ||
+              name.includes("OCEAN") ||
+              name.includes("STRAIT") ||
+              name.includes("CHANNEL")
+            );
+          });
+
+          if (waterBody?.preferredGazetteerName) {
+            resolvedName =
+              waterBody.preferredGazetteerName;
+          }
+        }
+
+        setSeaName(resolvedName);
+
+        if (onSeaNameResolved) {
+          onSeaNameResolved(resolvedName);
+        }
+      } catch (error) {
+        /*
+         * Abort errors are expected when the user clicks another
+         * location. Don't display them as failures.
+         */
+        if (error.name === "AbortError") {
+          return;
+        }
+
+        console.warn(
+          "Sea name lookup failed:",
+          error
+        );
+
+        if (currentRequestId !== requestIdRef.current) {
+          return;
+        }
+
+        /*
+         * API failure should NOT leave the UI permanently
+         * stuck on "Loading sea name..."
+         */
+        const fallbackName = "Open Ocean";
+
+        setSeaName(fallbackName);
+
+        if (onSeaNameResolved) {
+          onSeaNameResolved(fallbackName);
+        }
+      }
+    };
+
+    fetchSeaName();
+
+    /*
+     * Automatically open the popup.
+     */
+    const timer = setTimeout(() => {
+      if (markerRef.current) {
+        markerRef.current.openPopup();
+      }
+    }, 50);
+
+    return () => {
       clearTimeout(timer);
-
+      controller.abort();
+    };
   }, [
-    position?.lat,
-    position?.lng,
+    position,
+    onSeaNameResolved,
   ]);
-
-  // ----------------------------------------------------------
-  // NO POSITION
-  // ----------------------------------------------------------
 
   if (!position) {
     return null;
   }
-
-  // ----------------------------------------------------------
-  // RENDER
-  // ----------------------------------------------------------
 
   return (
     <Marker
@@ -430,31 +245,22 @@ export default function LocationMarker({
       ]}
       icon={pointerIcon}
       eventHandlers={{
-        add: event => {
-
+        add: (event) => {
           setTimeout(() => {
-
             event.target.openPopup();
-
           }, 30);
-
         },
 
-        click: event => {
+        click: (event) => {
           event.target.openPopup();
         },
       }}
     >
-
       <Popup
         autoPan={true}
-        autoPanPadding={[
-          35,
-          35,
-        ]}
+        autoPanPadding={[35, 35]}
         closeButton={true}
       >
-
         <div
           style={{
             minWidth: "190px",
@@ -463,9 +269,6 @@ export default function LocationMarker({
               "Inter, Arial, sans-serif",
           }}
         >
-
-          {/* TITLE */}
-
           <div
             style={{
               fontSize: "15px",
@@ -477,23 +280,21 @@ export default function LocationMarker({
             📍 Exact Location
           </div>
 
-          {/* SEA NAME */}
-
           <div
             style={{
               fontSize: "13px",
               fontWeight: "600",
-              color: "#0ea5e9",
+              color:
+                seaName === "Loading sea name..."
+                  ? "#64748b"
+                  : "#0ea5e9",
               marginBottom: "8px",
               textTransform: "uppercase",
               letterSpacing: "0.5px",
-              minHeight: "18px",
             }}
           >
-            {seaName}
+            {seaName || "Loading sea name..."}
           </div>
-
-          {/* COORDINATES */}
 
           <div
             style={{
@@ -502,27 +303,15 @@ export default function LocationMarker({
               color: "#374151",
             }}
           >
-
-            <strong>
-              Latitude:
-            </strong>{" "}
-            {position.lat.toFixed(6)}
-            °
-
+            <strong>Latitude:</strong>{" "}
+            {position.lat.toFixed(6)}°
             <br />
 
-            <strong>
-              Longitude:
-            </strong>{" "}
-            {position.lng.toFixed(6)}
-            °
-
+            <strong>Longitude:</strong>{" "}
+            {position.lng.toFixed(6)}°
           </div>
 
-          {/* LAND WARNING */}
-
           {position.isOnLand && (
-
             <div
               style={{
                 color: "#ef4444",
@@ -531,31 +320,21 @@ export default function LocationMarker({
                 marginTop: "8px",
               }}
             >
-              ⚠️ Land Area Detected
+              Land Area Detected
             </div>
-
           )}
-
         </div>
-
       </Popup>
-
     </Marker>
   );
 }
 
-// ============================================================
-// MAP CONTROLLER
-// ============================================================
-
 export function MapController({
   targetPosition,
 }) {
-
   const map = useMap();
 
   useEffect(() => {
-
     if (!targetPosition) {
       return;
     }
@@ -565,34 +344,21 @@ export function MapController({
         targetPosition.lat,
         targetPosition.lng,
       ],
-      Math.max(
-        map.getZoom(),
-        5
-      ),
+      Math.max(map.getZoom(), 5),
       {
         duration: 1.2,
         easeLinearity: 0.25,
       }
     );
-
-  }, [
-    targetPosition,
-    map,
-  ]);
+  }, [targetPosition, map]);
 
   return null;
 }
 
-// ============================================================
-// TOUCH CONTROLLER
-// ============================================================
-
 export function MapTouchController() {
-
   const map = useMap();
 
   useEffect(() => {
-
     map.options.touchZoom = true;
     map.options.dragging = true;
     map.options.scrollWheelZoom = true;
@@ -600,14 +366,13 @@ export function MapTouchController() {
 
     map.invalidateSize();
 
-    const timer =
-      setTimeout(() => {
-        map.invalidateSize();
-      }, 250);
+    const timer = setTimeout(() => {
+      map.invalidateSize();
+    }, 250);
 
-    return () =>
+    return () => {
       clearTimeout(timer);
-
+    };
   }, [map]);
 
   return null;

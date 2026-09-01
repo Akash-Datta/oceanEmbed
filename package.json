@@ -12,7 +12,7 @@
   "dependencies": {
     "@turf/turf": "^7.4.0",
     "chart.js": "^4.5.1",
-    "framer-motion": "^10.18.0",
+    "framer-motion": "^13.1.1",
     "leaflet": "^1.9.4",
     "react": "^19.2.8",
     "react-chartjs-2": "^5.3.1",

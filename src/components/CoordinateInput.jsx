@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef } from "react";
 import { getCoordinateSuggestions, parseCoordinate, formatLatitude, formatLongitude } from "../utils/coordinateUtils";
 
 export default function CoordinateInput({ type, value, setValue, disabled }) {
@@ -6,24 +6,23 @@ export default function CoordinateInput({ type, value, setValue, disabled }) {
   const suggestions = useMemo(() => getCoordinateSuggestions(value, type), [value, type]);
   const placeholder = type === "latitude" ? "Enter latitude" : "Enter longitude";
 
-  const selectSuggestion = (suggestion) => {
-    setValue(suggestion.value);
-    setShowSuggestions(false);
-  };
+  // THE SHIELD: Tracks if the mouse is physically over the dropdown box
+  const isHovering = useRef(false);
 
-  // Format the input value when the user clicks away
   const handleBlur = () => {
-    setTimeout(() => {
-      setShowSuggestions(false);
-      
-      if (value && value.trim() !== "") {
-        const parsed = parseCoordinate(value, type);
-        if (parsed !== null) {
-          const formatted = type === "latitude" ? formatLatitude(parsed) : formatLongitude(parsed);
-          setValue(formatted);
-        }
+    // If the mouse is over the dropdown, ABORT the blur formatting completely.
+    // This allows the click event to happen undisturbed.
+    if (isHovering.current) return;
+
+    setShowSuggestions(false);
+    
+    if (value && value.trim() !== "") {
+      const parsed = parseCoordinate(value, type);
+      if (parsed !== null) {
+        const formatted = type === "latitude" ? formatLatitude(parsed) : formatLongitude(parsed);
+        setValue(formatted);
       }
-    }, 180); // Slight delay allows clicking a suggestion to register first
+    }
   };
 
   return (
@@ -45,13 +44,22 @@ export default function CoordinateInput({ type, value, setValue, disabled }) {
         onBlur={handleBlur}
       />
       {showSuggestions && suggestions.length > 0 && !disabled && (
-        <div className="suggestions-box">
+        <div 
+          className="suggestions-box"
+          // Activate the shield when the mouse enters the box
+          onMouseEnter={() => { isHovering.current = true; }}
+          // Deactivate the shield if they move the mouse away without clicking
+          onMouseLeave={() => { isHovering.current = false; }}
+        >
           {suggestions.map((suggestion, index) => (
             <div
               key={`${suggestion.value}-${index}`}
               className="suggestion-item"
-              onMouseDown={() => selectSuggestion(suggestion)}
-              onTouchStart={() => selectSuggestion(suggestion)}
+              onClick={() => {
+                setValue(suggestion.value);
+                setShowSuggestions(false);
+                isHovering.current = false; // Reset shield after successful click
+              }}
             >
               {suggestion.value}
             </div>

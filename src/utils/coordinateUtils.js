@@ -1,31 +1,52 @@
+import * as turf from "@turf/turf";
+import landGeoJSON from "../data/landMask.json";
+
+// ============================================================
+// COORDINATE FORMATTING
+// ============================================================
+
 export function formatLongitude(value) {
-  let longitude = value;
+  let longitude = Number(value);
+
   while (longitude > 180) longitude -= 360;
   while (longitude < -180) longitude += 360;
-  
-  if (Math.abs(longitude) < 0.000001) return "0°";
-  
+
+  if (Math.abs(longitude) < 0.000001) {
+    return "0°";
+  }
+
   const formatted = parseFloat(Math.abs(longitude).toFixed(6));
-  
+
   return longitude > 0
     ? `${formatted}° E`
     : `${formatted}° W`;
 }
 
 export function formatLatitude(value) {
-  if (Math.abs(value) < 0.000001) return "0°";
-  
-  const formatted = parseFloat(Math.abs(value).toFixed(6));
-  
-  return value > 0
+  const latitude = Number(value);
+
+  if (Math.abs(latitude) < 0.000001) {
+    return "0°";
+  }
+
+  const formatted = parseFloat(Math.abs(latitude).toFixed(6));
+
+  return latitude > 0
     ? `${formatted}° N`
     : `${formatted}° S`;
 }
 
+// ============================================================
+// COORDINATE PARSER
+// ============================================================
+
 export function parseCoordinate(value, type) {
-  if (!value || !value.trim()) return null;
-  
+  if (!value || !value.trim()) {
+    return null;
+  }
+
   let text = value.trim().toUpperCase();
+
   let direction = null;
 
   if (/[NSEW]$/.test(text)) {
@@ -34,16 +55,29 @@ export function parseCoordinate(value, type) {
   }
 
   text = text.replace(/°/g, "").trim();
+
   const number = parseFloat(text);
-  
-  if (Number.isNaN(number)) return null;
+
+  if (Number.isNaN(number)) {
+    return null;
+  }
 
   let result = number;
-  if (direction === "S" || direction === "W") result = -Math.abs(number);
-  if (direction === "N" || direction === "E") result = Math.abs(number);
 
-  if (type === "latitude" && (result < -90 || result > 90)) return null;
-  
+  if (direction === "S" || direction === "W") {
+    result = -Math.abs(number);
+  }
+
+  if (direction === "N" || direction === "E") {
+    result = Math.abs(number);
+  }
+
+  if (type === "latitude") {
+    if (result < -90 || result > 90) {
+      return null;
+    }
+  }
+
   if (type === "longitude") {
     while (result > 180) result -= 360;
     while (result < -180) result += 360;
@@ -52,69 +86,407 @@ export function parseCoordinate(value, type) {
   return result;
 }
 
+// ============================================================
+// COORDINATE SUGGESTIONS
+// ============================================================
+
 export function getCoordinateSuggestions(input, type) {
-  if (!input || !input.trim()) return [];
-  
+  if (!input || !input.trim()) {
+    return [];
+  }
+
   const text = input.trim().toUpperCase();
+
   const numericMatch = text.match(/^-?\d+(\.\d+)?/);
-  
-  if (!numericMatch) return [];
+
+  if (!numericMatch) {
+    return [];
+  }
 
   const search = numericMatch[0].replace("-", "");
+
   const max = type === "latitude" ? 90 : 180;
+
   const suggestions = [];
 
   for (let value = 0; value <= max; value++) {
     const valueText = String(value);
-    
+
     if (valueText.startsWith(search)) {
       if (type === "latitude") {
-        suggestions.push({ value: `${value}° N`, coordinate: value });
-        if (value !== 0) suggestions.push({ value: `${value}° S`, coordinate: -value });
+        suggestions.push({
+          value: `${value}° N`,
+          coordinate: value,
+        });
+
+        if (value !== 0) {
+          suggestions.push({
+            value: `${value}° S`,
+            coordinate: -value,
+          });
+        }
       } else {
-        suggestions.push({ value: `${value}° E`, coordinate: value });
-        if (value !== 0) suggestions.push({ value: `${value}° W`, coordinate: -value });
+        suggestions.push({
+          value: `${value}° E`,
+          coordinate: value,
+        });
+
+        if (value !== 0) {
+          suggestions.push({
+            value: `${value}° W`,
+            coordinate: -value,
+          });
+        }
       }
     }
-    if (suggestions.length >= 18) break;
+
+    if (suggestions.length >= 18) {
+      break;
+    }
   }
+
   return suggestions;
 }
 
 // ============================================================
-// WORLDWIDE OCEAN SNAPPER (EXPANDED LANDMASK)
+// LONGITUDE NORMALIZATION
 // ============================================================
+
+function normalizeLongitude(lng) {
+  let longitude = Number(lng);
+
+  while (longitude > 180) {
+    longitude -= 360;
+  }
+
+  while (longitude < -180) {
+    longitude += 360;
+  }
+
+  return longitude;
+}
+
+// ============================================================
+// LAND DETECTION
+// ============================================================
+
+/*
+ * IMPORTANT:
+ *
+ * The previous implementation used:
+ *
+ * turf.pointsWithinPolygon(point, landGeoJSON)
+ *
+ * That function is for finding POINT FEATURES inside polygons.
+ *
+ * Here we already have one point and want to ask:
+ *
+ * "Is this point inside the land polygon?"
+ *
+ * Therefore booleanPointInPolygon() is the correct Turf function.
+ */
+
+export function checkIfLand(lat, lng) {
+  const latitude = Number(lat);
+  const longitude = normalizeLongitude(lng);
+
+  if (
+    !Number.isFinite(latitude) ||
+    !Number.isFinite(longitude) ||
+    latitude < -90 ||
+    latitude > 90
+  ) {
+    return false;
+  }
+
+  try {
+    const point = turf.point([longitude, latitude]);
+
+    /*
+     * landGeoJSON can be either:
+     * - Feature
+     * - FeatureCollection
+     * - Polygon
+     * - MultiPolygon
+     */
+
+    if (!landGeoJSON) {
+      console.warn("Land mask is unavailable.");
+      return false;
+    }
+
+    // FeatureCollection
+    if (landGeoJSON.type === "FeatureCollection") {
+      for (const feature of landGeoJSON.features || []) {
+        if (!feature || !feature.geometry) {
+          continue;
+        }
+
+        if (
+          turf.booleanPointInPolygon(
+            point,
+            feature
+          )
+        ) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+    // Single Feature / Polygon / MultiPolygon
+    return turf.booleanPointInPolygon(
+      point,
+      landGeoJSON
+    );
+  } catch (error) {
+    console.error(
+      "Land detection failed:",
+      error
+    );
+
+    /*
+     * If the geometry itself fails, do NOT falsely
+     * classify every coordinate as land.
+     */
+    return false;
+  }
+}
+
+// ============================================================
+// SNAP LAND LOCATION TO NEAREST OCEAN
+// ============================================================
+
 export function snapToNearestOcean(lat, lng) {
-  let newLat = lat;
-  
-  let normalizedLng = lng;
-  while (normalizedLng > 180) normalizedLng -= 360;
-  while (normalizedLng < -180) normalizedLng += 360;
-  
-  let newLng = normalizedLng;
+  const normalizedLng = normalizeLongitude(lng);
 
-  // Fully expanded bounding boxes to ensure land clicks redirect to oceans
-  const landZones = [
-    { minLat: 8, maxLat: 35, minLng: 68, maxLng: 89, snapLat: lat, snapLng: 67.0 }, // India -> Arabian Sea
-    { minLat: -35, maxLat: 37, minLng: -18, maxLng: 60, snapLat: 0.0, snapLng: 0.0 }, // Africa/Middle East -> Gulf of Guinea
-    { minLat: 35, maxLat: 75, minLng: -10, maxLng: 40, snapLat: 45.0, snapLng: -15.0 }, // Europe -> Atlantic
-    { minLat: 35, maxLat: 75, minLng: 40, maxLng: 180, snapLat: lat, snapLng: 150.0 }, // Russia/Northern Asia -> Pacific
-    { minLat: 10, maxLat: 35, minLng: 90, maxLng: 130, snapLat: lat, snapLng: 135.0 }, // SE Asia/China -> Pacific
-    { minLat: 15, maxLat: 75, minLng: -170, maxLng: -60, snapLat: lat, snapLng: -135.0 }, // North America -> Pacific
-    { minLat: -55, maxLat: 15, minLng: -85, maxLng: -35, snapLat: lat, snapLng: -90.0 }, // South America -> Pacific
-    { minLat: -45, maxLat: -10, minLng: 110, maxLng: 155, snapLat: lat, snapLng: 105.0 } // Australia -> Indian Ocean
-  ];
+  /*
+   * First check the exact coordinate.
+   *
+   * This is the most important check.
+   */
 
-  for (let zone of landZones) {
-    if (lat >= zone.minLat && lat <= zone.maxLat && normalizedLng >= zone.minLng && normalizedLng <= zone.maxLng) {
-      newLat = zone.snapLat;
-      newLng = zone.snapLng;
-      break; 
+  const originalIsLand = checkIfLand(
+    lat,
+    normalizedLng
+  );
+
+  if (!originalIsLand) {
+    return {
+      lat,
+      lng: normalizedLng,
+      redirected: false,
+    };
+  }
+
+  /*
+   * The entered coordinate is definitely land.
+   *
+   * Search outward in rings.
+   */
+
+  const angleStep = 20;
+
+  const initialRadius = 0.1;
+  const radiusStep = 0.1;
+  const maxRadius = 10;
+
+  for (
+    let radius = initialRadius;
+    radius <= maxRadius;
+    radius += radiusStep
+  ) {
+    for (
+      let angle = 0;
+      angle < 360;
+      angle += angleStep
+    ) {
+      const radians =
+        (angle * Math.PI) / 180;
+
+      /*
+       * Latitude and longitude degrees are
+       * not exactly the same physical distance,
+       * but this is sufficient for a regional
+       * ocean-location redirect.
+       */
+
+      const testLat =
+        lat + radius * Math.cos(radians);
+
+      const testLng =
+        normalizedLng +
+        radius * Math.sin(radians);
+
+      if (
+        testLat < -90 ||
+        testLat > 90
+      ) {
+        continue;
+      }
+
+      const normalizedTestLng =
+        normalizeLongitude(testLng);
+
+      if (
+        !checkIfLand(
+          testLat,
+          normalizedTestLng
+        )
+      ) {
+        /*
+         * We found water.
+         *
+         * Push slightly farther in the same
+         * direction to avoid placing the marker
+         * directly on a complicated coastline.
+         */
+
+        const safeRadius = radius + 0.15;
+
+        const safeLat =
+          lat +
+          safeRadius *
+            Math.cos(radians);
+
+        const safeLng =
+          normalizedLng +
+          safeRadius *
+            Math.sin(radians);
+
+        if (
+          safeLat < -90 ||
+          safeLat > 90
+        ) {
+          continue;
+        }
+
+        const normalizedSafeLng =
+          normalizeLongitude(safeLng);
+
+        if (
+          !checkIfLand(
+            safeLat,
+            normalizedSafeLng
+          )
+        ) {
+          return {
+            lat: parseFloat(
+              safeLat.toFixed(6)
+            ),
+
+            lng: parseFloat(
+              normalizedSafeLng.toFixed(6)
+            ),
+
+            redirected: true,
+          };
+        }
+
+        /*
+         * If the extra push landed back on land,
+         * the first water point is still better
+         * than the original land coordinate.
+         */
+
+        return {
+          lat: parseFloat(
+            testLat.toFixed(6)
+          ),
+
+          lng: parseFloat(
+            normalizedTestLng.toFixed(6)
+          ),
+
+          redirected: true,
+        };
+      }
     }
   }
 
+  /*
+   * Extremely unusual fallback.
+   *
+   * Don't silently return 0,0 because that makes
+   * it look as if the user entered the Gulf of Guinea.
+   */
+
   return {
-    lat: parseFloat(newLat.toFixed(6)),
-    lng: parseFloat(newLng.toFixed(6))
+    lat,
+    lng: normalizedLng,
+    redirected: false,
+    failed: true,
   };
+}
+
+// ============================================================
+// REGIONAL WATER BODY DETECTION
+// ============================================================
+
+/*
+ * These are regional fallbacks.
+ *
+ * Marine Regions is still queried by LocationMarker,
+ * but if its response does not contain a useful
+ * named water body, these names prevent the UI
+ * from unnecessarily showing "Open Ocean".
+ */
+
+export function getRegionalWaterBodyName(
+  lat,
+  lng
+) {
+  const latitude = Number(lat);
+  const longitude = normalizeLongitude(lng);
+
+  /*
+   * Arabian Sea
+   */
+  if (
+    latitude >= 5 &&
+    latitude <= 30 &&
+    longitude >= 50 &&
+    longitude <= 78
+  ) {
+    return "Arabian Sea";
+  }
+
+  /*
+   * Bay of Bengal
+   */
+  if (
+    latitude >= 5 &&
+    latitude <= 25 &&
+    longitude > 78 &&
+    longitude <= 100
+  ) {
+    return "Bay of Bengal";
+  }
+
+  /*
+   * Andaman Sea
+   */
+  if (
+    latitude >= 5 &&
+    latitude <= 18 &&
+    longitude > 96 &&
+    longitude <= 101
+  ) {
+    return "Andaman Sea";
+  }
+
+  /*
+   * Indian Ocean
+   */
+  if (
+    latitude >= -40 &&
+    latitude <= 30 &&
+    longitude >= 40 &&
+    longitude <= 110
+  ) {
+    return "Indian Ocean";
+  }
+
+  return "Indian Ocean";
 }

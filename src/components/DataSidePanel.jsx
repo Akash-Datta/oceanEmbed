@@ -1,66 +1,473 @@
-import React, { useState, useMemo } from 'react';
-import TemperatureProfile from './TemperatureProfile';
-import { getLocationMetrics } from '../data/dummyOceanData';
+import React, {
+  useMemo,
+  useState,
+} from "react";
 
-export default function DataSidePanel({ position, depth, onClose }) {
-  const [isExpanded, setIsExpanded] = useState(false);
+import TemperatureProfile from "./TemperatureProfile";
+
+import {
+  getLocationMetrics,
+} from "../data/dummyOceanData";
+
+export default function DataSidePanel({
+  position,
+  depth,
+  seaName,
+  onClose,
+}) {
+  const [
+    isExpanded,
+    setIsExpanded,
+  ] = useState(false);
+
+  /*
+  ============================================================
+  LOCATION METRICS
+  ============================================================
+
+  Depend on actual coordinates rather than the entire
+  position object.
+  ============================================================
+  */
 
   const metrics = useMemo(() => {
-    if (!position) return null;
-    return getLocationMetrics(position.lat, position.lng);
-  }, [position]);
+    if (!position) {
+      return null;
+    }
 
-  if (!position || !metrics) return null;
+    return getLocationMetrics(
+      position.lat,
+      position.lng
+    );
+  }, [
+    position?.lat,
+    position?.lng,
+  ]);
 
-  const toggleExpand = () => setIsExpanded(!isExpanded);
+  if (
+    !position ||
+    !metrics
+  ) {
+    return null;
+  }
+
+  const toggleExpand =
+    () => {
+      setIsExpanded(
+        (previous) =>
+          !previous
+      );
+    };
 
   return (
-    <div className={`side-data-panel ${isExpanded ? 'expanded' : ''}`}>
+    <div
+      className={`side-data-panel ${
+        isExpanded
+          ? "expanded"
+          : ""
+      }`}
+    >
+
+      {/* =====================================================
+          HEADER
+          ===================================================== */}
+
       <div className="panel-header">
-        <h4>Location Data</h4>
+
+        <h4>
+          Location Data
+        </h4>
+
         <div className="panel-actions">
-          <button onClick={toggleExpand} className="action-btn expand-btn" title={isExpanded ? "Collapse" : "Expand"}>
-            {isExpanded ? "🗗" : "⛶"}
+
+          <button
+            onClick={
+              toggleExpand
+            }
+
+            className="action-btn expand-btn"
+
+            title={
+              isExpanded
+                ? "Collapse"
+                : "Expand"
+            }
+          >
+            {isExpanded
+              ? "🗗"
+              : "⛶"}
           </button>
-          <button onClick={onClose} className="action-btn close-btn" title="Close">
+
+          <button
+            onClick={
+              onClose
+            }
+
+            className="action-btn close-btn"
+
+            title="Close"
+          >
             ×
           </button>
+
         </div>
       </div>
-      
+
+      {/* =====================================================
+          CONTENT
+          ===================================================== */}
+
       <div className="panel-content">
-        {/* UPDATED TO 6 DECIMAL PLACES HERE */}
-        <p><strong>Lat:</strong> {position.lat.toFixed(6)}°</p>
-        <p><strong>Lng:</strong> {position.lng.toFixed(6)}°</p>
-        {depth && <p><strong>Depth:</strong> {depth} m</p>}
-        
-        <hr />
-        
-        <h5>Surface Parameters</h5>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '20px' }}>
-          <div style={{ background: 'rgba(14, 165, 233, 0.1)', padding: '10px', borderRadius: '8px' }}>
-            <span style={{ fontSize: '11px', color: '#64748b', display: 'block', fontWeight: 'bold' }}>SST (Temp)</span>
-            <strong style={{ color: '#0f172a', fontSize: '15px' }}>{metrics.surfaceData.sst} °C</strong>
-          </div>
-          <div style={{ background: 'rgba(14, 165, 233, 0.1)', padding: '10px', borderRadius: '8px' }}>
-            <span style={{ fontSize: '11px', color: '#64748b', display: 'block', fontWeight: 'bold' }}>SSS (Salinity)</span>
-            <strong style={{ color: '#0f172a', fontSize: '15px' }}>{metrics.surfaceData.sss} PSU</strong>
-          </div>
-          <div style={{ background: 'rgba(14, 165, 233, 0.1)', padding: '10px', borderRadius: '8px' }}>
-            <span style={{ fontSize: '11px', color: '#64748b', display: 'block', fontWeight: 'bold' }}>SSH (Height)</span>
-            <strong style={{ color: '#0f172a', fontSize: '15px' }}>{metrics.surfaceData.ssh} m</strong>
-          </div>
-          <div style={{ background: 'rgba(14, 165, 233, 0.1)', padding: '10px', borderRadius: '8px' }}>
-            <span style={{ fontSize: '11px', color: '#64748b', display: 'block', fontWeight: 'bold' }}>SLA (Anomaly)</span>
-            <strong style={{ color: '#0f172a', fontSize: '15px' }}>{metrics.surfaceData.sla} m</strong>
-          </div>
+
+        {/* WATER BODY */}
+
+        <div
+          style={{
+            marginBottom:
+              "12px",
+
+            padding:
+              "8px 10px",
+
+            background:
+              "rgba(14, 165, 233, 0.08)",
+
+            borderRadius:
+              "6px",
+
+            borderLeft:
+              "3px solid #0ea5e9",
+          }}
+        >
+          <span
+            style={{
+              fontSize:
+                "10px",
+
+              color:
+                "#64748b",
+
+              display:
+                "block",
+
+              fontWeight:
+                "bold",
+
+              textTransform:
+                "uppercase",
+            }}
+          >
+            Water Body
+          </span>
+
+          <strong
+            style={{
+              color:
+                "#0369a1",
+
+              fontSize:
+                "13px",
+
+              letterSpacing:
+                "0.3px",
+            }}
+          >
+            {seaName ||
+              "Open Ocean"}
+          </strong>
         </div>
-        
+
+        {/* COORDINATES */}
+
+        <p>
+          <strong>
+            Lat:
+          </strong>{" "}
+          {position.lat.toFixed(
+            6
+          )}
+          °
+        </p>
+
+        <p>
+          <strong>
+            Lng:
+          </strong>{" "}
+          {position.lng.toFixed(
+            6
+          )}
+          °
+        </p>
+
+        {depth && (
+          <p>
+            <strong>
+              Depth:
+            </strong>{" "}
+            {depth} m
+          </p>
+        )}
+
         <hr />
-        <h5>Vertical Temperature Profile</h5>
-        <div style={{ height: isExpanded ? '400px' : '220px', transition: 'height 0.3s' }}>
-          <TemperatureProfile selectedDepth={depth} profileData={metrics.profileData} />
+
+        {/* =================================================
+            SURFACE PARAMETERS
+            ================================================= */}
+
+        <h5>
+          Surface Parameters
+        </h5>
+
+        <div
+          style={{
+            display:
+              "grid",
+
+            gridTemplateColumns:
+              "1fr 1fr",
+
+            gap:
+              "10px",
+
+            marginBottom:
+              "20px",
+          }}
+        >
+
+          {/* SST */}
+
+          <div
+            style={{
+              background:
+                "rgba(14, 165, 233, 0.1)",
+
+              padding:
+                "10px",
+
+              borderRadius:
+                "8px",
+            }}
+          >
+            <span
+              style={{
+                fontSize:
+                  "11px",
+
+                color:
+                  "#64748b",
+
+                display:
+                  "block",
+
+                fontWeight:
+                  "bold",
+              }}
+            >
+              SST (Temp)
+            </span>
+
+            <strong
+              style={{
+                color:
+                  "#0f172a",
+
+                fontSize:
+                  "15px",
+              }}
+            >
+              {
+                metrics
+                  .surfaceData
+                  .sst
+              }{" "}
+              °C
+            </strong>
+          </div>
+
+          {/* SSS */}
+
+          <div
+            style={{
+              background:
+                "rgba(14, 165, 233, 0.1)",
+
+              padding:
+                "10px",
+
+              borderRadius:
+                "8px",
+            }}
+          >
+            <span
+              style={{
+                fontSize:
+                  "11px",
+
+                color:
+                  "#64748b",
+
+                display:
+                  "block",
+
+                fontWeight:
+                  "bold",
+              }}
+            >
+              SSS (Salinity)
+            </span>
+
+            <strong
+              style={{
+                color:
+                  "#0f172a",
+
+                fontSize:
+                  "15px",
+              }}
+            >
+              {
+                metrics
+                  .surfaceData
+                  .sss
+              }{" "}
+              PSU
+            </strong>
+          </div>
+
+          {/* SSH */}
+
+          <div
+            style={{
+              background:
+                "rgba(14, 165, 233, 0.1)",
+
+              padding:
+                "10px",
+
+              borderRadius:
+                "8px",
+            }}
+          >
+            <span
+              style={{
+                fontSize:
+                  "11px",
+
+                color:
+                  "#64748b",
+
+                display:
+                  "block",
+
+                fontWeight:
+                  "bold",
+              }}
+            >
+              SSH (Height)
+            </span>
+
+            <strong
+              style={{
+                color:
+                  "#0f172a",
+
+                fontSize:
+                  "15px",
+              }}
+            >
+              {
+                metrics
+                  .surfaceData
+                  .ssh
+              }{" "}
+              m
+            </strong>
+          </div>
+
+          {/* SLA */}
+
+          <div
+            style={{
+              background:
+                "rgba(14, 165, 233, 0.1)",
+
+              padding:
+                "10px",
+
+              borderRadius:
+                "8px",
+            }}
+          >
+            <span
+              style={{
+                fontSize:
+                  "11px",
+
+                color:
+                  "#64748b",
+
+                display:
+                  "block",
+
+                fontWeight:
+                  "bold",
+              }}
+            >
+              SLA (Anomaly)
+            </span>
+
+            <strong
+              style={{
+                color:
+                  "#0f172a",
+
+                fontSize:
+                  "15px",
+              }}
+            >
+              {
+                metrics
+                  .surfaceData
+                  .sla
+              }{" "}
+              m
+            </strong>
+          </div>
+
         </div>
+
+        <hr />
+
+        {/* =================================================
+            TEMPERATURE PROFILE
+            ================================================= */}
+
+        <h5>
+          Vertical Temperature Profile
+        </h5>
+
+        <div
+          style={{
+            height:
+              isExpanded
+                ? "400px"
+                : "220px",
+
+            transition:
+              "height 0.3s",
+          }}
+        >
+          <TemperatureProfile
+            selectedDepth={
+              depth
+            }
+
+            profileData={
+              metrics.profileData
+            }
+          />
+        </div>
+
       </div>
     </div>
   );

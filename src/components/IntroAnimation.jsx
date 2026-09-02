@@ -18,7 +18,7 @@ const IntroAnimation = ({ isLoaded, onFinish }) => {
       "आमच्या वेबपेजवर आपले स्वागत आहे",
       "हाम्रो वेबपेजमा तपाईलाई स्वागत छ",
       "ଆମର ୱେବ୍‌ପେଜ୍‌କୁ ସ୍ୱାଗତ",
-      "ਸਾਡੇ ਵੈੱਬਪੇਜ 'ਤੇ ਤੁਹਾਡਾ ਸਵਾਗਤ ਹੈ",
+      "ਸਾਡੇ ਵੈੱਬਪੇਜ 'ਤੇ ਤੁਹਾਡਾ ਸਵਾਗതം ਹੈ",
       "अस्मदीये वेबपुट्जे भवतां स्वागतम्",
       "ᱟᱞᱮᱭᱟᱜ ᱣᱮᱵᱽᱯᱮᱡᱽ ᱨᱮ ᱡᱚᱛᱚ ᱠᱚ ᱜᱮ ᱜᱚᱭᱟᱨ",
       "اسان جي ويب پيج تي اوهان جي مهرباني",
@@ -33,27 +33,23 @@ const IntroAnimation = ({ isLoaded, onFinish }) => {
   const [index, setIndex] = useState(0);
   const [visible, setVisible] = useState(true);
 
-  /*
-   * Change the greeting only while the map is loading.
-   */
   useEffect(() => {
     if (isLoaded || !visible) {
       return;
     }
 
     const timer = setTimeout(() => {
-      setIndex((previous) => (previous + 1) % greetings.length);
+      setIndex((previous) => {
+        if (previous < greetings.length - 1) {
+          return previous + 1;
+        }
+        return previous; // Stop looping and stay on the final greeting ("Welcome to our webpage")
+      });
     }, 180);
 
     return () => clearTimeout(timer);
   }, [index, isLoaded, visible, greetings.length]);
 
-
-  /*
-   * MAP FINISHED LOADING
-   *
-   * Immediately remove the intro.
-   */
   useEffect(() => {
     if (!isLoaded) {
       return;
@@ -66,7 +62,6 @@ const IntroAnimation = ({ isLoaded, onFinish }) => {
     }
   }, [isLoaded, onFinish]);
 
-
   return (
     <AnimatePresence>
       {visible && (
@@ -75,30 +70,16 @@ const IntroAnimation = ({ isLoaded, onFinish }) => {
             position: "fixed",
             inset: 0,
             zIndex: 99999,
-
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-
             overflow: "hidden",
-
             backgroundColor: "#0f172a",
             color: "white",
-
             padding: "0 20px",
           }}
-
-          initial={{
-            y: 0,
-          }}
-
-          animate={{
-            y: 0,
-          }}
-
-          /*
-           * Immediately slide away when map is ready.
-           */
+          initial={{ y: 0 }}
+          animate={{ y: 0 }}
           exit={{
             y: "-100%",
             transition: {
@@ -110,40 +91,18 @@ const IntroAnimation = ({ isLoaded, onFinish }) => {
           <AnimatePresence mode="wait">
             <motion.h1
               key={index}
-
               style={{
-                fontSize:
-                  "clamp(2rem, 5vw, 4.5rem)",
-
+                fontSize: "clamp(2rem, 5vw, 4.5rem)",
                 fontWeight: "bold",
-
                 margin: 0,
-
                 textAlign: "center",
-
-                fontFamily:
-                  "Inter, sans-serif",
-
+                fontFamily: "Inter, sans-serif",
                 lineHeight: 1.25,
-
                 maxWidth: "90%",
               }}
-
-              initial={{
-                opacity: 0,
-                y: 20,
-              }}
-
-              animate={{
-                opacity: 1,
-                y: 0,
-              }}
-
-              exit={{
-                opacity: 0,
-                y: -20,
-              }}
-
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
               transition={{
                 duration: 0.12,
                 ease: "easeOut",

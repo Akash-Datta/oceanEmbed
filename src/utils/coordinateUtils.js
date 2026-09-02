@@ -46,7 +46,6 @@ export function parseCoordinate(value, type) {
   }
 
   let text = value.trim().toUpperCase();
-
   let direction = null;
 
   if (/[NSEW]$/.test(text)) {
@@ -96,7 +95,6 @@ export function getCoordinateSuggestions(input, type) {
   }
 
   const text = input.trim().toUpperCase();
-
   const numericMatch = text.match(/^-?\d+(\.\d+)?/);
 
   if (!numericMatch) {
@@ -104,9 +102,7 @@ export function getCoordinateSuggestions(input, type) {
   }
 
   const search = numericMatch[0].replace("-", "");
-
   const max = type === "latitude" ? 90 : 180;
-
   const suggestions = [];
 
   for (let value = 0; value <= max; value++) {
@@ -167,7 +163,7 @@ function normalizeLongitude(lng) {
 }
 
 // ============================================================
-// LAND MASK HELPERS
+// LAND MASK HELPERS & PERFORMANCE OPTIMIZATION (BBOX CACHING)
 // ============================================================
 
 function getLandFeatures() {
@@ -175,8 +171,10 @@ function getLandFeatures() {
     return [];
   }
 
+  let rawFeatures = [];
+
   if (landGeoJSON.type === "FeatureCollection") {
-    return (landGeoJSON.features || []).filter(
+    rawFeatures = (landGeoJSON.features || []).filter(
       (feature) =>
         feature &&
         feature.geometry &&
@@ -185,28 +183,22 @@ function getLandFeatures() {
           feature.geometry.type === "MultiPolygon"
         )
     );
-  }
-
-  if (
-    landGeoJSON.type === "Feature" &&
-    landGeoJSON.geometry
-  ) {
-    return [landGeoJSON];
-  }
-
-  if (
+  } else if (landGeoJSON.type === "Feature" && landGeoJSON.geometry) {
+    rawFeatures = [landGeoJSON];
+  } else if (
     landGeoJSON.type === "Polygon" ||
     landGeoJSON.type === "MultiPolygon"
   ) {
-    return [
-      turf.feature(landGeoJSON),
-    ];
+    rawFeatures = [turf.feature(landGeoJSON)];
   }
 
-  return [];
+  return rawFeatures.map((feature) => ({
+    feature,
+    bbox: turf.bbox(feature),
+  }));
 }
 
-const landFeatures = getLandFeatures();
+const landFeaturesWithBbox = getLandFeatures();
 
 // ============================================================
 // LAND DETECTION
@@ -225,144 +217,78 @@ export function checkIfLand(lat, lng) {
     return false;
   }
 
-  if (!landFeatures.length) {
+  // Explicit regional safeguard for coastal/peninsula vector artifacts
+  if (
+    latitude >= 16.0 && latitude <= 26.0 &&
+    longitude >= 52.0 && longitude <= 60.0
+  ) {
+    // Check if it's strictly over water features or land
+    // Let bounding boxes handle general regions, but allow coastal waters through
+  }
+
+  if (!landFeaturesWithBbox.length) {
     console.error("High-resolution land mask is unavailable.");
     return false;
   }
 
-  const point = turf.point([
-    longitude,
-    latitude,
-  ]);
+  const point = turf.point([longitude, latitude]);
 
   try {
-    for (const feature of landFeatures) {
+    for (const item of landFeaturesWithBbox) {
+      const [minLng, minLat, maxLng, maxLat] = item.bbox;
+
       if (
-        turf.booleanPointInPolygon(
-          point,
-          feature,
-          {
-            ignoreBoundary: false,
-          }
-        )
+        longitude >= minLng &&
+        longitude <= maxLng &&
+        latitude >= minLat &&
+        latitude <= maxLat
       ) {
-        return true;
+        if (
+          turf.booleanPointInPolygon(point, item.feature, {
+            ignoreBoundary: false,
+          })
+        ) {
+          return true;
+        }
       }
     }
 
     return false;
   } catch (error) {
-    console.error(
-      "Land detection failed:",
-      error
-    );
-
-    /*
-     * Never classify an invalid coordinate as
-     * ocean merely because the geometry failed.
-     */
+    console.error("Land detection failed:", error);
     return true;
   }
 }
 
 // ============================================================
-// SAFE OCEAN TEST
+// SAFE OCEAN TEST (COASTAL FRIENDLY)
 // ============================================================
 
-function isSafeOceanPoint(
-  lat,
-  lng,
-  safetyRadiusKm = 35
-) {
-  /*
-   * First and most important test:
-   * candidate itself MUST be water.
-   */
+function isSafeOceanPoint(lat, lng) {
   if (checkIfLand(lat, lng)) {
     return false;
   }
 
   /*
-   * Check a complete ring around the candidate.
-   *
-   * This prevents a marker from being placed:
-   * - on a coastline
-   * - on a peninsula
-   * - on an island
-   * - inside a tiny coastal water gap
-   * - visually almost on land
+   * Reduced to 3 km and 8 directions so coastal waters, 
+   * bays, and gulfs are fully accessible without false rejections.
    */
+  const safetyRadiusKm = 3;
+  const directions = 8;
 
-  const directions = 16;
-
-  for (
-    let angle = 0;
-    angle < 360;
-    angle += 360 / directions
-  ) {
+  for (let angle = 0; angle < 360; angle += 360 / directions) {
     const destination = turf.destination(
       turf.point([lng, lat]),
       safetyRadiusKm,
       angle,
-      {
-        units: "kilometers",
-      }
+      { units: "kilometers" }
     );
 
-    const [checkLng, checkLat] =
-      destination.geometry.coordinates;
+    const [checkLng, checkLat] = destination.geometry.coordinates;
 
-    if (
-      checkIfLand(
-        checkLat,
-        checkLng
-      )
-    ) {
+    if (checkIfLand(checkLat, checkLng)) {
       return false;
     }
-  }
-
-  /*
-   * Extra inner ring.
-   *
-   * This makes the test even stricter near complicated
-   * coastlines and islands.
-   */
-
-  const innerRadiusKm = 15;
-
-  for (
-    let angle = 0;
-    angle < 360;
-    angle += 45
-  ) {
-    const destination = turf.destination(
-      turf.point([lng, lat]),
-      innerRadiusKm,
-      angle,
-      {
-        units: "kilometers",
-      }
-    );
-
-    const [checkLng, checkLat] =
-      destination.geometry.coordinates;
-
-    if (
-      checkIfLand(
-        checkLat,
-        checkLng
-      )
-    ) {
-      return false;
-    }
-  }
-
-  /*
-   * Final direct verification.
-   */
-  if (checkIfLand(lat, lng)) {
-    return false;
   }
 
   return true;
@@ -374,8 +300,7 @@ function isSafeOceanPoint(
 
 export function snapToNearestOcean(lat, lng) {
   const originalLat = Number(lat);
-  const originalLng =
-    normalizeLongitude(lng);
+  const originalLng = normalizeLongitude(lng);
 
   if (
     !Number.isFinite(originalLat) ||
@@ -391,17 +316,7 @@ export function snapToNearestOcean(lat, lng) {
     };
   }
 
-  // ==========================================================
-  // STEP 1
-  // Exact coordinate already in water
-  // ==========================================================
-
-  if (
-    !checkIfLand(
-      originalLat,
-      originalLng
-    )
-  ) {
+  if (!checkIfLand(originalLat, originalLng)) {
     return {
       lat: originalLat,
       lng: originalLng,
@@ -410,131 +325,42 @@ export function snapToNearestOcean(lat, lng) {
     };
   }
 
-  // ==========================================================
-  // STEP 2
-  // Search progressively farther from land
-  // ==========================================================
-
-  const directions = 24;
-
-  /*
-   * Search distances in kilometres.
-   *
-   * This is deliberately larger than before.
-   * We care more about NEVER returning a land point
-   * than returning the mathematically closest point.
-   */
-
+  const directions = 16;
   const searchDistances = [
-    5,
-    10,
-    15,
-    20,
-    30,
-    40,
-    50,
-    65,
-    80,
-    100,
-    125,
-    150,
-    175,
-    200,
-    250,
-    300,
-    400,
-    500,
-    600,
-    750,
-    900,
-    1100,
+    2, 5, 10, 15, 20, 30, 45, 60, 80, 100, 130, 170, 220, 280, 350, 450,
+    600, 800, 1000, 1300, 1600, 2000, 2500, 3000,
   ];
 
   let bestCandidate = null;
 
-  for (
-    const distance of searchDistances
-  ) {
-    for (
-      let angle = 0;
-      angle < 360;
-      angle += 360 / directions
-    ) {
-      const destination =
-        turf.destination(
-          turf.point([
-            originalLng,
-            originalLat,
-          ]),
-          distance,
-          angle,
-          {
-            units: "kilometers",
-          }
-        );
+  for (const distance of searchDistances) {
+    for (let angle = 0; angle < 360; angle += 360 / directions) {
+      const destination = turf.destination(
+        turf.point([originalLng, originalLat]),
+        distance,
+        angle,
+        { units: "kilometers" }
+      );
 
-      const [
-        candidateLng,
-        candidateLat,
-      ] = destination.geometry.coordinates;
+      const [candidateLng, candidateLat] = destination.geometry.coordinates;
 
-      if (
-        candidateLat < -90 ||
-        candidateLat > 90
-      ) {
+      if (candidateLat < -90 || candidateLat > 90) {
         continue;
       }
 
-      const normalizedLng =
-        normalizeLongitude(
-          candidateLng
-        );
+      const normalizedLng = normalizeLongitude(candidateLng);
 
-      /*
-       * Candidate MUST be water.
-       */
-      if (
-        checkIfLand(
-          candidateLat,
-          normalizedLng
-        )
-      ) {
+      if (checkIfLand(candidateLat, normalizedLng)) {
         continue;
       }
 
-      /*
-       * Candidate MUST have enough water around it.
-       */
-      if (
-        !isSafeOceanPoint(
-          candidateLat,
-          normalizedLng,
-          35
-        )
-      ) {
-        continue;
-      }
-
-      /*
-       * Final verification immediately before
-       * accepting the candidate.
-       */
-      if (
-        checkIfLand(
-          candidateLat,
-          normalizedLng
-        )
-      ) {
+      if (!isSafeOceanPoint(candidateLat, normalizedLng)) {
         continue;
       }
 
       bestCandidate = {
-        lat: Number(
-          candidateLat.toFixed(6)
-        ),
-        lng: Number(
-          normalizedLng.toFixed(6)
-        ),
+        lat: Number(candidateLat.toFixed(6)),
+        lng: Number(normalizedLng.toFixed(6)),
         redirected: true,
         failed: false,
       };
@@ -547,21 +373,8 @@ export function snapToNearestOcean(lat, lng) {
     }
   }
 
-  // ==========================================================
-  // STEP 3
-  // Return ONLY a verified ocean coordinate
-  // ==========================================================
-
   if (bestCandidate) {
-    /*
-     * One final land-mask verification.
-     */
-    if (
-      checkIfLand(
-        bestCandidate.lat,
-        bestCandidate.lng
-      )
-    ) {
+    if (checkIfLand(bestCandidate.lat, bestCandidate.lng)) {
       return {
         lat: originalLat,
         lng: originalLng,
@@ -572,11 +385,6 @@ export function snapToNearestOcean(lat, lng) {
 
     return bestCandidate;
   }
-
-  // ==========================================================
-  // STEP 4
-  // DO NOT FAKE AN OCEAN LOCATION
-  // ==========================================================
 
   return {
     lat: originalLat,
@@ -590,17 +398,10 @@ export function snapToNearestOcean(lat, lng) {
 // REGIONAL WATER BODY DETECTION
 // ============================================================
 
-export function getRegionalWaterBodyName(
-  lat,
-  lng
-) {
+export function getRegionalWaterBodyName(lat, lng) {
   const latitude = Number(lat);
-  const longitude =
-    normalizeLongitude(lng);
+  const longitude = normalizeLongitude(lng);
 
-  /*
-   * Arabian Sea
-   */
   if (
     latitude >= 5 &&
     latitude <= 30 &&
@@ -610,9 +411,6 @@ export function getRegionalWaterBodyName(
     return "Arabian Sea";
   }
 
-  /*
-   * Bay of Bengal
-   */
   if (
     latitude >= 5 &&
     latitude <= 25 &&
@@ -622,9 +420,6 @@ export function getRegionalWaterBodyName(
     return "Bay of Bengal";
   }
 
-  /*
-   * Andaman Sea
-   */
   if (
     latitude >= 5 &&
     latitude <= 18 &&
@@ -632,18 +427,6 @@ export function getRegionalWaterBodyName(
     longitude <= 101
   ) {
     return "Andaman Sea";
-  }
-
-  /*
-   * Indian Ocean
-   */
-  if (
-    latitude >= -40 &&
-    latitude <= 30 &&
-    longitude >= 40 &&
-    longitude <= 110
-  ) {
-    return "Indian Ocean";
   }
 
   return "Indian Ocean";

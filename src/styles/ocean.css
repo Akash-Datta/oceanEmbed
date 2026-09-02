@@ -1518,3 +1518,8 @@ select.ocean-control {
     transform: translateY(0);
   }
 }
+.ocean-page {
+  background: linear-gradient(135deg, #0c2979 0%, #1e628f 50%, #0698e1 100%);
+  position: relative;
+  overflow: hidden;
+}

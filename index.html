@@ -17,7 +17,7 @@
         width: 100%;
         height: 100%;
         overflow: hidden;
-        background: #0f172a;
+        background: #7993ce;
       }
 
       #root {
@@ -71,7 +71,7 @@
 
     <div id="boot-loader">
       <div id="boot-message">
-        Welcome to our webpage
+        আপোনাাক আমাৰ ৱেবপেজলৈ স্বাগতম
       </div>
     </div>
 
@@ -93,7 +93,7 @@
         "आमच्या वेबपेजवर आपले स्वागत आहे",
         "हाम्रो वेबपेजमा तपाईलाई स्वागत छ",
         "ଆମର ୱେବ୍‌ପେଜ୍‌କୁ ସ୍ୱାଗତ",
-        "ਸਾਡੇ ਵੈੱਬਪੇਜ 'ਤੇ ਤੁਹਾਡਾ ਸਵਾਗਤ ਹੈ",
+        "ਸਾਡੇ ਵੈੱਬਪੇਜ 'ਤੇ ਤੁਹਾਡਾ ਸਵਾਗതം ਹੈ",
         "अस्मदीये वेबपुट्जे भवतां स्वागतम्",
         "ᱟᱞᱮᱭᱟᱜ ᱣᱮᱵᱽᱯᱮᱡᱽ ᱨᱮ ᱡᱚᱛᱚ ᱠᱚ ᱜᱮ ᱜᱚᱭᱟᱨ",
         "اسان جي ويب پيج تي اوهان جي مهرباني",
@@ -103,30 +103,32 @@
         "Welcome to our webpage"
       ];
 
-      const bootMessage =
-        document.getElementById("boot-message");
-
+      const bootMessage = document.getElementById("boot-message");
       let bootIndex = 0;
-
       const BOOT_INTERVAL = 120;
+      let bootTimeout;
 
-      const bootInterval = setInterval(() => {
-        bootIndex =
-          (bootIndex + 1) % bootGreetings.length;
+      function stepBoot() {
+        if (bootIndex < bootGreetings.length - 1) {
+          bootIndex++;
+          bootMessage.textContent = bootGreetings[bootIndex];
+          bootTimeout = setTimeout(stepBoot, BOOT_INTERVAL);
+        } else {
+          // Linger on the final greeting ("Welcome to our webpage") until React takes over
+          bootMessage.textContent = bootGreetings[bootGreetings.length - 1];
+        }
+      }
 
-        bootMessage.textContent =
-          bootGreetings[bootIndex];
-      }, BOOT_INTERVAL);
+      bootTimeout = setTimeout(stepBoot, BOOT_INTERVAL);
 
       /*
        * React calls this immediately when it is ready
        * to take over the screen.
        */
       window.finishOceanBootLoader = () => {
-        clearInterval(bootInterval);
+        clearTimeout(bootTimeout);
 
-        const loader =
-          document.getElementById("boot-loader");
+        const loader = document.getElementById("boot-loader");
 
         if (!loader) return;
 

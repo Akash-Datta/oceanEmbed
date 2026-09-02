@@ -5,102 +5,67 @@ const ParticlesBackground = () => {
 
     useEffect(() => {
         const canvas = canvasRef.current;
-
         if (!canvas) return;
 
         const ctx = canvas.getContext("2d");
-
         let particles = [];
         let animationId;
-
-        const particleCount = 65;
+        const particleCount = 50;
 
         class Particle {
             constructor() {
                 this.reset();
-                this.x = Math.random() * canvas.width;
+                // Randomly scatter initial positions across the whole screen height
                 this.y = Math.random() * canvas.height;
             }
 
             reset() {
                 this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
+                this.y = canvas.height + 20; // Start just below the screen
+                this.radius = Math.random() * 2.2 + 0.6; // Varied bubble/plankton sizes
+                
+                // Buoyancy: move upward consistently with a slight drift
+                this.speedY = -(Math.random() * 0.5 + 0.15); 
+                this.speedX = (Math.random() - 0.5) * 0.25;
 
-                this.radius = Math.random() * 1.8 + 0.6;
+                // Sine wave parameters for organic underwater swaying current
+                this.wobble = Math.random() * Math.PI * 2;
+                this.wobbleSpeed = Math.random() * 0.02 + 0.008;
 
-                this.speedX = (Math.random() - 0.5) * 0.35;
-                this.speedY = (Math.random() - 0.5) * 0.35;
-
-                this.opacity = Math.random() * 0.5 + 0.25;
-
-                this.twinkleSpeed = Math.random() * 0.02 + 0.005;
-                this.twinkleDirection = Math.random() > 0.5 ? 1 : -1;
+                this.opacity = Math.random() * 0.4 + 0.1;
             }
 
             draw() {
                 ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
 
-                ctx.arc(
-                    this.x,
-                    this.y,
-                    this.radius,
-                    0,
-                    Math.PI * 2
-                );
-
-                const alpha = Math.max(
-                    0.15,
-                    Math.min(0.9, this.opacity)
-                );
-
-                ctx.fillStyle = `rgba(125, 211, 252, ${alpha})`;
-
-                ctx.shadowBlur = 8;
-                ctx.shadowColor = `rgba(56, 189, 248, ${alpha})`;
-
+                // Aquatic cyan/teal soft glow
+                ctx.fillStyle = `rgba(148, 221, 248, ${this.opacity})`;
+                ctx.shadowBlur = 12;
+                ctx.shadowColor = `rgba(34, 211, 238, 0.4)`;
+                
                 ctx.fill();
-
-                ctx.shadowBlur = 0;
+                ctx.shadowBlur = 0; // Reset shadow for performance
             }
 
             update() {
-                this.x += this.speedX;
+                // Apply current swaying and upward buoyancy
+                this.wobble += this.wobbleSpeed;
+                this.x += this.speedX + Math.sin(this.wobble) * 0.3;
                 this.y += this.speedY;
 
-                /*
-                 * Subtle twinkling effect
-                 */
-                this.opacity +=
-                    this.twinkleSpeed * this.twinkleDirection;
+                // Organic shimmer/pulsing effect
+                this.opacity += Math.sin(this.wobble) * 0.003;
+                this.opacity = Math.max(0.05, Math.min(0.55, this.opacity));
 
-                if (this.opacity >= 0.8) {
-                    this.opacity = 0.8;
-                    this.twinkleDirection = -1;
+                // Recycle particle to the bottom when it floats past the top
+                if (this.y < -10) {
+                    this.reset();
                 }
 
-                if (this.opacity <= 0.2) {
-                    this.opacity = 0.2;
-                    this.twinkleDirection = 1;
-                }
-
-                /*
-                 * Wrap around screen
-                 */
-                if (this.x < -5) {
-                    this.x = canvas.width + 5;
-                }
-
-                if (this.x > canvas.width + 5) {
-                    this.x = -5;
-                }
-
-                if (this.y < -5) {
-                    this.y = canvas.height + 5;
-                }
-
-                if (this.y > canvas.height + 5) {
-                    this.y = -5;
-                }
+                // Wrap around horizontally if it drifts off the screen sides
+                if (this.x < -10) this.x = canvas.width + 10;
+                if (this.x > canvas.width + 10) this.x = -10;
 
                 this.draw();
             }
@@ -108,7 +73,6 @@ const ParticlesBackground = () => {
 
         const createParticles = () => {
             particles = [];
-
             for (let i = 0; i < particleCount; i++) {
                 particles.push(new Particle());
             }
@@ -124,21 +88,14 @@ const ParticlesBackground = () => {
             canvas.style.height = `${window.innerHeight}px`;
 
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
             createParticles();
         };
 
         resizeCanvas();
-
         window.addEventListener("resize", resizeCanvas);
 
         const animate = () => {
-            ctx.clearRect(
-                0,
-                0,
-                window.innerWidth,
-                window.innerHeight
-            );
+            ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
             particles.forEach((particle) => {
                 particle.update();

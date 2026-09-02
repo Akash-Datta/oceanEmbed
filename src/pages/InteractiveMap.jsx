@@ -19,7 +19,6 @@ import LocationMarker, {
 } from "../components/LocationMarker";
 import DataSidePanel from "../components/DataSidePanel";
 import SpatialDistribution from "../components/SpatialDistribution";
-import IntroAnimation from "../components/IntroAnimation";
 import AboutAuthors from "../components/AboutAuthors";
 
 import {
@@ -180,8 +179,6 @@ export default function InteractiveMap({ onMapLoaded }) {
 
   return (
     <div className="ocean-page">
-      <IntroAnimation isLoaded={isMapLoaded} onFinish={() => { }} />
-
       <nav className="ocean-navbar">
         <div className="navbar-brand">
           <h2 className="ocean-title">Spatiotemporal Ocean Temperature Profiling</h2>
@@ -197,7 +194,6 @@ export default function InteractiveMap({ onMapLoaded }) {
         </button>
       </nav>
 
-      {/* Notification banner placed directly below navbar in normal document flow */}
       {notification && (
         <div className="ocean-notification-banner">
           <span>⚠️ {notification}</span>

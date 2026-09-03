@@ -14,65 +14,48 @@ export default function DataSidePanel({
   seaName,
   onClose,
 }) {
-  const [isExpanded, setIsExpanded] =
-    useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
-  const metrics = useMemo(() => {
+  const { snappedLat, snappedLng, metrics } = useMemo(() => {
     if (!position) {
-      return null;
+      return { snappedLat: 0, snappedLng: 0, metrics: null };
     }
 
-    return getLocationMetrics(
-      position.lat,
-      position.lng
-    );
-  }, [
-    position?.lat,
-    position?.lng,
-  ]);
+    // Optimization algorithm: Snap exact coordinates to the nearest 0.25 grid increment
+    const sLat = Math.round(position.lat / 0.25) * 0.25;
+    const sLng = Math.round(position.lng / 0.25) * 0.25;
+
+    const data = getLocationMetrics(sLat, sLng);
+    return { snappedLat: sLat, snappedLng: sLng, metrics: data };
+  }, [position?.lat, position?.lng]);
 
   if (!position || !metrics) {
     return null;
   }
 
   const toggleExpand = () => {
-    setIsExpanded(
-      (previous) => !previous
-    );
+    setIsExpanded((previous) => !previous);
   };
 
-  const displaySeaName =
-    seaName || "Loading sea name...";
-
-  const isLoading =
-    displaySeaName ===
-    "Loading sea name...";
+  const displaySeaName = seaName || "Loading sea name...";
+  const isLoading = displaySeaName === "Loading sea name...";
 
   return (
     <div
       className={`side-data-panel ${
-        isExpanded
-          ? "expanded"
-          : ""
+        isExpanded ? "expanded" : ""
       }`}
     >
       <div className="panel-header">
-        <h4>Location Data</h4>
+        <h4>Grid Location Data</h4>
 
         <div className="panel-actions">
-
           <button
             onClick={toggleExpand}
             className="action-btn expand-btn"
-            title={
-              isExpanded
-                ? "Collapse"
-                : "Expand"
-            }
+            title={isExpanded ? "Collapse" : "Expand"}
           >
-            {isExpanded
-              ? "🗗"
-              : "⛶"}
+            {isExpanded ? "🗗" : "⛶"}
           </button>
 
           <button
@@ -82,22 +65,18 @@ export default function DataSidePanel({
           >
             ×
           </button>
-
         </div>
       </div>
 
       <div className="panel-content">
-
         {/* WATER BODY */}
         <div
           style={{
             marginBottom: "12px",
             padding: "8px 10px",
-            background:
-              "rgba(14, 165, 233, 0.08)",
+            background: "rgba(14, 165, 233, 0.08)",
             borderRadius: "6px",
-            borderLeft:
-              "3px solid #0ea5e9",
+            borderLeft: "3px solid #0ea5e9",
           }}
         >
           <span
@@ -106,8 +85,7 @@ export default function DataSidePanel({
               color: "#64748b",
               display: "block",
               fontWeight: "bold",
-              textTransform:
-                "uppercase",
+              textTransform: "uppercase",
             }}
           >
             Water Body
@@ -115,56 +93,45 @@ export default function DataSidePanel({
 
           <strong
             style={{
-              color: isLoading
-                ? "#64748b"
-                : "#0369a1",
+              color: isLoading ? "#64748b" : "#0369a1",
               fontSize: "13px",
-              letterSpacing:
-                "0.3px",
+              letterSpacing: "0.3px",
             }}
           >
             {displaySeaName}
           </strong>
         </div>
 
-        {/* COORDINATES */}
+        {/* DATASET GRID COORDINATES ($0.25^\circ$ STEP FORMAT) */}
         <p>
-          <strong>Lat:</strong>{" "}
-          {position.lat.toFixed(6)}°
+          <strong>Grid Lat:</strong> {snappedLat.toFixed(2)}°
         </p>
 
         <p>
-          <strong>Lng:</strong>{" "}
-          {position.lng.toFixed(6)}°
+          <strong>Grid Lng:</strong> {snappedLng.toFixed(2)}°
         </p>
 
         {depth && (
           <p>
-            <strong>Depth:</strong>{" "}
-            {depth} m
+            <strong>Depth:</strong> {depth} m
           </p>
         )}
 
         <hr />
 
-        <h5>
-          Surface Parameters
-        </h5>
+        <h5>Surface Parameters</h5>
 
         <div
           style={{
             display: "grid",
-            gridTemplateColumns:
-              "1fr 1fr",
+            gridTemplateColumns: "1fr 1fr",
             gap: "10px",
             marginBottom: "20px",
           }}
         >
-
           <div
             style={{
-              background:
-                "rgba(14, 165, 233, 0.1)",
+              background: "rgba(14, 165, 233, 0.1)",
               padding: "10px",
               borderRadius: "8px",
             }}
@@ -192,8 +159,7 @@ export default function DataSidePanel({
 
           <div
             style={{
-              background:
-                "rgba(14, 165, 233, 0.1)",
+              background: "rgba(14, 165, 233, 0.1)",
               padding: "10px",
               borderRadius: "8px",
             }}
@@ -221,8 +187,7 @@ export default function DataSidePanel({
 
           <div
             style={{
-              background:
-                "rgba(14, 165, 233, 0.1)",
+              background: "rgba(14, 165, 233, 0.1)",
               padding: "10px",
               borderRadius: "8px",
             }}
@@ -250,8 +215,7 @@ export default function DataSidePanel({
 
           <div
             style={{
-              background:
-                "rgba(14, 165, 233, 0.1)",
+              background: "rgba(14, 165, 233, 0.1)",
               padding: "10px",
               borderRadius: "8px",
             }}
@@ -276,32 +240,23 @@ export default function DataSidePanel({
               {metrics.surfaceData.sla} m
             </strong>
           </div>
-
         </div>
 
         <hr />
 
-        <h5>
-          Vertical Temperature Profile
-        </h5>
+        <h5>Vertical Temperature Profile</h5>
 
         <div
           style={{
-            height: isExpanded
-              ? "400px"
-              : "220px",
-            transition:
-              "height 0.3s",
+            height: isExpanded ? "400px" : "220px",
+            transition: "height 0.3s",
           }}
         >
           <TemperatureProfile
             selectedDepth={depth}
-            profileData={
-              metrics.profileData
-            }
+            profileData={metrics.profileData}
           />
         </div>
-
       </div>
     </div>
   );

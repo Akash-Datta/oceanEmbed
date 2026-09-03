@@ -3,12 +3,14 @@ import "leaflet/dist/leaflet.css";
 import React, {
   useCallback,
   useEffect,
+  useMemo,
   useState,
 } from "react";
 
 import {
   MapContainer,
   TileLayer,
+  useMap,
 } from "react-leaflet";
 
 import ControlBar from "../components/ControlBar";
@@ -20,6 +22,7 @@ import LocationMarker, {
 import DataSidePanel from "../components/DataSidePanel";
 import SpatialDistribution from "../components/SpatialDistribution";
 import AboutAuthors from "../components/AboutAuthors";
+import WebGuidelines from "../components/WebGuidelines";
 
 import {
   parseCoordinate,
@@ -29,6 +32,19 @@ import {
 } from "../utils/coordinateUtils";
 
 import "../styles/ocean.css";
+
+function MapInvalidator({ trigger }) {
+  const map = useMap();
+  useEffect(() => {
+    if (map) {
+      const timer = setTimeout(() => {
+        map.invalidateSize();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [map, trigger]);
+  return null;
+}
 
 export default function InteractiveMap({ onMapLoaded }) {
   const [position, setPosition] = useState(null);
@@ -45,6 +61,7 @@ export default function InteractiveMap({ onMapLoaded }) {
   const [activeLayerMode, setActiveLayerMode] = useState(false);
   const [initialFocus, setInitialFocus] = useState(null);
   const [showAboutPanel, setShowAboutPanel] = useState(false);
+  const [showGuidelinesPanel, setShowGuidelinesPanel] = useState(false);
   const [notification, setNotification] = useState(null);
 
   const [isMapLoaded, setIsMapLoaded] = useState(false);
@@ -177,6 +194,41 @@ export default function InteractiveMap({ onMapLoaded }) {
     !position.isOnLand
   );
 
+  const memoizedMapContainer = useMemo(() => (
+    <MapContainer
+      className="ocean-map"
+      bounds={[
+        [7, 56],
+        [25, 99],
+      ]}
+      minZoom={3}
+      maxZoom={12}
+      attributionControl={false}
+      worldCopyJump={true}
+      maxBounds={[
+        [-90, -Infinity],
+        [90, Infinity],
+      ]}
+      maxBoundsViscosity={1.0}
+      whenReady={handleMapReady}
+    >
+      <TileLayer
+        url={`https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png?key=${import.meta.env.VITE_MAP_API_KEY}`}
+      />
+      <MapTouchController />
+      <DynamicGrid />
+      <LocationMarker
+        position={position}
+        setPosition={setPosition}
+        startDate={startDate}
+        onSeaNameResolved={handleSeaNameResolved}
+        triggerNotification={triggerNotification}
+      />
+      <MapController targetPosition={targetPosition} />
+      <MapInvalidator trigger={showAboutPanel || showGuidelinesPanel} />
+    </MapContainer>
+  ), [handleMapReady, position, targetPosition, startDate, handleSeaNameResolved, triggerNotification, showAboutPanel, showGuidelinesPanel]);
+
   return (
     <div className="ocean-page">
       <nav className="ocean-navbar">
@@ -186,12 +238,24 @@ export default function InteractiveMap({ onMapLoaded }) {
             Interactive marine temperature intelligence • Spatial mapping • Depth-wise profiling
           </div>
         </div>
-        <button
-          className="about-authors-nav-btn"
-          onClick={() => setShowAboutPanel(true)}
-        >
-          👥 About Authors
-        </button>
+        <div style={{ display: "flex", gap: "10px" }}>
+          <button
+            className="about-authors-nav-btn"
+            onClick={() => setShowGuidelinesPanel(true)}
+            disabled={showGuidelinesPanel || showAboutPanel}
+            style={{ opacity: (showGuidelinesPanel || showAboutPanel) ? 0.6 : 1, cursor: (showGuidelinesPanel || showAboutPanel) ? "not-allowed" : "pointer" }}
+          >
+            📖 Web Guidelines
+          </button>
+          <button
+            className="about-authors-nav-btn"
+            onClick={() => setShowAboutPanel(true)}
+            disabled={showAboutPanel || showGuidelinesPanel}
+            style={{ opacity: (showAboutPanel || showGuidelinesPanel) ? 0.6 : 1, cursor: (showAboutPanel || showGuidelinesPanel) ? "not-allowed" : "pointer" }}
+          >
+            👥 About Authors
+          </button>
+        </div>
       </nav>
 
       {notification && (
@@ -201,37 +265,7 @@ export default function InteractiveMap({ onMapLoaded }) {
       )}
 
       <div className="ocean-map-wrapper">
-        <MapContainer
-          className="ocean-map"
-          bounds={[
-            [7, 56],
-            [25, 99],
-          ]}
-          minZoom={3}
-          maxZoom={12}
-          attributionControl={false}
-          worldCopyJump={true}
-          maxBounds={[
-            [-90, -Infinity],
-            [90, Infinity],
-          ]}
-          maxBoundsViscosity={1.0}
-          whenReady={handleMapReady}
-        >
-          <TileLayer
-            url={`https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png?key=${import.meta.env.VITE_MAP_API_KEY}`}
-          />
-          <MapTouchController />
-          <DynamicGrid />
-          <LocationMarker
-            position={position}
-            setPosition={setPosition}
-            startDate={startDate}
-            onSeaNameResolved={handleSeaNameResolved}
-            triggerNotification={triggerNotification}
-          />
-          <MapController targetPosition={targetPosition} />
-        </MapContainer>
+        {memoizedMapContainer}
 
         {activeLayerMode ? (
           <div className="map-layer-controls">
@@ -314,6 +348,10 @@ export default function InteractiveMap({ onMapLoaded }) {
 
       {showAboutPanel && (
         <AboutAuthors onClose={() => setShowAboutPanel(false)} />
+      )}
+
+      {showGuidelinesPanel && (
+        <WebGuidelines onClose={() => setShowGuidelinesPanel(false)} />
       )}
     </div>
   );

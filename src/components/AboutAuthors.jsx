@@ -50,7 +50,7 @@ export default function AboutAuthors({ onClose }) {
                 <img src="/akash.jpeg" alt="Akash Datta" className="member-img" />
               </div>
               <h5>Akash Datta</h5>
-              <p className="member-role">Front Developer & MERN Stack</p>
+              <p className="member-role">Frontend Developer & MERN Stack</p>
               <a href="https://github.com/AkashDatta" target="_blank" rel="noreferrer" className="github-link">
                 <span>GitHub Profile</span>
               </a>
@@ -69,7 +69,7 @@ export default function AboutAuthors({ onClose }) {
 
             <div className="member-card">
               <div className="member-avatar">
-                <img src="/anuvab.png" alt="Anuvab Kundu" className="member-img" />
+                <img src="/anuvab.jpeg" alt="Anuvab Kundu" className="member-img" />
               </div>
               <h5>Anuvab Kundu</h5>
               <p className="member-role">ML Architect Executioner</p>

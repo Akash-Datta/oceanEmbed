@@ -46,10 +46,25 @@ function MapInvalidator({ trigger }) {
   return null;
 }
 
+// Safely captures the map instance and exposes it to the parent wrapper
+function MapInitializer({ setMap, onMapLoaded }) {
+  const map = useMap();
+  useEffect(() => {
+    if (map) {
+      setMap(map);
+      if (onMapLoaded) {
+        onMapLoaded();
+      }
+    }
+  }, [map, setMap, onMapLoaded]);
+  return null;
+}
+
 export default function InteractiveMap({ onMapLoaded }) {
   const [position, setPosition] = useState(null);
   const [targetPosition, setTargetPosition] = useState(null);
   const [currentSeaName, setCurrentSeaName] = useState("");
+  const [mapInstance, setMapInstance] = useState(null);
 
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -112,6 +127,7 @@ export default function InteractiveMap({ onMapLoaded }) {
 
     setLatitude(formatLatitude(position.lat));
     setLongitude(formatLongitude(position.lng));
+    setTargetPosition(position);
   }, [position]);
 
   const handleSeaNameResolved = useCallback((name) => {
@@ -203,6 +219,7 @@ export default function InteractiveMap({ onMapLoaded }) {
       ]}
       minZoom={3}
       maxZoom={12}
+      zoomControl={false}
       attributionControl={false}
       worldCopyJump={true}
       maxBounds={[
@@ -210,7 +227,6 @@ export default function InteractiveMap({ onMapLoaded }) {
         [90, Infinity],
       ]}
       maxBoundsViscosity={1.0}
-      whenReady={handleMapReady}
     >
       <TileLayer
         url={`https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png?key=${import.meta.env.VITE_MAP_API_KEY}`}
@@ -225,6 +241,7 @@ export default function InteractiveMap({ onMapLoaded }) {
         triggerNotification={triggerNotification}
       />
       <MapController targetPosition={targetPosition} />
+      <MapInitializer setMap={setMapInstance} onMapLoaded={handleMapReady} />
       <MapInvalidator trigger={showAboutPanel || showGuidelinesPanel} />
     </MapContainer>
   ), [handleMapReady, position, targetPosition, startDate, handleSeaNameResolved, triggerNotification, showAboutPanel, showGuidelinesPanel]);
@@ -266,6 +283,28 @@ export default function InteractiveMap({ onMapLoaded }) {
 
       <div className="ocean-map-wrapper">
         {memoizedMapContainer}
+
+        {/* Stable custom zoom controls rendered outside MapContainer to prevent DOM stripping */}
+        {mapInstance && (
+          <div className="custom-zoom-controls" onClick={(e) => e.stopPropagation()}>
+            <button
+              className="custom-zoom-btn"
+              type="button"
+              onClick={() => mapInstance.zoomIn()}
+              title="Zoom In"
+            >
+              +
+            </button>
+            <button
+              className="custom-zoom-btn"
+              type="button"
+              onClick={() => mapInstance.zoomOut()}
+              title="Zoom Out"
+            >
+              −
+            </button>
+          </div>
+        )}
 
         {activeLayerMode ? (
           <div className="map-layer-controls">

@@ -21,7 +21,6 @@ export default function DataSidePanel({
       return { snappedLat: 0, snappedLng: 0, metrics: null };
     }
 
-    // Optimization algorithm: Snap exact coordinates to the nearest 0.25 grid increment
     const sLat = Math.round(position.lat / 0.25) * 0.25;
     const sLng = Math.round(position.lng / 0.25) * 0.25;
 
@@ -69,7 +68,6 @@ export default function DataSidePanel({
       </div>
 
       <div className="panel-content">
-        {/* WATER BODY */}
         <div
           style={{
             marginBottom: "12px",
@@ -102,7 +100,6 @@ export default function DataSidePanel({
           </strong>
         </div>
 
-        {/* DATASET GRID COORDINATES ($0.25^\circ$ STEP FORMAT) */}
         <p>
           <strong>Grid Lat:</strong> {snappedLat.toFixed(2)}°
         </p>
@@ -228,7 +225,7 @@ export default function DataSidePanel({
                 fontWeight: "bold",
               }}
             >
-              SLA (Anomaly)
+              UO (Eastward Current)
             </span>
 
             <strong
@@ -237,7 +234,36 @@ export default function DataSidePanel({
                 fontSize: "15px",
               }}
             >
-              {metrics.surfaceData.sla} m
+              {metrics.surfaceData.uo} m/s
+            </strong>
+          </div>
+
+          <div
+            style={{
+              background: "rgba(14, 165, 233, 0.1)",
+              padding: "10px",
+              borderRadius: "8px",
+              gridColumn: "span 2",
+            }}
+          >
+            <span
+              style={{
+                fontSize: "11px",
+                color: "#64748b",
+                display: "block",
+                fontWeight: "bold",
+              }}
+            >
+              VO (Northward Current)
+            </span>
+
+            <strong
+              style={{
+                color: "#0f172a",
+                fontSize: "15px",
+              }}
+            >
+              {metrics.surfaceData.vo} m/s
             </strong>
           </div>
         </div>

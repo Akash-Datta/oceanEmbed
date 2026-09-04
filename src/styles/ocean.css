@@ -2714,7 +2714,7 @@ select.ocean-control {
    ===================================================== */
 @media (max-width: 700px) {
     .ocean-page {
-        padding: 8px;
+        padding: 6px;
         height: 100vh;
         overflow-y: auto;
     }
@@ -2722,8 +2722,8 @@ select.ocean-control {
     .ocean-navbar {
         flex-direction: column;
         align-items: stretch;
-        gap: 8px;
-        padding: 10px;
+        gap: 6px;
+        padding: 8px;
     }
 
     .navbar-actions, div[style*="display: flex"][style*="gap: 10px"] {
@@ -2735,48 +2735,117 @@ select.ocean-control {
     .about-authors-nav-btn {
         flex: 1;
         text-align: center;
-        padding: 7px 10px;
+        padding: 6px 8px;
         font-size: 11px;
     }
 
+    /* Make map compact on mobile */
+    .ocean-map-wrapper {
+        height: 440px;
+        border-radius: 16px;
+    }
+
+    /* Move zoom controls to bottom-right to avoid clashing */
+    .custom-zoom-controls {
+        bottom: 16px;
+        right: 16px;
+        left: auto;
+    }
+
+    /* Automatically hide input control bar when side panel is open on mobile */
+    .ocean-map-wrapper:has(.side-data-panel) .ocean-controls {
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(-15px);
+        transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
     .ocean-controls {
-        top: 12px;
-        left: 12px;
-        right: 12px;
+        top: 10px;
+        left: 10px;
+        right: 10px;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 8px;
-        padding: 10px;
+        gap: 6px;
+        padding: 8px;
+        border-radius: 14px;
     }
 
     .ocean-go {
         grid-column: span 2;
     }
 
+    /* Side panel bottom sheet styling */
     .side-data-panel {
         top: auto;
         bottom: 0;
         right: 0;
         left: 0;
         width: 100%;
-        height: 50vh;
+        height: 48vh;
         border-radius: 20px 20px 0 0;
     }
 
     .side-data-panel.expanded {
         height: 100vh;
         border-radius: 0;
+        top: 0;
     }
 
+    /* Spatial Distribution (3-Map View) mobile fixes */
+    .spatial-dashboard-container {
+        padding: 10px;
+        background: rgba(13, 42, 124, 0.85);
+        backdrop-filter: blur(10px);
+    }
+
+    .spatial-dashboard-inner {
+        padding: 14px;
+        max-height: 94vh;
+        border-radius: 16px;
+    }
+
+    .spatial-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        margin-bottom: 14px;
+        padding-bottom: 10px;
+    }
+
+    .spatial-title {
+        font-size: 15px;
+        text-align: center;
+    }
+
+    .spatial-header .back-to-map-btn {
+        width: 100%;
+        text-align: center;
+        padding: 8px;
+    }
+
+    .spatial-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .spatial-image-wrapper {
+        aspect-ratio: 16 / 9;
+    }
+
+    .spatial-grid .spatial-card.focused {
+        transform: scale(1.02);
+    }
+
+    /* About & Guidelines mobile drawer */
     .about-authors-panel {
         max-width: 100% !important;
         border-radius: 24px 24px 0 0 !important;
-        height: 88vh !important;
+        height: 85vh !important;
         position: fixed !important;
         bottom: 0 !important;
         top: auto !important;
         left: 0 !important;
         right: 0 !important;
-        animation: slideInUpPanel 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
     .contributors-grid {

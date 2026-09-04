@@ -65,8 +65,25 @@ export default function InteractiveMap({ onMapLoaded }) {
   const [currentSeaName, setCurrentSeaName] = useState("");
   const [mapInstance, setMapInstance] = useState(null);
 
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  // Initialize start date by default to 4 days prior to today (e.g., August 31 when today is September 4)
+  const [startDate, setStartDate] = useState(() => {
+    const d = new Date();
+    d.setDate(d.getDate() - 4);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  });
+
+  // Initialize end date by default to today
+  const [endDate, setEndDate] = useState(() => {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  });
+
   const [depth, setDepth] = useState("");
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
@@ -130,7 +147,6 @@ export default function InteractiveMap({ onMapLoaded }) {
     const diffTime = today - selectedDate;
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-    // Restrict Sept 2, 3, and 4 (diffDays 0, 1, and 2) with pending sync notification
     if (diffDays >= 0 && diffDays <= 2) {
       const targetDateStr = selectedDate.toLocaleDateString("en-US", {
         month: "long",
@@ -143,7 +159,6 @@ export default function InteractiveMap({ onMapLoaded }) {
       return;
     }
 
-    // September 1, August 31, and all prior dates (diffDays >= 3) work normally
     setStartDate(value);
   };
 

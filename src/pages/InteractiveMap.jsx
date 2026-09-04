@@ -65,7 +65,7 @@ export default function InteractiveMap({ onMapLoaded }) {
   const [currentSeaName, setCurrentSeaName] = useState("");
   const [mapInstance, setMapInstance] = useState(null);
 
-  // Initialize start date by default to 4 days prior to today (e.g., August 31 when today is September 4)
+  // Initialize start date by default to exactly 4 days prior to current date
   const [startDate, setStartDate] = useState(() => {
     const d = new Date();
     d.setDate(d.getDate() - 4);
@@ -75,7 +75,7 @@ export default function InteractiveMap({ onMapLoaded }) {
     return `${year}-${month}-${day}`;
   });
 
-  // Initialize end date by default to today
+  // Initialize end date by default to current date
   const [endDate, setEndDate] = useState(() => {
     const d = new Date();
     const year = d.getFullYear();
@@ -144,16 +144,17 @@ export default function InteractiveMap({ onMapLoaded }) {
       return;
     }
 
-    const diffTime = today - selectedDate;
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    // Maximum allowable starting date is current date minus 4 days
+    const maxAllowedStartDate = new Date(today);
+    maxAllowedStartDate.setDate(today.getDate() - 4);
 
-    if (diffDays >= 0 && diffDays <= 2) {
+    if (selectedDate > maxAllowedStartDate) {
       const targetDateStr = selectedDate.toLocaleDateString("en-US", {
         month: "long",
         day: "numeric",
         year: "numeric",
       });
-      triggerNotification(`Selected date (${targetDateStr}) is restricted: Historical archive data for this date is currently pending synchronization.`);
+      triggerNotification(`Selected date (${targetDateStr}) is restricted: Historical archive data for dates within the last 4 days is currently pending synchronization.`);
       setStartDate("");
       setEndDate("");
       return;
@@ -176,9 +177,14 @@ export default function InteractiveMap({ onMapLoaded }) {
 
     date.setDate(date.getDate() + 4);
 
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const targetDate = date > today ? today : date;
+
+    const year = targetDate.getFullYear();
+    const month = String(targetDate.getMonth() + 1).padStart(2, "0");
+    const day = String(targetDate.getDate()).padStart(2, "0");
     
     setEndDate(`${year}-${month}-${day}`);
   }, [startDate]);

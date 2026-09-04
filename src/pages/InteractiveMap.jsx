@@ -46,7 +46,6 @@ function MapInvalidator({ trigger }) {
   return null;
 }
 
-// Safely captures the map instance and exposes it to the parent wrapper
 function MapInitializer({ setMap, onMapLoaded }) {
   const map = useMap();
   useEffect(() => {
@@ -104,6 +103,50 @@ export default function InteractiveMap({ onMapLoaded }) {
     }
   }, [onMapLoaded]);
 
+  const validateAndSetStartDate = (value) => {
+    if (!value) {
+      setStartDate("");
+      setEndDate("");
+      return;
+    }
+
+    const selectedDate = new Date(`${value}T00:00:00`);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const formattedToday = today.toLocaleDateString("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    });
+
+    if (selectedDate > today) {
+      triggerNotification(`You cannot enter future dates beyond today (${formattedToday}).`);
+      setStartDate("");
+      setEndDate("");
+      return;
+    }
+
+    const diffTime = today - selectedDate;
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+    // Restrict Sept 2, 3, and 4 (diffDays 0, 1, and 2) with pending sync notification
+    if (diffDays >= 0 && diffDays <= 2) {
+      const targetDateStr = selectedDate.toLocaleDateString("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      });
+      triggerNotification(`Selected date (${targetDateStr}) is restricted: Historical archive data for this date is currently pending synchronization.`);
+      setStartDate("");
+      setEndDate("");
+      return;
+    }
+
+    // September 1, August 31, and all prior dates (diffDays >= 3) work normally
+    setStartDate(value);
+  };
+
   useEffect(() => {
     if (!startDate) {
       setEndDate("");
@@ -117,7 +160,12 @@ export default function InteractiveMap({ onMapLoaded }) {
     }
 
     date.setDate(date.getDate() + 4);
-    setEndDate(date.toISOString().split("T")[0]);
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    
+    setEndDate(`${year}-${month}-${day}`);
   }, [startDate]);
 
   useEffect(() => {
@@ -157,7 +205,7 @@ export default function InteractiveMap({ onMapLoaded }) {
 
   const handleGo = async () => {
     if (!startDate) {
-      triggerNotification("Please enter the starting date first.");
+      triggerNotification("Please enter a valid starting date first.");
       return;
     }
 
@@ -284,7 +332,6 @@ export default function InteractiveMap({ onMapLoaded }) {
       <div className="ocean-map-wrapper">
         {memoizedMapContainer}
 
-        {/* Stable custom zoom controls rendered outside MapContainer to prevent DOM stripping */}
         {mapInstance && (
           <div className="custom-zoom-controls" onClick={(e) => e.stopPropagation()}>
             <button
@@ -353,7 +400,7 @@ export default function InteractiveMap({ onMapLoaded }) {
         ) : (
           <ControlBar
             startDate={startDate}
-            setStartDate={setStartDate}
+            setStartDate={validateAndSetStartDate}
             endDate={endDate}
             depth={depth}
             setDepth={setDepth}

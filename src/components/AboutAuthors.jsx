@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { useLanguage } from "../context/LanguageContext";
 
 export default function AboutAuthors({ onClose }) {
   const { t } = useLanguage();
+  const [zoomedMember, setZoomedMember] = useState(null);
 
   return (
     <div className="about-authors-backdrop" onClick={onClose}>
@@ -27,7 +28,10 @@ export default function AboutAuthors({ onClose }) {
 
           <div className="contributors-grid">
             <div className="member-card">
-              <div className="member-avatar">
+              <div 
+                className="member-avatar clickable-avatar" 
+                onClick={() => setZoomedMember({ img: "/Aadi.png", nameKey: "aadiName" })}
+              >
                 <img src="/Aadi.png" alt="Aaditya Sardar" className="member-img" />
               </div>
               <h5>{t("aadiName")}</h5>
@@ -38,7 +42,10 @@ export default function AboutAuthors({ onClose }) {
             </div>
 
             <div className="member-card">
-              <div className="member-avatar">
+              <div 
+                className="member-avatar clickable-avatar" 
+                onClick={() => setZoomedMember({ img: "/Teesta.jpeg", nameKey: "teestaName" })}
+              >
                 <img src="/Teesta.jpeg" alt="Teesta Mukherjee" className="member-img" />
               </div>
               <h5>{t("teestaName")}</h5>
@@ -49,7 +56,10 @@ export default function AboutAuthors({ onClose }) {
             </div>
 
             <div className="member-card">
-              <div className="member-avatar">
+              <div 
+                className="member-avatar clickable-avatar" 
+                onClick={() => setZoomedMember({ img: "/akash.jpeg", nameKey: "akashName" })}
+              >
                 <img src="/akash.jpeg" alt="Akash Datta" className="member-img" />
               </div>
               <h5>{t("akashName")}</h5>
@@ -60,7 +70,10 @@ export default function AboutAuthors({ onClose }) {
             </div>
 
             <div className="member-card">
-              <div className="member-avatar">
+              <div 
+                className="member-avatar clickable-avatar" 
+                onClick={() => setZoomedMember({ img: "/ayush.jpeg", nameKey: "ayushName" })}
+              >
                 <img src="/ayush.jpeg" alt="Ayush Mondal" className="member-img" />
               </div>
               <h5>{t("ayushName")}</h5>
@@ -71,7 +84,10 @@ export default function AboutAuthors({ onClose }) {
             </div>
 
             <div className="member-card">
-              <div className="member-avatar">
+              <div 
+                className="member-avatar clickable-avatar" 
+                onClick={() => setZoomedMember({ img: "/anuvab.jpeg", nameKey: "anuvabName" })}
+              >
                 <img src="/anuvab.jpeg" alt="Anuvab Kundu" className="member-img" />
               </div>
               <h5>{t("anuvabName")}</h5>
@@ -82,7 +98,10 @@ export default function AboutAuthors({ onClose }) {
             </div>
 
             <div className="member-card">
-              <div className="member-avatar">
+              <div 
+                className="member-avatar clickable-avatar" 
+                onClick={() => setZoomedMember({ img: "/jishnu.jpeg", nameKey: "jishnuName" })}
+              >
                 <img src="/jishnu.jpeg" alt="Jishnu Pal" className="member-img" />
               </div>
               <h5>{t("jishnuName")}</h5>
@@ -94,6 +113,21 @@ export default function AboutAuthors({ onClose }) {
           </div>
         </div>
       </div>
+
+      {/* WhatsApp-Style Photo Zoom Lightbox with Blur & Auto-Translation */}
+      {zoomedMember && (
+        <div className="photo-zoom-backdrop" onClick={() => setZoomedMember(null)}>
+          <div className="photo-zoom-content" onClick={(e) => e.stopPropagation()}>
+            <button className="zoom-back-btn" onClick={() => setZoomedMember(null)}>
+              ← Back
+            </button>
+            <div className="zoomed-image-wrapper">
+              <img src={zoomedMember.img} alt={t(zoomedMember.nameKey)} className="zoomed-target-img" />
+            </div>
+            <h3 className="zoomed-person-name">{t(zoomedMember.nameKey)}</h3>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

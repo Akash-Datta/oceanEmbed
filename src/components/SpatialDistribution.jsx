@@ -1,11 +1,5 @@
-import React, {
-  useEffect,
-  useState,
-} from "react";
-
-import {
-  fetchSpatialMaps,
-} from "../data/dummyOceanData";
+import React, { useEffect, useState } from "react";
+import { fetchSpatialMaps } from "../data/dummyOceanData";
 import { useLanguage } from "../context/LanguageContext";
 
 export default function SpatialDistribution({
@@ -22,6 +16,7 @@ export default function SpatialDistribution({
 
   const [loading, setLoading] = useState(true);
   const [focusedMap, setFocusedMap] = useState(initialFocus);
+  const [scale, setScale] = useState(1);
 
   useEffect(() => {
     setFocusedMap(initialFocus);
@@ -30,12 +25,7 @@ export default function SpatialDistribution({
   useEffect(() => {
     let isMounted = true;
     setLoading(true);
-
-    setMaps({
-      argo: "",
-      convformer: "",
-      error: "",
-    });
+    setMaps({ argo: "", convformer: "", error: "" });
 
     fetchSpatialMaps(depth)
       .then((data) => {
@@ -49,9 +39,7 @@ export default function SpatialDistribution({
       })
       .catch((error) => {
         console.error("Failed to load spatial maps:", error);
-        if (isMounted) {
-          setLoading(false);
-        }
+        if (isMounted) setLoading(false);
       });
 
     return () => {
@@ -60,14 +48,15 @@ export default function SpatialDistribution({
   }, [depth]);
 
   useEffect(() => {
-    const handleOutsideClick = () => {
-      setFocusedMap(null);
-    };
+    setScale(1);
+  }, [focusedMap]);
 
-    window.addEventListener("click", handleOutsideClick);
-    return () => {
-      window.removeEventListener("click", handleOutsideClick);
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") setFocusedMap(null);
     };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
   const handleImageError = (event, name) => {
@@ -75,51 +64,76 @@ export default function SpatialDistribution({
     event.currentTarget.style.display = "none";
   };
 
+  const handleZoom = (delta, e) => {
+    e.stopPropagation();
+    setScale((prev) => Math.min(Math.max(prev + delta, 1), 3));
+  };
+
   return (
-    <div className="spatial-dashboard-container" onClick={onBack}>
+    <div className="spatial-dashboard-container animate-ocean-fade" onClick={onBack}>
       <div 
         className="spatial-dashboard-inner" 
-        onClick={(e) => {
-          e.stopPropagation();
-          setFocusedMap(null);
-        }}
+        onClick={(e) => e.stopPropagation()}
       >
-        <div
-          className="spatial-header"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <h3 className="spatial-title">
-            {t("spatialTitle")}{" "}
-            {depth ? parseFloat(depth).toFixed(1) : "0.0"} {t("spatialDepth")}
-          </h3>
-
-          <button className="back-to-map-btn" onClick={onBack}>
-            {t("backToMap")}
-          </button>
+        <div className="spatial-header">
+          <div className="spatial-header-titles">
+            <h3 className="spatial-title">
+              🌊 {t("spatialTitle")}{" "}
+              <span className="spatial-depth-badge">
+                {depth ? parseFloat(depth).toFixed(1) : "0.0"} m
+              </span>{" "}
+              {t("spatialDepth")}
+            </h3>
+            <span className="spatial-subtitle">Interactive Marine Intelligence & Deep-Sea Profiling</span>
+          </div>
+          <div className="spatial-header-actions">
+            {focusedMap && (
+              <button className="back-to-grid-btn" onClick={() => setFocusedMap(null)}>
+                ← {t("allModels")}
+              </button>
+            )}
+            <button className="back-to-map-btn" onClick={onBack}>
+              {t("backToMap")}
+            </button>
+          </div>
         </div>
 
         <div className={`spatial-grid ${focusedMap ? "has-focus" : ""}`}>
           {/* ARGO */}
           <div
             className={`spatial-card ${focusedMap === "argo" ? "focused" : ""}`}
-            onClick={(e) => {
-              e.stopPropagation();
-              setFocusedMap(focusedMap === "argo" ? null : "argo");
-            }}
+            onClick={() => !focusedMap && setFocusedMap("argo")}
           >
             <div className="spatial-card-header">
               <h4>{t("argoTruth")}</h4>
+              <div className="card-toolbar" onClick={(e) => e.stopPropagation()}>
+                {focusedMap === "argo" ? (
+                  <>
+                    <button type="button" onClick={(e) => handleZoom(0.5, e)} title="Zoom In">+</button>
+                    <button type="button" onClick={(e) => handleZoom(-0.5, e)} title="Zoom Out">−</button>
+                    <button type="button" onClick={(e) => { e.stopPropagation(); setScale(1); }} title="Reset">↺</button>
+                  </>
+                ) : (
+                  <button type="button" onClick={() => setFocusedMap("argo")} title="Expand">⛶</button>
+                )}
+              </div>
             </div>
             <div className="spatial-image-wrapper">
               {loading ? (
-                <div className="loading-text">{t("fetchingMap")}</div>
+                <div className="spatial-loader">
+                  <div className="ocean-spinner"></div>
+                  <span>{t("fetchingMap")}</span>
+                </div>
               ) : maps.argo ? (
-                <img
-                  src={maps.argo}
-                  alt="Independent ARGO"
-                  className="heatmap-img"
-                  onError={(event) => handleImageError(event, "ARGO")}
-                />
+                <div className="image-viewport">
+                  <img
+                    src={maps.argo}
+                    alt="Independent ARGO"
+                    className="heatmap-img"
+                    style={{ transform: `scale(${focusedMap === "argo" ? scale : 1})` }}
+                    onError={(event) => handleImageError(event, "ARGO")}
+                  />
+                </div>
               ) : (
                 <div className="loading-text">{t("argoUnavailable")}</div>
               )}
@@ -129,25 +143,38 @@ export default function SpatialDistribution({
           {/* CONVFORMER */}
           <div
             className={`spatial-card ${focusedMap === "convformer" ? "focused" : ""}`}
-            onClick={(e) => {
-              e.stopPropagation();
-              setFocusedMap(focusedMap === "convformer" ? null : "convformer");
-            }}
+            onClick={() => !focusedMap && setFocusedMap("convformer")}
           >
             <div className="spatial-card-header">
               <h4>{t("convformerPred")}</h4>
-              <div className="mock-toolbar">📷 🔍 ⛶</div>
+              <div className="card-toolbar" onClick={(e) => e.stopPropagation()}>
+                {focusedMap === "convformer" ? (
+                  <>
+                    <button type="button" onClick={(e) => handleZoom(0.5, e)} title="Zoom In">+</button>
+                    <button type="button" onClick={(e) => handleZoom(-0.5, e)} title="Zoom Out">−</button>
+                    <button type="button" onClick={(e) => { e.stopPropagation(); setScale(1); }} title="Reset">↺</button>
+                  </>
+                ) : (
+                  <button type="button" onClick={() => setFocusedMap("convformer")} title="Expand">⛶</button>
+                )}
+              </div>
             </div>
             <div className="spatial-image-wrapper">
               {loading ? (
-                <div className="loading-text">{t("fetchingMap")}</div>
+                <div className="spatial-loader">
+                  <div className="ocean-spinner"></div>
+                  <span>{t("fetchingMap")}</span>
+                </div>
               ) : maps.convformer ? (
-                <img
-                  src={maps.convformer}
-                  alt="Convformer Prediction"
-                  className="heatmap-img"
-                  onError={(event) => handleImageError(event, "Convformer")}
-                />
+                <div className="image-viewport">
+                  <img
+                    src={maps.convformer}
+                    alt="Convformer Prediction"
+                    className="heatmap-img"
+                    style={{ transform: `scale(${focusedMap === "convformer" ? scale : 1})` }}
+                    onError={(event) => handleImageError(event, "Convformer")}
+                  />
+                </div>
               ) : (
                 <div className="loading-text">{t("predUnavailable")}</div>
               )}
@@ -157,24 +184,38 @@ export default function SpatialDistribution({
           {/* ERROR */}
           <div
             className={`spatial-card error-card ${focusedMap === "error" ? "focused" : ""}`}
-            onClick={(e) => {
-              e.stopPropagation();
-              setFocusedMap(focusedMap === "error" ? null : "error");
-            }}
+            onClick={() => !focusedMap && setFocusedMap("error")}
           >
             <div className="spatial-card-header">
               <h4>{t("absoluteError")}</h4>
+              <div className="card-toolbar" onClick={(e) => e.stopPropagation()}>
+                {focusedMap === "error" ? (
+                  <>
+                    <button type="button" onClick={(e) => handleZoom(0.5, e)} title="Zoom In">+</button>
+                    <button type="button" onClick={(e) => handleZoom(-0.5, e)} title="Zoom Out">−</button>
+                    <button type="button" onClick={(e) => { e.stopPropagation(); setScale(1); }} title="Reset">↺</button>
+                  </>
+                ) : (
+                  <button type="button" onClick={() => setFocusedMap("error")} title="Expand">⛶</button>
+                )}
+              </div>
             </div>
             <div className="spatial-image-wrapper error-wrapper">
               {loading ? (
-                <div className="loading-text">{t("fetchingMap")}</div>
+                <div className="spatial-loader">
+                  <div className="ocean-spinner"></div>
+                  <span>{t("fetchingMap")}</span>
+                </div>
               ) : maps.error ? (
-                <img
-                  src={maps.error}
-                  alt="Absolute Error"
-                  className="heatmap-img"
-                  onError={(event) => handleImageError(event, "Error")}
-                />
+                <div className="image-viewport">
+                  <img
+                    src={maps.error}
+                    alt="Absolute Error"
+                    className="heatmap-img"
+                    style={{ transform: `scale(${focusedMap === "error" ? scale : 1})` }}
+                    onError={(event) => handleImageError(event, "Error")}
+                  />
+                </div>
               ) : (
                 <div className="loading-text">{t("errorUnavailable")}</div>
               )}

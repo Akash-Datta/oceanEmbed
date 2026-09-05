@@ -161,7 +161,8 @@ export const translations = {
     futureDateError: "You cannot enter future dates beyond today",
     restrictedDateError: "Selected date is restricted: Historical archive data for dates within the last 4 days is currently pending synchronization.",
     validStartDatePrompt: "Please enter a valid starting date first.",
-    validLatLonPrompt: "Please enter a valid latitude and longitude."
+    validLatLonPrompt: "Please enter a valid latitude and longitude.",
+    allModels: "All Models"
   },
   hi: {
     title: "स्थान-काल महासागर तापमान प्रोफाइलिंग",
@@ -325,6 +326,7 @@ export const translations = {
     futureDateError: "आप आज के बाद की भविष्य की तारीखें दर्ज नहीं कर सकते",
     restrictedDateError: "चयनित तिथि प्रतिबंधित है: पिछले 4 दिनों की तारीखों के लिए ऐतिहासिक存档 डेटा वर्तमान में सिंक्रनाइज़ेशन के अधीन है।",
     validStartDatePrompt: "कृपया पहले एक वैध शुरुआती तारीख दर्ज करें।",
+    allModels: "सभी मॉडल",
     validLatLonPrompt: "कृपया एक वैध अक्षांश और देशांतर दर्ज करें।"
   },
   bn: {
@@ -367,7 +369,7 @@ export const translations = {
     contributors: "অবদানকারী এবং মূল সদস্য",
     teamLeader: "টিম লিডার",
     fullStackRole: "ফুল-স্ট্যাক এবং এমএল ইন্টিগ্রেশন",
-    frontendRole: "ফ্রন্টএন্ড ডেভেলপার এবং এমইআরএন স্ট্যাক",
+    frontendRole: "ফ্রন্টএন্ড ডেভেলপার এবং MERN স্ট্যাক",
     designRole: "ডিজাইনিং, পরিকল্পনা এবং বাস্তবায়ন",
     mlArchitectExec: "এমএল আর্কিটেক্ট এক্সিকিউশনার",
     mlArchitectDesign: "এমএল আর্কিটেক্ট ডিজাইনার",
@@ -489,6 +491,7 @@ export const translations = {
     futureDateError: "আপনি আজকের পরের তারিখ নির্বাচন করতে পারবেন না",
     restrictedDateError: "নির্বাচিত তারিখ সীমাবদ্ধ: গত ৪ দিনের মধ্যে ঐতিহাসিক আর্কাইভ ডেটা বর্তমানে সিঙ্ক্রোনাইজেশনের অপেক্ষায় রয়েছে।",
     validStartDatePrompt: "দয়া করে প্রথমে একটি বৈধ শুরুর তারিখ লিখুন।",
+    allModels: "সকল মডেল",
     validLatLonPrompt: "দয়া করে একটি বৈধ অক্ষাংশ এবং দ্রাঘিমাংশ লিখুন।"
   },
   mr: {
@@ -654,6 +657,7 @@ export const translations = {
     futureDateError: "तुम्ही आजच्या पुढील तारखा प्रविष्ट करू शकत नाही",
     restrictedDateError: "निवडलेली तारीख प्रतिबंधित आहे: गेल्या ४ दिवसांमधील ऐतिहासिक अभिलेख डेटा सध्या सिंक होण्याच्या प्रतीक्षेत आहे.",
     validStartDatePrompt: "कृपया प्रथम वैध सुरुवातीची तारीख प्रविष्ट करा.",
+    allModels: "सर्व मॉडेल",
     validLatLonPrompt: "कृपया वैध अक्षांश आणि रेखांश प्रविष्ट करा."
   },
   te: {
@@ -819,6 +823,7 @@ export const translations = {
     futureDateError: "మీరు నేటి తర్వాత భవిష్యత్తు తేదీలను నమోదు చేయలేరు",
     restrictedDateError: "ఎంచుకున్న తేదీ పరిమితం చేయబడింది: గత 4 రోజులలోపు చారిత్రక ఆర్కైవ్ డేటా ప్రస్తుతం సింక్రొనైజేషన్ కోసం వేచి ఉంది.",
     validStartDatePrompt: "దయచేసి ముందుగా చెల్లుబాటు అయ్యే ప్రారంభ తేదీని నమోదు చేయండి.",
+    allModels: "అన్ని మోడల్స్",
     validLatLonPrompt: "దయచేసి చెల్లుబాటు అయ్యే అక్షాంశం మరియు రేఖాంశాన్ని నమోదు చేయండి."
   },
   ta: {
@@ -984,6 +989,7 @@ export const translations = {
     futureDateError: "இன்றுக்கு அடுத்த எதிர்காலத் தேதிகளை நீங்கள் உள்ளிட முடியாது",
     restrictedDateError: "தேர்ந்தெடுக்கப்பட்ட தேதி தடைசெய்யப்பட்டுள்ளது: கடந்த 4 நாட்களுக்குள்ளான வரலாற்று காப்பகத் தரவு தற்போது ஒத்திசைவுக்காகக் காத்திருக்கிறது.",
     validStartDatePrompt: "முதலில் சரியான தொடக்கத் தேதியை உள்ளிடவும்.",
+    allModels: "அனைத்து மாதிரிகள்",
     validLatLonPrompt: "சரியான அலா. மற்றும் தீர்க்க. ஐ உள்ளிடவும்."
   },
   gu: {
@@ -1148,6 +1154,7 @@ export const translations = {
     futureDateError: "તમે આજના પછીની ભવિષ્યની તારીખો દાખલ કરી શકતા નથી",
     restrictedDateError: "પસંદ કરેલી તારીખ પ્રતિબંધિત છે: છેલ્લા 4 દિવસની તારીખો માટેનો ಐತಿಹಾಸिक આર્કાઇવ ડેટા હાલમાં સિંક્રનાઇઝેશનની અપેક્ષામાં છે.",
     validStartDatePrompt: "કૃપા કરીને પહેલા માન્ય પ્રારંભ તારીખ દાખલ કરો.",
+    allModels: "બધા મોડેલો",
     validLatLonPrompt: "કૃપા કરીને માન્ય અક્ષાંશ અને રેખાંશ દાખલ કરો."
   },
   kn: {
@@ -1312,6 +1319,7 @@ export const translations = {
     futureDateError: "ಇಂದಿನ ನಂತರದ ಭವಿಷ್ಯದ ದಿನಾಂಕಗಳನ್ನು ನೀವು ನಮೂದಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ",
     restrictedDateError: "ಆಯ್ಕೆಮಾಡಿದ ದಿನಾಂಕ ನಿರ್ಬಂಧಿಸಲಾಗಿದೆ: ಕಳೆದ 4 ದಿನಗಳೊಳಗಿನ ಐತಿಹಾಸಿಕ ಆರ್ಕೈವ್ ಡೇಟಾ ಪ್ರಸ್ತುತ ಸಿಂಕ್ರೊನೈಸೇಶನ್‌ಗಾಗಿ ಕಾಯುತ್ತಿದೆ.",
     validStartDatePrompt: "ದಯವಿಟ್ಟು ಮೊದಲು ಮಾನ್ಯವಾದ ಪ್ರಾರಂಭ ದಿನಾಂಕವನ್ನು ನಮೂದಿಸಿ.",
+    allModels: "ಎಲ್ಲಾ ಮಾದರಿಗಳು",
     validLatLonPrompt: "ದಯವಿಟ್ಟು ಮಾನ್ಯವಾದ ಅಕ್ಷಾಂಶ ಮತ್ತು ರೇಖಾಂಶವನ್ನು ನಮೂದಿಸಿ."
   },
   ml: {
@@ -1476,6 +1484,7 @@ export const translations = {
     futureDateError: "ഇന്നത്തെ തീയതിക്ക് ശേഷമുള്ള ഭാവി തീയതികൾ നൽകാൻ കഴിയില്ല",
     restrictedDateError: "തിരഞ്ഞെടുത്ത തീയതി പരിമിതപ്പെടുത്തിയിരിക്കുന്നു: കഴിഞ്ഞ 4 ദിവസത്തിനുള്ളിലെ ചരിത്രപരമായ ആർക്കൈവ് ഡാറ്റ നിലവിൽ സിൻക്രോണൈസേഷനായി കാത്തിരിക്കുന്നു.",
     validStartDatePrompt: "ദയവായി ആദ്യം സാധുവായ ആരംഭ തീയതി നൽകുക.",
+    allModels: "എല്ലാ മോഡലുകളും",
     validLatLonPrompt: "ദയവായി സാധുവായ അക്ഷാംശവും രേഖാംശവും നൽകുക."
   },
   pa: {
@@ -1640,6 +1649,7 @@ export const translations = {
     futureDateError: "ਤੁਸੀਂ ਅੱਜ ਤੋਂ ਬਾਅਦ ਦੀਆਂ ਭਵਿੱਖ ਦੀਆਂ ਤਾਰੀਖਾਂ ਦਾਖਲ ਨਹੀਂ ਕਰ ਸਕਦੇ",
     restrictedDateError: "ਚੁਣੀ ਗਈ ਮਿਤੀ ਪ੍ਰਤੀਬੰਧਿਤ ਹੈ: ਪਿਛਲੇ 4 ਦਿਨਾਂ ਦੀਆਂ ਤਾਰੀਖਾਂ ਲਈ ਇਤਿਹਾਸਕ ਆਰਕਾਈਵ ਡਾਟਾ ਵਰਤਮਾਨ ਵਿੱਚ ਸਿੰਕ੍ਰੋਨਾਈਜ਼ੇਸ਼ਨ ਦੇ ਅਧੀਨ ਹੈ।",
     validStartDatePrompt: "ਕਿਰਪਾ ਕਰਕੇ ਪਹਿਲਾਂ ਇੱਕ ਵੈਧ ਸ਼ੁਰੂਆਤੀ ਮਿਤੀ ਦਾਖਲ ਕਰੋ।",
+    allModels: "ਸਾਰੇ ਮਾਡਲ",
     validLatLonPrompt: "ਕਿਰਪਾ ਕਰਕੇ ਇੱਕ ਵੈਧ ਅਕਸ਼ਾਂਸ਼ ਅਤੇ ਲੰਬਕਾਰ ਦਾਖل ਕਰੋ।"
   },
   or: {
@@ -1804,6 +1814,7 @@ export const translations = {
     futureDateError: "ଆପଣ ଆଜି ପରର ଭବିଷ୍ୟତ ତାରିଖ ପ୍ରବେଶ କରିପାରିବେ ନାହିଁ",
     restrictedDateError: "ନିର୍ବାଚିତ ତାରିଖ ପ୍ରତିବନ୍ଧିତ: ଗତ 4 ଦିନ ମଧ୍ୟରେ ଥିବା Historical archive ଡାଟା ବର୍ତ୍ତମାନ ସିଙ୍କ୍ରୋନାଇଜେସନ୍ ଅଧୀନରେ ଅଛି।",
     validStartDatePrompt: "ଦୟାକରି ପ୍ରଥମେ ଏକ ବୈଧ ଆରମ୍ଭ ତାରିଖ ପ୍ରବେଶ କରନ୍ତୁ।",
+    allModels: "ସମସ୍ତ ମଡେଲ୍",
     validLatLonPrompt: "ଦୟାକରି ଏକ ବୈଧ ଅକ୍ଷାଂଶ ଏବଂ ଦ୍ରାଘିମା ପ୍ରବେଶ କରନ୍ତୁ।"
   },
   as: {
@@ -1968,6 +1979,7 @@ export const translations = {
     futureDateError: "আপুনি আজিৰ পিছৰ ভৱিষ্যত তাৰিখ প্ৰবিষ্ট কৰিব নোৱাৰে",
     restrictedDateError: "নিৰ্বাচিত তাৰিখ প্ৰতিবন্ধিত: বিগত ৪ দিনৰ ভিতৰৰ ঐতিহাসিক আৰ্কাইভ ডেটা বৰ্তমান চিনক্ৰ'নিজেশ্যনৰ অপেক্ষাত আছে।",
     validStartDatePrompt: "অনুগ্ৰহ কৰি প্ৰথমে এটা বৈধ আৰম্ভণি তাৰিখ প্ৰবিষ্ট কৰক।",
+    allModels: "সকলো মডেল",
     validLatLonPrompt: "অনুগ্ৰহ কৰি এটা বৈধ অক্ষাংশ আৰু দ্ৰাঘিমাংশ প্ৰবিষ্ট কৰক।"
   },
   ur: {
@@ -2132,6 +2144,7 @@ export const translations = {
     futureDateError: "آپ آج کے بعد کی مستقبل کی تاریخیں درج نہیں کر سکتے",
     restrictedDateError: "منتخب کردہ تاریخ محدود ہے: پچھلے 4 دنوں کی تاریخی آرکائیو ڈیٹا فی الحال مطابقت پذیر ہونے کی منتظر ہے۔",
     validStartDatePrompt: "براہ کرم پہلے ایک درست شروعاتی تاریخ درج کریں۔",
+    allModels: "تمام ماڈلز",
     validLatLonPrompt: "براہ کرم ایک درست عرض بلد اور طول بلد درج کریں۔"
   },
   mai: {
@@ -2296,6 +2309,7 @@ export const translations = {
     futureDateError: "अहाँ आजुक बादक भविष्यक मिति दर्ज नै कऽ सकै छी",
     restrictedDateError: "चयनित मिति प्रतिबन्धित अछि: पछिला ४ दिनक ऐतिहासिक अभिलेख डेटा हाल सिंक्रनाइजेशक प्रतीक्षामे अछि।",
     validStartDatePrompt: "कृपया पहिने एकटा वैध सुरुआति मिति दर्ज करू।",
+    allModels: "सभ माडल",
     validLatLonPrompt: "कृपया एकटा वैध अक्षांश आ देशान्तर दर्ज करू।"
   },
   sat: {
@@ -2460,10 +2474,11 @@ export const translations = {
     futureDateError: "تاريخ ᱵᱟᱝ ᱠᱟᱱᱟ",
     restrictedDateError: "ᱵᱟᱪᱷᱟᱣ ᱟᱠᱟᱱ ᱢᱟᱦᱟᱸ ᱫᱚ ᱵᱟᱝ ᱜᱟᱱᱚᱜᱼᱟ",
     validStartDatePrompt: "ᱴᱷᱤᱠ ᱮᱛᱚᱦᱚᱵ ᱢᱟᱦᱟᱸ ᱚᱞ ᱢᱮ।",
-    validLatLonPrompt: "ᱴᱷᱤᱠ ᱞᱮᱴᱤᱴᱭᱩᱰ ᱟᱨ ᱞᱚᱝᱜᱤᱴᱭᱩᱰ ᱚᱞ ᱢᱮ।"
+    allModels: "ᱟᱨᱟᱯᱩᱨᱟ",
+    validLatLonPrompt: "ᱴᱷᱤᱠ ᱞᱮᱴᱤᱴᱭᱩᱰ ᱟᱨ ᱞᱚᱝᱜᱤᱴᱭᱚ ᱚᱚ ᱢᱚ।"
   },
   ks: {
-    title: "स्थान-काल महासागर तापमान प्रोफाइलिंग",
+    title: "اسپیشیوٹیمپل اوشین ٹمپریچر انٹیلی جنس پلیٹ فارم",
     subtitle: "انٹرایکٹو سمندری درجہ حرارت کی ذہانت • مقامی میپنگ • گہرائی کے لحاظ سے پروفائلنگ",
     webGuidelines: "📖 ویب گائیڈ لائنز",
     aboutAuthors: "👥 مصنفین کے بارے میں",
@@ -2498,14 +2513,14 @@ export const translations = {
     aboutTitle: "مصنفین اور کور ٹیم کے بارے میں",
     presentedBy: "فخر کے ساتھ پیش کردہ",
     teamName: "ٹیم کنوویجرز",
-    teamSubtitle: "اسپیشیوٹیمپோரل اوشین انٹیلی جنس اور میرین پروفائلنگ سسٹم",
+    teamSubtitle: "اسپیشیوٹیمپل اوشین انٹیلی جنس اور میرین پروفائلنگ سسٹم",
     contributors: "معاونین اور اہم ارکان",
     teamLeader: "ٹیم لیڈر",
     fullStackRole: "فل اسٹیک اور ایم ایل انٹیگریشن",
     frontendRole: "فرنٹ اینڈ ڈویلپر اور MERN اسٹیک",
     designRole: "ڈیزائننگ، پلاننگ اور عمل درآمد",
-    mlArchitectExec: "ایم ایل آرکیটেکٹ ایگزیکیوشنر",
-    mlArchitectDesign: "ایم ایل آرکیটেکٹ ڈیزائنر",
+    mlArchitectExec: "ایم ایل آرکیٹکٹ ایگزیکیوشنر",
+    mlArchitectDesign: "ایم ایل آرکیٹےکٹ ڈیزائنر",
     githubProfile: "گٹ ہب پروفائل",
     aadiName: "آدتیہ سردار",
     teestaName: "تیستا مکھرجی",
@@ -2624,6 +2639,7 @@ export const translations = {
     futureDateError: "آپ آج کے بعد کی مستقبل کی تاریخیں درج نہیں کر سکتے",
     restrictedDateError: "منتخب کردہ تاریخ محدود ہے: پچھلے 4 دنوں کی تاریخی آرکائیو ڈیٹا فی الحال مطابقت پذیر ہونے کی منتظر ہے۔",
     validStartDatePrompt: "براہ کرم پہلے ایک درست شروعاتی تاریخ درج کریں۔",
+    allModels: "سڀ مودل",
     validLatLonPrompt: "براہ کرم ایک درست عرض بلد اور طول بلد درج کریں۔"
   },
   ne: {
@@ -2788,6 +2804,7 @@ export const translations = {
     futureDateError: "तपाईं आज पछि भविष्यको मिति प्रविष्ट गर्न सक्नुहुन्न",
     restrictedDateError: "चयन गरिएको मिति प्रतिबन्धित छ: गत ४ दिन भित्रको ऐतिहासिक अभिलेख डेटा हाल सिङ्क्रोनाइजेशको प्रतीक्षामा छ।",
     validStartDatePrompt: "कृपया पहिले एक वैध सुरु मिति प्रविष्ट गर्नुहोस्।",
+    allModels: "सबै मोडेलहरू",
     validLatLonPrompt: "कृपया एक वैध अक्षांश र देशान्तर प्रविष्ट गर्नुहोस्।"
   },
   sd: {
@@ -2952,6 +2969,7 @@ export const translations = {
     futureDateError: "توهان اڄ کان پوءِ جون مستقبل جون تاريخون داخل نٿਾ ڪري سگهو",
     restrictedDateError: "چونڊيل تاريخ محدود آهي: گذريل 4 ڏينهن جي تاريخن جو تاريخي آرڪائيو ڊيٽا هن وقت هم وقت سازي جي انتظار ۾ آهي.",
     validStartDatePrompt: "مهرباني ڪري پهرين صحيح شروعاتي تاريخ داخل ڪريو.",
+    allModels: "سڀ مودل",
     validLatLonPrompt: "مهرباني ڪري صحيح ويڪرائي ڦاڪ ۽ ڊگھائي ڦاڪ داخل ڪريو."
   },
   kok: {
@@ -3117,6 +3135,7 @@ export const translations = {
     futureDateError: "तुम्ही आजच्या पुढील तारखा प्रविष्ट करू शकत नाही",
     restrictedDateError: "निवडलेली तारीख प्रतिबंधित आहे: गेल्या ४ दिवसांमधील ऐतिहासिक अभिलेख डेटा सध्या सिंक होण्याच्या प्रतीक्षेत आहे.",
     validStartDatePrompt: "कृपया प्रथम वैध सुरुवातीची तारीख प्रविष्ट करा.",
+    allModels: "सर्व मॉडल",
     validLatLonPrompt: "कृपया वैध अक्षांश आणि रेखांश प्रविष्ट करा."
   },
   doi: {
@@ -3281,6 +3300,7 @@ export const translations = {
     futureDateError: "तुस अज्जर दे बाद दी भविष्य दी तारीखें दर्ज नेईं करी सकदे",
     restrictedDateError: "चयनित मिति प्रतिबंधित ऐ: पिछले 4 दिनां दी ऐतिहासिक आर्काइव डेटा इस वेले सिंक्रनाइजेशन दी प्रतीक्षा च ऐ।",
     validStartDatePrompt: "कृपया पैहले इक वैध शुरुआत दी मिति दर्ज करो।",
+    allModels: "सारे मॉडल",
     validLatLonPrompt: "कृपया इक वैध अक्षांश ते देशान्तर दर्ज करो।"
   },
   mni: {
@@ -3445,6 +3465,7 @@ export const translations = {
     futureDateError: "মহৈ মঙোলগী তারিখ থাপ্পা ইয়াদে",
     restrictedDateError: "খল্লবা তারিখ অদু রিস্রিক্ত তৌখ্রে",
     validStartDatePrompt: "চুম্বা তারিখ থাপ্পিয়ু।",
+    allModels: "সকলো মডেল",
     validLatLonPrompt: "চুম্বা লাতিচুদ অমসুং লংগিচুদ থাপ্পিয়ু।"
   },
   brx: {
@@ -3609,6 +3630,7 @@ export const translations = {
     futureDateError: "आं दानि उनाव थानाय सानथुम थारनो हाया",
     restrictedDateError: "सायखनाय सानथुमा फ्बाय: गावनि सिंक जाबाय थानाय",
     validStartDatePrompt: "थार जागायजेननाय सानथुम थार।",
+    allModels: "साबो मोडेल",
     validLatLonPrompt: "थार अक्षांश आरो देशान्तर थार।"
   },
   sa: {
@@ -3773,6 +3795,7 @@ export const translations = {
     futureDateError: "अद्यात् परं भविष्यस्य दिनाङ्कं प्रवेष्टुं न शक्नुथ",
     restrictedDateError: "चयनितदिनाङ्कः प्रतिबन्धितः: गत-४-दिनानाम् ऐतिहासिकं डेटा-अभिलेखः सिङ्क्रनाइजेशन् प्रतीक्षते।",
     validStartDatePrompt: "कृपया प्रथमम् एकं वैधम् आरम्भिकदिनाङ्कं प्रविशत।",
+    allModels: "सर्वे मोडेलाः",
     validLatLonPrompt: "कृपया वैधम् अक्षांशं देशान्तरं च प्रविशत।"
   }
 };

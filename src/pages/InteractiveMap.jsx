@@ -347,7 +347,7 @@ export default function InteractiveMap({ onMapLoaded }) {
             {t("subtitle")}
           </div>
         </div>
-        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+        <div className="navbar-actions">
           <LanguageSelector />
           <button
             className="about-authors-nav-btn"

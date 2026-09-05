@@ -198,8 +198,6 @@ export function snapToNearestOcean(lat, lng) {
     let finalLat = bestCandidate.lat;
     let finalLng = bestCandidate.lng;
 
-    // Push the candidate further out into open water along the same vector 
-    // to prevent jagged coastline polygon edges from landing on beaches or mudflats.
     const pushDistances = [3, 1.5, 0.5];
     for (const pushDist of pushDistances) {
       const offshoreDest = turf.destination(
@@ -281,6 +279,28 @@ export function parseAndTranslateApiSeaName(name, t) {
   if (upper.includes("CELEBES")) return t("celebesSea") || cleanName;
   if (upper.includes("JAVA")) return t("javaSea") || cleanName;
   if (upper.includes("BANDA")) return t("bandaSea") || cleanName;
+  if (upper.includes("MOLUCCA")) return t("moluccaSea") || cleanName;
+  if (upper.includes("BISMARCK")) return t("bismarckSea") || cleanName;
+
+  // Regional, Mediterranean & Polar Seas
+  if (upper.includes("ROSS")) return t("rossSea") || cleanName;
+  if (upper.includes("AMUNDSEN")) return t("amundsenSea") || cleanName;
+  if (upper.includes("BELLINGHAUSEN")) return t("bellingshausenSea") || cleanName;
+  if (upper.includes("WEDDELL")) return t("weddellSea") || cleanName;
+  if (upper.includes("BOTHNIA") || upper.includes("BOTHNIAN")) return t("gulfOfBothnia") || cleanName;
+  if (upper.includes("TYRRHENIAN")) return t("tyrrhenianSea") || cleanName;
+  if (upper.includes("ADRIATIC")) return t("adriaticSea") || cleanName;
+  if (upper.includes("LIGURIAN")) return t("ligurianSea") || cleanName;
+
+  // Specific Straits, Channels & Gulfs
+  if (upper.includes("TAIWAN")) return t("taiwanStrait") || cleanName;
+  if (upper.includes("MAGELLAN")) return t("straitOfMagellan") || cleanName;
+  if (upper.includes("BEAGLE")) return t("beagleChannel") || cleanName;
+  if (upper.includes("LE MAIRE") || upper.includes("LEMAIRE")) return t("leMaireStrait") || cleanName;
+  if (upper.includes("KARIMATA")) return t("karimataStrait") || cleanName;
+  if (upper.includes("SICILY")) return t("straitOfSicily") || cleanName;
+  if (upper.includes("VENICE")) return t("gulfOfVenice") || cleanName;
+
   if (upper.includes("SOLOMON")) return t("solomonSea") || cleanName;
   if (upper.includes("LACCADIVE")) return t("laccadiveSea") || cleanName;
   if (upper.includes("TIMOR")) return t("timorSea") || cleanName;
@@ -304,6 +324,15 @@ export function parseAndTranslateApiSeaName(name, t) {
   if (upper.includes("IRISH")) return t("irishSea") || cleanName;
   if (upper.includes("MARMARA")) return t("seaOfMarmara") || cleanName;
   
+  if (upper.includes("MAKASSAR")) return t("makassarStrait") || cleanName;
+  if (upper.includes("FLORES")) return t("floresSea") || cleanName;
+  if (upper.includes("BALI")) return t("baliSea") || cleanName;
+  if (upper.includes("SAVU") || upper.includes("SAWU")) return t("savuSea") || cleanName;
+  if (upper.includes("SERAM")) return t("seramSea") || cleanName;
+  if (upper.includes("HALMAHERA")) return t("halmaheraSea") || cleanName;
+  if (upper.includes("SUNDA")) return t("sundaStrait") || cleanName;
+  if (upper.includes("LOMBOK")) return t("lombokStrait") || cleanName;
+
   if (upper.includes("MOZAMBIQUE")) return t("mozambiqueChannel") || cleanName;
   if (upper.includes("ENGLISH CHANNEL") || upper.includes("ENGLISH")) return t("englishChannel") || cleanName;
   if (upper.includes("YUCATAN")) return t("yucatanStrait") || cleanName;
@@ -315,7 +344,6 @@ export function parseAndTranslateApiSeaName(name, t) {
   if (upper.includes("BASS")) return t("bassStrait") || cleanName;
   if (upper.includes("COOK")) return t("cookStrait") || cleanName;
   if (upper.includes("FLORIDA")) return t("floridaStrait") || cleanName;
-  if (upper.includes("TAIWAN")) return t("taiwanStrait") || cleanName;
 
   if (upper.includes("GUINEA")) return t("gulfOfGuinea") || cleanName;
   if (upper.includes("ADEN")) return t("gulfOfAden") || cleanName;
@@ -329,7 +357,6 @@ export function parseAndTranslateApiSeaName(name, t) {
   if (upper.includes("AEGEAN")) return t("aegeanSea") || cleanName;
   if (upper.includes("IONIAN") || upper.includes("IRONIAN")) return t("ionianSea") || cleanName;
   if (upper.includes("CRETE") || upper.includes("CRETAN")) return t("creteSea") || cleanName;
-  if (upper.includes("MARMARA")) return t("seaOfMarmara") || cleanName;
   
   return t("openOcean") || "Open Ocean";
 }

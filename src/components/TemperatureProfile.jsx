@@ -233,7 +233,7 @@ export default function TemperatureProfile({ selectedDepth, profileData }) {
         <Line data={chartData} options={chartOptions} plugins={[depthRulerPlugin]} />
       </div>
       
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '30px', paddingTop: '16px', paddingBottom: '4px' }}>
+      <div className="profile-legend">
         
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <div style={{ width: '28px', height: '4px', backgroundColor: '#0000FF', borderRadius: '2px' }}></div>

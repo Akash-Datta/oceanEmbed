@@ -1302,6 +1302,12 @@ select.ocean-control {
     flex-direction: column;
 }
 
+.navbar-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
 .ocean-title {
     margin: 0;
     font-size: clamp(18px, 2.2vw, 26px);
@@ -2710,6 +2716,18 @@ select.ocean-control {
 }
 
 /* =====================================================
+   TEMPERATURE PROFILE LEGEND (used by TemperatureProfile.jsx)
+   ===================================================== */
+.profile-legend {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    padding-top: 16px;
+    padding-bottom: 4px;
+}
+
+/* =====================================================
    ISOLATED MOBILE RESPONSIVE OVERRIDES (MAX-WIDTH: 700PX)
    ===================================================== */
 @media (max-width: 700px) {
@@ -2730,6 +2748,12 @@ select.ocean-control {
         display: flex !important;
         justify-content: space-between !important;
         width: 100% !important;
+        flex-wrap: wrap;
+        gap: 8px !important;
+    }
+
+    .navbar-actions select.about-authors-nav-btn {
+        flex: 1 1 100%;
     }
 
     .about-authors-nav-btn {
@@ -2792,6 +2816,13 @@ select.ocean-control {
         height: 100vh;
         border-radius: 0;
         top: 0;
+    }
+
+    /* Keep the temperature-profile legend from overflowing narrow screens */
+    .profile-legend {
+        gap: 14px;
+        flex-wrap: wrap;
+        padding-top: 10px;
     }
 
     /* 4. Spatial Distribution (3-Map View) mobile UI polish */

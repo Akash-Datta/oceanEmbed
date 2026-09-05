@@ -298,7 +298,7 @@ export default function InteractiveMap({ onMapLoaded }) {
       <TileLayer
         url={`https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png?key=${import.meta.env.VITE_MAP_API_KEY}`}
       />
-      <MapTouchController position={position} depth={depth} />
+      <MapTouchController />
       <DynamicGrid />
       <LocationMarker
         position={position}

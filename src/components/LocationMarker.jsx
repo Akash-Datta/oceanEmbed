@@ -258,28 +258,19 @@ export function MapController({ targetPosition }) {
   return null;
 }
 
-export function MapTouchController({ position, depth }) {
+export function MapTouchController() {
   const map = useMap();
 
   useEffect(() => {
-    // Allow map movements (dragging, zooming) ONLY during sole depth operation (depth is chosen and no position is set)
-    const isSoleDepth = Boolean(depth && !position);
+    map.options.touchZoom = true;
+    map.options.dragging = true;
+    map.options.scrollWheelZoom = true;
+    map.options.doubleClickZoom = true;
 
-    if (isSoleDepth) {
-      map.dragging.enable();
-      map.touchZoom.enable();
-      map.scrollWheelZoom.enable();
-      map.doubleClickZoom.enable();
-      map.boxZoom.enable();
-      map.keyboard.enable();
-    } else {
-      map.dragging.disable();
-      map.touchZoom.disable();
-      map.scrollWheelZoom.disable();
-      map.doubleClickZoom.disable();
-      map.boxZoom.disable();
-      map.keyboard.disable();
-    }
+    if (map.dragging && !map.dragging.enabled()) map.dragging.enable();
+    if (map.touchZoom && !map.touchZoom.enabled()) map.touchZoom.enable();
+    if (map.scrollWheelZoom && !map.scrollWheelZoom.enabled()) map.scrollWheelZoom.enable();
+    if (map.doubleClickZoom && !map.doubleClickZoom.enabled()) map.doubleClickZoom.enable();
 
     map.invalidateSize();
 
@@ -290,7 +281,7 @@ export function MapTouchController({ position, depth }) {
     return () => {
       clearTimeout(timer);
     };
-  }, [map, position, depth]);
+  }, [map]);
 
   return null;
 }

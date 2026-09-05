@@ -1,6 +1,7 @@
 import React, { useRef, useEffect } from "react";
 import L from "leaflet";
 import CoordinateInput from "./CoordinateInput";
+import { useLanguage } from "../context/LanguageContext";
 
 export default function ControlBar({
   startDate, setStartDate, endDate,
@@ -11,6 +12,7 @@ export default function ControlBar({
   isLocationDisabled,
   showSidePanel
 }) {
+  const { t } = useLanguage();
   const controlRef = useRef(null);
 
   useEffect(() => {
@@ -56,7 +58,7 @@ export default function ControlBar({
         style={{ opacity: isDepthDisabled ? 0.5 : 1, cursor: isDepthDisabled ? 'not-allowed' : 'pointer' }}
         onChange={(e) => setDepth(e.target.value)}
       >
-        <option value="">Choose depth</option>
+        <option value="">{t("chooseDepth")}</option>
         {depthOptions.map((val) => (
           <option key={val} value={val}>{val} m</option>
         ))}
@@ -82,7 +84,7 @@ export default function ControlBar({
         disabled={isGoDisabled}
         style={{ opacity: isGoDisabled ? 0.5 : 1, cursor: isGoDisabled ? 'not-allowed' : 'pointer' }}
       >
-        Go
+        {t("go")}
       </button>
     </div>
   );

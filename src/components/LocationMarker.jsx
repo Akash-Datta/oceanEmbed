@@ -7,7 +7,8 @@ import {
 } from "react-leaflet";
 import L from "leaflet";
 
-import { snapToNearestOcean } from "../utils/coordinateUtils";
+import { snapToNearestOcean, parseAndTranslateApiSeaName, formatLatitude, formatLongitude } from "../utils/coordinateUtils";
+import { useLanguage } from "../context/LanguageContext";
 
 const pointerIcon = L.divIcon({
   className: "custom-pointer",
@@ -21,17 +22,23 @@ export default function LocationMarker({
   position,
   setPosition,
   startDate,
+  depth,
   onSeaNameResolved,
   triggerNotification,
 }) {
+  const { language, t } = useLanguage();
   const markerRef = useRef(null);
   const [seaName, setSeaName] = useState("");
   const requestIdRef = useRef(0);
 
   useMapEvents({
-    click(event) {
+    async click(event) {
       if (!startDate) {
-        triggerNotification("Please enter the starting date first.");
+        triggerNotification(t("startDatePrompt") || "Please enter the starting date first.");
+        return;
+      }
+
+      if (depth) {
         return;
       }
 
@@ -39,15 +46,16 @@ export default function LocationMarker({
       const lng = event.latlng.lng;
 
       try {
-        const snapped = snapToNearestOcean(lat, lng);
+        const snappedResult = snapToNearestOcean(lat, lng);
+        const snapped = snappedResult instanceof Promise ? await snappedResult : snappedResult;
 
-        if (snapped.failed) {
-          triggerNotification("Unable to find a nearby ocean location. Please try another coordinate.");
+        if (!snapped || snapped.failed) {
+          triggerNotification(t("oceanLocFailed") || "Unable to find a nearby ocean location. Please try another coordinate.");
           return;
         }
 
         if (snapped.redirected) {
-          triggerNotification("Land coordinate detected. Redirecting location to the nearest sea coordinates.");
+          triggerNotification(t("landRedirect") || "Land coordinate detected. Redirecting location to the nearest sea coordinates.");
         }
 
         const newPos = {
@@ -56,7 +64,7 @@ export default function LocationMarker({
           isOnLand: false,
         };
 
-        setSeaName("Loading sea name...");
+        setSeaName(t("loadingSeaName") || "Loading sea name...");
         setPosition(newPos);
       } catch (error) {
         console.error("Ocean redirection failed:", error);
@@ -71,7 +79,7 @@ export default function LocationMarker({
     }
 
     const currentRequestId = ++requestIdRef.current;
-    const loadingText = "Loading sea name...";
+    const loadingText = t("loadingSeaName") || "Loading sea name...";
 
     setSeaName(loadingText);
 
@@ -115,13 +123,17 @@ export default function LocationMarker({
 
           if (waterBody?.preferredGazetteerName) {
             resolvedName = waterBody.preferredGazetteerName;
+          } else if (data[0]?.preferredGazetteerName) {
+            resolvedName = data[0].preferredGazetteerName;
           }
         }
 
-        setSeaName(resolvedName);
+        const finalSeaName = parseAndTranslateApiSeaName(resolvedName, t);
+
+        setSeaName(finalSeaName);
 
         if (onSeaNameResolved) {
-          onSeaNameResolved(resolvedName);
+          onSeaNameResolved(finalSeaName);
         }
       } catch (error) {
         if (error.name === "AbortError") {
@@ -132,7 +144,7 @@ export default function LocationMarker({
           return;
         }
 
-        const fallbackName = "Open Ocean";
+        const fallbackName = parseAndTranslateApiSeaName("Open Ocean", t);
         setSeaName(fallbackName);
 
         if (onSeaNameResolved) {
@@ -153,7 +165,7 @@ export default function LocationMarker({
       clearTimeout(timer);
       controller.abort();
     };
-  }, [position, onSeaNameResolved]);
+  }, [position, onSeaNameResolved, t]);
 
   if (!position) {
     return null;
@@ -192,20 +204,20 @@ export default function LocationMarker({
               color: "#075985",
             }}
           >
-            📍 Exact Location
+            {t("exactLocation") || "📍 Exact Location"}
           </div>
 
           <div
             style={{
               fontSize: "13px",
               fontWeight: "600",
-              color: seaName === "Loading sea name..." ? "#64748b" : "#0ea5e9",
+              color: seaName === (t("loadingSeaName") || "Loading sea name...") ? "#64748b" : "#0ea5e9",
               marginBottom: "8px",
               textTransform: "uppercase",
               letterSpacing: "0.5px",
             }}
           >
-            {seaName || "Loading sea name..."}
+            {seaName || (t("loadingSeaName") || "Loading sea name...")}
           </div>
 
           <div
@@ -215,9 +227,9 @@ export default function LocationMarker({
               color: "#374151",
             }}
           >
-            <strong>Latitude:</strong> {position.lat.toFixed(6)}°
+            <strong>{t("gridLat")}:</strong> {formatLatitude(position.lat, language)}
             <br />
-            <strong>Longitude:</strong> {position.lng.toFixed(6)}°
+            <strong>{t("gridLng")}:</strong> {formatLongitude(position.lng, language)}
           </div>
         </div>
       </Popup>
@@ -246,14 +258,28 @@ export function MapController({ targetPosition }) {
   return null;
 }
 
-export function MapTouchController() {
+export function MapTouchController({ position, depth }) {
   const map = useMap();
 
   useEffect(() => {
-    map.options.touchZoom = true;
-    map.options.dragging = true;
-    map.options.scrollWheelZoom = true;
-    map.options.doubleClickZoom = true;
+    // Allow map movements (dragging, zooming) ONLY during sole depth operation (depth is chosen and no position is set)
+    const isSoleDepth = Boolean(depth && !position);
+
+    if (isSoleDepth) {
+      map.dragging.enable();
+      map.touchZoom.enable();
+      map.scrollWheelZoom.enable();
+      map.doubleClickZoom.enable();
+      map.boxZoom.enable();
+      map.keyboard.enable();
+    } else {
+      map.dragging.disable();
+      map.touchZoom.disable();
+      map.scrollWheelZoom.disable();
+      map.doubleClickZoom.disable();
+      map.boxZoom.disable();
+      map.keyboard.disable();
+    }
 
     map.invalidateSize();
 
@@ -264,7 +290,7 @@ export function MapTouchController() {
     return () => {
       clearTimeout(timer);
     };
-  }, [map]);
+  }, [map, position, depth]);
 
   return null;
 }

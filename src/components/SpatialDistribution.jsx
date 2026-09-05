@@ -6,12 +6,14 @@ import React, {
 import {
   fetchSpatialMaps,
 } from "../data/dummyOceanData";
+import { useLanguage } from "../context/LanguageContext";
 
 export default function SpatialDistribution({
   depth,
   initialFocus,
   onBack,
 }) {
+  const { t } = useLanguage();
   const [maps, setMaps] = useState({
     argo: "",
     convformer: "",
@@ -57,7 +59,6 @@ export default function SpatialDistribution({
     };
   }, [depth]);
 
-  // Restores outside click functionality to outfocus selected map
   useEffect(() => {
     const handleOutsideClick = () => {
       setFocusedMap(null);
@@ -88,12 +89,12 @@ export default function SpatialDistribution({
           onClick={(e) => e.stopPropagation()}
         >
           <h3 className="spatial-title">
-            Spatial Temperature Distribution at{" "}
-            {depth ? parseFloat(depth).toFixed(1) : "0.0"} m Depth
+            {t("spatialTitle")}{" "}
+            {depth ? parseFloat(depth).toFixed(1) : "0.0"} {t("spatialDepth")}
           </h3>
 
           <button className="back-to-map-btn" onClick={onBack}>
-            ← Back to Interactive Map
+            {t("backToMap")}
           </button>
         </div>
 
@@ -107,11 +108,11 @@ export default function SpatialDistribution({
             }}
           >
             <div className="spatial-card-header">
-              <h4>Independent ARGO (Ground Truth)</h4>
+              <h4>{t("argoTruth")}</h4>
             </div>
             <div className="spatial-image-wrapper">
               {loading ? (
-                <div className="loading-text">Fetching Map Data...</div>
+                <div className="loading-text">{t("fetchingMap")}</div>
               ) : maps.argo ? (
                 <img
                   src={maps.argo}
@@ -120,7 +121,7 @@ export default function SpatialDistribution({
                   onError={(event) => handleImageError(event, "ARGO")}
                 />
               ) : (
-                <div className="loading-text">ARGO map unavailable</div>
+                <div className="loading-text">{t("argoUnavailable")}</div>
               )}
             </div>
           </div>
@@ -134,12 +135,12 @@ export default function SpatialDistribution({
             }}
           >
             <div className="spatial-card-header">
-              <h4>Convformer Prediction</h4>
+              <h4>{t("convformerPred")}</h4>
               <div className="mock-toolbar">📷 🔍 ⛶</div>
             </div>
             <div className="spatial-image-wrapper">
               {loading ? (
-                <div className="loading-text">Fetching Map Data...</div>
+                <div className="loading-text">{t("fetchingMap")}</div>
               ) : maps.convformer ? (
                 <img
                   src={maps.convformer}
@@ -148,7 +149,7 @@ export default function SpatialDistribution({
                   onError={(event) => handleImageError(event, "Convformer")}
                 />
               ) : (
-                <div className="loading-text">Prediction map unavailable</div>
+                <div className="loading-text">{t("predUnavailable")}</div>
               )}
             </div>
           </div>
@@ -162,11 +163,11 @@ export default function SpatialDistribution({
             }}
           >
             <div className="spatial-card-header">
-              <h4>Absolute Error (|Pred - Actual|)</h4>
+              <h4>{t("absoluteError")}</h4>
             </div>
             <div className="spatial-image-wrapper error-wrapper">
               {loading ? (
-                <div className="loading-text">Fetching Map Data...</div>
+                <div className="loading-text">{t("fetchingMap")}</div>
               ) : maps.error ? (
                 <img
                   src={maps.error}
@@ -175,7 +176,7 @@ export default function SpatialDistribution({
                   onError={(event) => handleImageError(event, "Error")}
                 />
               ) : (
-                <div className="loading-text">Error map unavailable</div>
+                <div className="loading-text">{t("errorUnavailable")}</div>
               )}
 
               <div className="mock-colorbar">

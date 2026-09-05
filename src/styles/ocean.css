@@ -2714,7 +2714,7 @@ select.ocean-control {
    ===================================================== */
 @media (max-width: 700px) {
     .ocean-page {
-        padding: 6px;
+        padding: 8px;
         height: 100vh;
         overflow-y: auto;
     }
@@ -2739,25 +2739,27 @@ select.ocean-control {
         font-size: 11px;
     }
 
-    /* Make map compact on mobile */
+    /* 1. Make the map smaller/more compact on mobile */
     .ocean-map-wrapper {
-        height: 440px;
+        height: 420px;
         border-radius: 16px;
     }
 
-    /* Move zoom controls to bottom-right to avoid clashing */
+    /* 2. Move zoom controls to bottom-right to prevent clashing with fields */
     .custom-zoom-controls {
         bottom: 16px;
         right: 16px;
         left: auto;
     }
 
-    /* Automatically hide input control bar when side panel is open on mobile */
-    .ocean-map-wrapper:has(.side-data-panel) .ocean-controls {
-        opacity: 0;
-        pointer-events: none;
-        transform: translateY(-15px);
-        transition: opacity 0.2s ease, transform 0.2s ease;
+    /* 3. Hide control bar inputs when side panel or 3-map view appears */
+    .ocean-map-wrapper:has(.side-data-panel) .ocean-controls,
+    .ocean-page:has(.spatial-dashboard-container) .ocean-controls,
+    .ocean-page:has(.spatial-dashboard-container) .map-layer-controls {
+        opacity: 0 !important;
+        pointer-events: none !important;
+        transform: translateY(-15px) !important;
+        visibility: hidden !important;
     }
 
     .ocean-controls {
@@ -2768,6 +2770,7 @@ select.ocean-control {
         gap: 6px;
         padding: 8px;
         border-radius: 14px;
+        transition: opacity 0.25s ease, transform 0.25s ease;
     }
 
     .ocean-go {
@@ -2791,11 +2794,12 @@ select.ocean-control {
         top: 0;
     }
 
-    /* Spatial Distribution (3-Map View) mobile fixes */
+    /* 4. Spatial Distribution (3-Map View) mobile UI polish */
     .spatial-dashboard-container {
         padding: 10px;
         background: rgba(13, 42, 124, 0.85);
         backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
     }
 
     .spatial-dashboard-inner {
@@ -2856,4 +2860,36 @@ select.ocean-control {
 @keyframes slideInUpPanel {
     from { transform: translateY(100%); }
     to { transform: translateY(0); }
+}
+/* =====================================================
+   SPECIAL NAMED REFERENCE LINES & LABELS (NORMAL UI MATCH)
+   ===================================================== */
+.grid-vertical-line.special-line,
+.grid-horizontal-line.special-line {
+    background: rgba(14, 165, 233, 0.85) !important;
+    width: 2px !important;
+    height: 2px !important;
+    z-index: 1200 !important;
+}
+
+.longitude-label.special-label,
+.latitude-label.special-label {
+    background: rgba(255, 255, 255, 0.96) !important;
+    color: #0369a1 !important;
+    font-weight: 800 !important;
+    font-size: 11px !important;
+    padding: 4px 8px !important;
+    border-radius: 6px !important;
+    border: 1px solid rgba(14, 165, 233, 0.5) !important;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15) !important;
+    z-index: 1300 !important;
+    white-space: nowrap;
+}
+
+.longitude-label.special-label {
+    transform: translateX(-50%) !important;
+}
+
+.latitude-label.special-label {
+    transform: translateY(-50%) !important;
 }

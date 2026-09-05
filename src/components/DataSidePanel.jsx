@@ -7,6 +7,7 @@ import TemperatureProfile from "./TemperatureProfile";
 import {
   getLocationMetrics,
 } from "../data/dummyOceanData";
+import { useLanguage } from "../context/LanguageContext";
 
 export default function DataSidePanel({
   position,
@@ -14,6 +15,7 @@ export default function DataSidePanel({
   seaName,
   onClose,
 }) {
+  const { t } = useLanguage();
   const [isExpanded, setIsExpanded] = useState(false);
 
   const { snappedLat, snappedLng, metrics } = useMemo(() => {
@@ -33,11 +35,20 @@ export default function DataSidePanel({
   }
 
   const toggleExpand = () => {
-    setIsExpanded((previous) => !previous);
+    setIsExpanded(!isExpanded);
   };
 
-  const displaySeaName = seaName || "Loading sea name...";
-  const isLoading = displaySeaName === "Loading sea name...";
+  const getTranslatedSeaName = (name) => {
+    if (!name || name === "Loading sea name...") return t("loadingSeaName");
+    const lower = name.toLowerCase();
+    if (lower.includes("bengal")) return t("bayOfBengal");
+    if (lower.includes("arabian")) return t("arabianSea");
+    if (lower.includes("indian")) return t("indianOcean");
+    return name;
+  };
+
+  const displaySeaName = getTranslatedSeaName(seaName);
+  const isLoading = !seaName || seaName === "Loading sea name...";
 
   return (
     <div
@@ -46,7 +57,7 @@ export default function DataSidePanel({
       }`}
     >
       <div className="panel-header">
-        <h4>Grid Location Data</h4>
+        <h4>{t("gridLocationData")}</h4>
 
         <div className="panel-actions">
           <button
@@ -86,7 +97,7 @@ export default function DataSidePanel({
               textTransform: "uppercase",
             }}
           >
-            Water Body
+            {t("waterBody")}
           </span>
 
           <strong
@@ -101,22 +112,22 @@ export default function DataSidePanel({
         </div>
 
         <p>
-          <strong>Grid Lat:</strong> {snappedLat.toFixed(2)}°
+          <strong>{t("gridLat")}:</strong> {snappedLat.toFixed(2)}°
         </p>
 
         <p>
-          <strong>Grid Lng:</strong> {snappedLng.toFixed(2)}°
+          <strong>{t("gridLng")}:</strong> {snappedLng.toFixed(2)}°
         </p>
 
         {depth && (
           <p>
-            <strong>Depth:</strong> {depth} m
+            <strong>{t("depth")}:</strong> {depth} m
           </p>
         )}
 
         <hr />
 
-        <h5>Surface Parameters</h5>
+        <h5>{t("surfaceParameters")}</h5>
 
         <div
           style={{
@@ -141,7 +152,7 @@ export default function DataSidePanel({
                 fontWeight: "bold",
               }}
             >
-              SST (Temp)
+              {t("sstLabel")}
             </span>
 
             <strong
@@ -169,7 +180,7 @@ export default function DataSidePanel({
                 fontWeight: "bold",
               }}
             >
-              SSS (Salinity)
+              {t("sssLabel")}
             </span>
 
             <strong
@@ -197,7 +208,7 @@ export default function DataSidePanel({
                 fontWeight: "bold",
               }}
             >
-              SSH (Height)
+              {t("sshLabel")}
             </span>
 
             <strong
@@ -225,7 +236,7 @@ export default function DataSidePanel({
                 fontWeight: "bold",
               }}
             >
-              UO (Eastward Current)
+              {t("uoLabel")}
             </span>
 
             <strong
@@ -254,7 +265,7 @@ export default function DataSidePanel({
                 fontWeight: "bold",
               }}
             >
-              VO (Northward Current)
+              {t("voLabel")}
             </span>
 
             <strong
@@ -270,7 +281,7 @@ export default function DataSidePanel({
 
         <hr />
 
-        <h5>Vertical Temperature Profile</h5>
+        <h5>{t("verticalProfile")}</h5>
 
         <div
           style={{

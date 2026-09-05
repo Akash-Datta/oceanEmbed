@@ -1,5 +1,5 @@
 import "leaflet/dist/leaflet.css";
-
+import { useLanguage } from "../context/LanguageContext";
 import React, {
   useCallback,
   useEffect,
@@ -23,6 +23,7 @@ import DataSidePanel from "../components/DataSidePanel";
 import SpatialDistribution from "../components/SpatialDistribution";
 import AboutAuthors from "../components/AboutAuthors";
 import WebGuidelines from "../components/WebGuidelines";
+import LanguageSelector from "../components/LanguageSelector";
 
 import {
   parseCoordinate,
@@ -59,30 +60,24 @@ function MapInitializer({ setMap, onMapLoaded }) {
   return null;
 }
 
+const getFormattedDateOffset = (offsetDays) => {
+  const d = new Date();
+  d.setDate(d.getDate() + offsetDays);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
 export default function InteractiveMap({ onMapLoaded }) {
+  const { t, language } = useLanguage();
   const [position, setPosition] = useState(null);
   const [targetPosition, setTargetPosition] = useState(null);
   const [currentSeaName, setCurrentSeaName] = useState("");
   const [mapInstance, setMapInstance] = useState(null);
 
-  // Initialize start date by default to exactly 4 days prior to current date
-  const [startDate, setStartDate] = useState(() => {
-    const d = new Date();
-    d.setDate(d.getDate() - 4);
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  });
-
-  // Initialize end date by default to current date
-  const [endDate, setEndDate] = useState(() => {
-    const d = new Date();
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  });
+  const [startDate, setStartDate] = useState(() => getFormattedDateOffset(-4));
+  const [endDate, setEndDate] = useState(() => getFormattedDateOffset(0));
 
   const [depth, setDepth] = useState("");
   const [latitude, setLatitude] = useState("");
@@ -122,8 +117,8 @@ export default function InteractiveMap({ onMapLoaded }) {
 
   const validateAndSetStartDate = (value) => {
     if (!value) {
-      setStartDate("");
-      setEndDate("");
+      setStartDate(getFormattedDateOffset(-4));
+      setEndDate(getFormattedDateOffset(0));
       return;
     }
 
@@ -131,32 +126,34 @@ export default function InteractiveMap({ onMapLoaded }) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const formattedToday = today.toLocaleDateString("en-US", {
+    const localeCode = language === "en" ? "en-US" : "hi-IN";
+    const formattedToday = today.toLocaleDateString(localeCode, {
       month: "long",
       day: "numeric",
       year: "numeric",
     });
 
     if (selectedDate > today) {
-      triggerNotification(`You cannot enter future dates beyond today (${formattedToday}).`);
-      setStartDate("");
-      setEndDate("");
+      const baseMsg = t("futureDateError") || "You cannot enter future dates beyond today";
+      triggerNotification(`${baseMsg} (${formattedToday}).`);
+      setStartDate(getFormattedDateOffset(-4));
+      setEndDate(getFormattedDateOffset(0));
       return;
     }
 
-    // Maximum allowable starting date is current date minus 4 days
-    const maxAllowedStartDate = new Date(today);
-    maxAllowedStartDate.setDate(today.getDate() - 4);
+    const diffTime = today - selectedDate;
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-    if (selectedDate > maxAllowedStartDate) {
-      const targetDateStr = selectedDate.toLocaleDateString("en-US", {
+    if (diffDays >= 0 && diffDays <= 2) {
+      const targetDateStr = selectedDate.toLocaleDateString(localeCode, {
         month: "long",
         day: "numeric",
         year: "numeric",
       });
-      triggerNotification(`Selected date (${targetDateStr}) is restricted: Historical archive data for dates within the last 4 days is currently pending synchronization.`);
-      setStartDate("");
-      setEndDate("");
+      const restrictedMsg = t("restrictedDateError") || "Selected date is restricted: Historical archive data for dates within the last 4 days is currently pending synchronization.";
+      triggerNotification(`(${targetDateStr}) ${restrictedMsg}`);
+      setStartDate(getFormattedDateOffset(-4));
+      setEndDate(getFormattedDateOffset(0));
       return;
     }
 
@@ -194,10 +191,10 @@ export default function InteractiveMap({ onMapLoaded }) {
       return;
     }
 
-    setLatitude(formatLatitude(position.lat));
-    setLongitude(formatLongitude(position.lng));
+    setLatitude(formatLatitude(position.lat, language));
+    setLongitude(formatLongitude(position.lng, language));
     setTargetPosition(position);
-  }, [position]);
+  }, [position, language]);
 
   const handleSeaNameResolved = useCallback((name) => {
     setCurrentSeaName(name);
@@ -226,7 +223,7 @@ export default function InteractiveMap({ onMapLoaded }) {
 
   const handleGo = async () => {
     if (!startDate) {
-      triggerNotification("Please enter a valid starting date first.");
+      triggerNotification(t("validStartDatePrompt") || "Please enter a valid starting date first.");
       return;
     }
 
@@ -241,20 +238,21 @@ export default function InteractiveMap({ onMapLoaded }) {
     const lng = parseCoordinate(longitude, "longitude");
 
     if (lat === null || lng === null) {
-      triggerNotification("Please enter a valid latitude and longitude.");
+      triggerNotification(t("validLatLonPrompt") || "Please enter a valid latitude and longitude.");
       return;
     }
 
     try {
-      const snapped = snapToNearestOcean(lat, lng);
+      const snappedResult = snapToNearestOcean(lat, lng);
+      const snapped = snappedResult instanceof Promise ? await snappedResult : snappedResult;
 
-      if (snapped.failed) {
-        triggerNotification("Unable to find a nearby ocean location. Please try another coordinate.");
+      if (!snapped || snapped.failed) {
+        triggerNotification(t("oceanLocFailed") || "Unable to find a nearby ocean location. Please try another coordinate.");
         return;
       }
 
       if (snapped.redirected) {
-        triggerNotification("Land coordinate detected. Redirecting location to the nearest sea coordinates.");
+        triggerNotification(t("landRedirect") || "Land coordinate detected. Redirecting location to the nearest sea coordinates.");
       }
 
       const newPos = {
@@ -267,7 +265,7 @@ export default function InteractiveMap({ onMapLoaded }) {
       setTargetPosition(newPos);
     } catch (error) {
       console.error("Ocean redirection failed:", error);
-      triggerNotification("Unable to find a nearby ocean location. Please try another coordinate.");
+      triggerNotification(t("oceanLocFailed") || "Unable to find a nearby ocean location. Please try another coordinate.");
     }
   };
 
@@ -300,12 +298,13 @@ export default function InteractiveMap({ onMapLoaded }) {
       <TileLayer
         url={`https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png?key=${import.meta.env.VITE_MAP_API_KEY}`}
       />
-      <MapTouchController />
+      <MapTouchController position={position} depth={depth} />
       <DynamicGrid />
       <LocationMarker
         position={position}
         setPosition={setPosition}
         startDate={startDate}
+        depth={depth}
         onSeaNameResolved={handleSeaNameResolved}
         triggerNotification={triggerNotification}
       />
@@ -313,25 +312,26 @@ export default function InteractiveMap({ onMapLoaded }) {
       <MapInitializer setMap={setMapInstance} onMapLoaded={handleMapReady} />
       <MapInvalidator trigger={showAboutPanel || showGuidelinesPanel} />
     </MapContainer>
-  ), [handleMapReady, position, targetPosition, startDate, handleSeaNameResolved, triggerNotification, showAboutPanel, showGuidelinesPanel]);
+  ), [handleMapReady, position, targetPosition, startDate, depth, handleSeaNameResolved, triggerNotification, showAboutPanel, showGuidelinesPanel]);
 
   return (
     <div className="ocean-page">
       <nav className="ocean-navbar">
         <div className="navbar-brand">
-          <h2 className="ocean-title">Spatiotemporal Ocean Temperature Profiling</h2>
+          <h2 className="ocean-title">{t("title")}</h2>
           <div className="ocean-subtitle">
-            Interactive marine temperature intelligence • Spatial mapping • Depth-wise profiling
+            {t("subtitle")}
           </div>
         </div>
-        <div style={{ display: "flex", gap: "10px" }}>
+        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+          <LanguageSelector />
           <button
             className="about-authors-nav-btn"
             onClick={() => setShowGuidelinesPanel(true)}
             disabled={showGuidelinesPanel || showAboutPanel}
             style={{ opacity: (showGuidelinesPanel || showAboutPanel) ? 0.6 : 1, cursor: (showGuidelinesPanel || showAboutPanel) ? "not-allowed" : "pointer" }}
           >
-            📖 Web Guidelines
+            {t("webGuidelines")}
           </button>
           <button
             className="about-authors-nav-btn"
@@ -339,7 +339,7 @@ export default function InteractiveMap({ onMapLoaded }) {
             disabled={showAboutPanel || showGuidelinesPanel}
             style={{ opacity: (showAboutPanel || showGuidelinesPanel) ? 0.6 : 1, cursor: (showAboutPanel || showGuidelinesPanel) ? "not-allowed" : "pointer" }}
           >
-            👥 About Authors
+            {t("aboutAuthors")}
           </button>
         </div>
       </nav>
@@ -384,7 +384,7 @@ export default function InteractiveMap({ onMapLoaded }) {
                   openDashboard("argo");
                 }}
               >
-                ARGO
+                {t("argo")}
               </button>
 
               <button
@@ -394,7 +394,7 @@ export default function InteractiveMap({ onMapLoaded }) {
                   openDashboard("convformer");
                 }}
               >
-                Prediction
+                {t("prediction")}
               </button>
 
               <button
@@ -404,7 +404,7 @@ export default function InteractiveMap({ onMapLoaded }) {
                   openDashboard("error");
                 }}
               >
-                Error
+                {t("error")}
               </button>
             </div>
 
@@ -415,7 +415,7 @@ export default function InteractiveMap({ onMapLoaded }) {
                 setActiveLayerMode(false);
               }}
             >
-              ← Cancel
+              {t("cancel")}
             </button>
           </div>
         ) : (

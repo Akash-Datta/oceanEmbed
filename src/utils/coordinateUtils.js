@@ -19,7 +19,7 @@ const cardinalDirections = {
   pa: { N: "ਉ", S: "ਦ", E: "ਪੂ", W: "ਪ" },
   or: { N: "ଉ", S: "ଦ", E: "ପୂ", W: "ପ" },
   as: { N: "উ", S: "দ", E: "পূ", W: "প" },
-  ne: { N: "उ", S: "द", E: "पू", W: "प" },
+  ne: { N: "उ", S: "द", E: "पू", W: "पू" },
   sd: { N: "اتر", S: "दक्षिण", E: "اوڀر", W: "اولهه" },
   kok: { N: "उ", S: "द", E: "उदेंत", W: "अस्तंत" },
   doi: { N: "उ", S: "द", E: "पू", W: "प" },
@@ -159,18 +159,6 @@ export function checkIfLand(lat, lng) {
   }
 }
 
-function isSafeOceanPoint(lat, lng) {
-  if (checkIfLand(lat, lng)) return false;
-  const safetyRadiusKm = 3;
-  const directions = 8;
-  for (let angle = 0; angle < 360; angle += 360 / directions) {
-    const destination = turf.destination(turf.point([lng, lat]), safetyRadiusKm, angle, { units: "kilometers" });
-    const [checkLng, checkLat] = destination.geometry.coordinates;
-    if (checkIfLand(checkLat, checkLng)) return false;
-  }
-  return true;
-}
-
 export function snapToNearestOcean(lat, lng) {
   const originalLat = Number(lat);
   const originalLng = normalizeLongitude(lng);
@@ -180,9 +168,17 @@ export function snapToNearestOcean(lat, lng) {
   if (!checkIfLand(originalLat, originalLng)) {
     return { lat: originalLat, lng: originalLng, redirected: false, failed: false };
   }
-  const directions = 16;
-  const searchDistances = [2, 5, 10, 15, 20, 30, 45, 60, 80, 100, 130, 170, 220, 280, 350, 450, 600, 800, 1000, 1500, 2000, 3000];
+
+  const directions = 32;
+  const searchDistances = [
+    0.5, 1, 1.5, 2, 3, 5, 8, 12, 16, 20, 30, 45, 60, 80, 100, 
+    130, 170, 220, 280, 350, 450, 600, 800, 1000, 
+    1250, 1500, 2000, 2500, 3000, 3750, 4500, 5500, 6500
+  ];
+
   let bestCandidate = null;
+  let winningAngle = 0;
+
   for (const distance of searchDistances) {
     for (let angle = 0; angle < 360; angle += 360 / directions) {
       const destination = turf.destination(turf.point([originalLng, originalLat]), distance, angle, { units: "kilometers" });
@@ -190,28 +186,47 @@ export function snapToNearestOcean(lat, lng) {
       if (candidateLat < -90 || candidateLat > 90) continue;
       const normalizedLng = normalizeLongitude(candidateLng);
       if (checkIfLand(candidateLat, normalizedLng)) continue;
-      if (!isSafeOceanPoint(candidateLat, normalizedLng)) continue;
-      bestCandidate = { lat: Number(candidateLat.toFixed(6)), lng: Number(normalizedLng.toFixed(6)), redirected: true, failed: false };
+      
+      bestCandidate = { lat: candidateLat, lng: normalizedLng };
+      winningAngle = angle;
       break;
     }
     if (bestCandidate) break;
   }
+
   if (bestCandidate) {
-    if (checkIfLand(bestCandidate.lat, bestCandidate.lng)) {
-      return { lat: originalLat, lng: originalLng, redirected: false, failed: true };
+    let finalLat = bestCandidate.lat;
+    let finalLng = bestCandidate.lng;
+
+    // Push the candidate further out into open water along the same vector 
+    // to prevent jagged coastline polygon edges from landing on beaches or mudflats.
+    const pushDistances = [3, 1.5, 0.5];
+    for (const pushDist of pushDistances) {
+      const offshoreDest = turf.destination(
+        turf.point([bestCandidate.lng, bestCandidate.lat]), 
+        pushDist, 
+        winningAngle, 
+        { units: "kilometers" }
+      );
+      const [offshoreLng, offshoreLat] = offshoreDest.geometry.coordinates;
+      const normalizedOffshoreLng = normalizeLongitude(offshoreLng);
+      if (offshoreLat >= -90 && offshoreLat <= 90 && !checkIfLand(offshoreLat, normalizedOffshoreLng)) {
+        finalLat = offshoreLat;
+        finalLng = normalizedOffshoreLng;
+        break;
+      }
     }
-    return bestCandidate;
+
+    return {
+      lat: Number(finalLat.toFixed(6)),
+      lng: Number(finalLng.toFixed(6)),
+      redirected: true,
+      failed: false,
+    };
   }
+
   return { lat: originalLat, lng: originalLng, redirected: false, failed: true };
 }
-
-// ============================================================
-// FULL-PHRASE GLOBAL WATER BODY & CHANNEL TRANSLATOR
-// ============================================================
-
-// ============================================================
-// FULL-PHRASE GLOBAL WATER BODY & CHANNEL TRANSLATOR
-// ============================================================
 
 // ============================================================
 // FULL-PHRASE GLOBAL WATER BODY & CHANNEL TRANSLATOR
@@ -225,7 +240,6 @@ export function parseAndTranslateApiSeaName(name, t) {
     return t("openOcean") || "Open Ocean";
   }
 
-  // Strip out messy geopolitical wrapper text (e.g., "Spanish part of the...")
   let cleanName = name;
   const partIndex = name.toLowerCase().indexOf("part of the");
   if (partIndex !== -1) {
@@ -236,7 +250,6 @@ export function parseAndTranslateApiSeaName(name, t) {
 
   const upper = cleanName.toUpperCase();
 
-  // Full-phrase matching mapped directly to translation keys including important channels
   if (upper.includes("NORTH ATLANTIC")) return t("northAtlanticOcean") || cleanName;
   if (upper.includes("SOUTH ATLANTIC")) return t("southAtlanticOcean") || cleanName;
   if (upper.includes("NORTH PACIFIC")) return t("northPacificOcean") || cleanName;
@@ -291,7 +304,6 @@ export function parseAndTranslateApiSeaName(name, t) {
   if (upper.includes("IRISH")) return t("irishSea") || cleanName;
   if (upper.includes("MARMARA")) return t("seaOfMarmara") || cleanName;
   
-  // Important Channels & Straits
   if (upper.includes("MOZAMBIQUE")) return t("mozambiqueChannel") || cleanName;
   if (upper.includes("ENGLISH CHANNEL") || upper.includes("ENGLISH")) return t("englishChannel") || cleanName;
   if (upper.includes("YUCATAN")) return t("yucatanStrait") || cleanName;
@@ -305,7 +317,6 @@ export function parseAndTranslateApiSeaName(name, t) {
   if (upper.includes("FLORIDA")) return t("floridaStrait") || cleanName;
   if (upper.includes("TAIWAN")) return t("taiwanStrait") || cleanName;
 
-  // Gulfs & Bays
   if (upper.includes("GUINEA")) return t("gulfOfGuinea") || cleanName;
   if (upper.includes("ADEN")) return t("gulfOfAden") || cleanName;
   if (upper.includes("CALIFORNIA")) return t("gulfOfCalifornia") || cleanName;
@@ -314,10 +325,11 @@ export function parseAndTranslateApiSeaName(name, t) {
   if (upper.includes("CARPENTARIA")) return t("gulfOfCarpentaria") || cleanName;
   if (upper.includes("HUDSON")) return t("hudsonBay") || cleanName;
   if (upper.includes("AUSTRALIAN BIGHT")) return t("greatAustralianBight") || cleanName;
-  // Mediterranean & Surrounding Regional Seas
+
   if (upper.includes("AEGEAN")) return t("aegeanSea") || cleanName;
   if (upper.includes("IONIAN") || upper.includes("IRONIAN")) return t("ionianSea") || cleanName;
   if (upper.includes("CRETE") || upper.includes("CRETAN")) return t("creteSea") || cleanName;
   if (upper.includes("MARMARA")) return t("seaOfMarmara") || cleanName;
+  
   return t("openOcean") || "Open Ocean";
 }

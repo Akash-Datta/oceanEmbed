@@ -162,7 +162,8 @@ export const translations = {
     restrictedDateError: "Selected date is restricted: Historical archive data for dates within the last 3 days is currently pending synchronization.",
     validStartDatePrompt: "Please enter a valid starting date first.",
     validLatLonPrompt: "Please enter a valid latitude and longitude.",
-    allModels: "All Models"
+    allModels: "All Models",
+    back: "Back"
   },
   hi: {
     title: "स्थान-काल महासागर तापमान प्रोफाइलिंग",
@@ -211,7 +212,7 @@ export const translations = {
     githubProfile: "गिटहब प्रोफ़ाइल",
     aadiName: "आदित्य सरदार",
     teestaName: "तीस्ता मुखर्जी",
-    akashName: "आकाश दत्ता",
+    akashName: "आकाश दत्त",
     ayushName: "आयुष मोंडल",
     anuvabName: "अनुभव कुंडू",
     jishnuName: "जिष्णु पाल",
@@ -327,7 +328,8 @@ export const translations = {
     restrictedDateError: "चयनित तिथि प्रतिबंधित है: पिछले 3 दिनों की तारीखों के लिए ऐतिहासिक存档 डेटा वर्तमान में सिंक्रनाइज़ेशन के अधीन है।",
     validStartDatePrompt: "कृपया पहले एक वैध शुरुआती तारीख दर्ज करें।",
     allModels: "सभी मॉडल",
-    validLatLonPrompt: "कृपया एक वैध अक्षांश और देशांतर दर्ज करें।"
+    validLatLonPrompt: "कृपया एक वैध अक्षांश और देशांतर दर्ज करें।",
+    back: "वापस"
   },
   bn: {
     title: "স্পেশিওটেম্পোরাল ওশান টেম্পারেচার প্রোফাইলিং",
@@ -492,7 +494,8 @@ export const translations = {
     restrictedDateError: "নির্বাচিত তারিখ সীমাবদ্ধ: গত 3 দিনের মধ্যে ঐতিহাসিক আর্কাইভ ডেটা বর্তমানে সিঙ্ক্রোনাইজেশনের অপেক্ষায় রয়েছে।",
     validStartDatePrompt: "দয়া করে প্রথমে একটি বৈধ শুরুর তারিখ লিখুন।",
     allModels: "সকল মডেল",
-    validLatLonPrompt: "দয়া করে একটি বৈধ অক্ষাংশ এবং দ্রাঘিমাংশ লিখুন।"
+    validLatLonPrompt: "দয়া করে একটি বৈধ অক্ষাংশ এবং দ্রাঘিমাংশ লিখুন।",
+    back: "ফিরে যান"
   },
   mr: {
     title: "स्थान-काल महासागर तापमान प्रोफाइलिंग",
@@ -541,7 +544,7 @@ export const translations = {
     githubProfile: "गिटहब प्रोफाइल",
     aadiName: "आदित्य सरदार",
     teestaName: "तीस्ता मुखर्जी",
-    akashName: "आकाश दत्ता",
+    akashName: "आकाश दत्त",
     ayushName: "आयुष मोंडल",
     anuvabName: "अनुभव कुंडू",
     jishnuName: "जिष्णु पाल",
@@ -658,7 +661,8 @@ export const translations = {
     restrictedDateError: "निवडलेली तारीख प्रतिबंधित आहे: गेल्या ३ दिवसांमधील ऐतिहासिक अभिलेख डेटा सध्या सिंक होण्याच्या प्रतीक्षेत आहे.",
     validStartDatePrompt: "कृपया प्रथम वैध सुरुवातीची तारीख प्रविष्ट करा.",
     allModels: "सर्व मॉडेल",
-    validLatLonPrompt: "कृपया वैध अक्षांश आणि रेखांश प्रविष्ट करा."
+    validLatLonPrompt: "कृपया वैध अक्षांश आणि रेखांश प्रविष्ट करा.",
+    back: "मागे जा"
   },
   te: {
     title: "స్పాటియోటెమ్టోరల్ మహాసముద్ర ఉష్ణోగ్రత ప్రొఫైలింగ్",
@@ -824,7 +828,8 @@ export const translations = {
     restrictedDateError: "ఎంచుకున్న తేదీ పరిమితం చేయబడింది: గత 3 రోజులలోపు చారిత్రక ఆర్కైవ్ డేటా ప్రస్తుతం సింక్రొనైజేషన్ కోసం వేచి ఉంది.",
     validStartDatePrompt: "దయచేసి ముందుగా చెల్లుబాటు అయ్యే ప్రారంభ తేదీని నమోదు చేయండి.",
     allModels: "అన్ని మోడల్స్",
-    validLatLonPrompt: "దయచేసి చెల్లుబాటు అయ్యే అక్షాంశం మరియు రేఖాంశాన్ని నమోదు చేయండి."
+    validLatLonPrompt: "దయచేసి చెల్లుబాటు అయ్యే అక్షాంశం మరియు రేఖాంశాన్ని నమోదు చేయండి.",
+    back: "తిరిగి వెళ్ళు"
   },
   ta: {
     title: "இட-காலப் பெருங்கடல் வெப்பநிலை விவரக்குறிப்பு",
@@ -990,7 +995,8 @@ export const translations = {
     restrictedDateError: "தேர்ந்தெடுக்கப்பட்ட தேதி தடைசெய்யப்பட்டுள்ளது: கடந்த 3 நாட்களுக்குள்ளான வரலாற்று காப்பகத் தரவு தற்போது ஒத்திசைவுக்காகக் காத்திருக்கிறது.",
     validStartDatePrompt: "முதலில் சரியான தொடக்கத் தேதியை உள்ளிடவும்.",
     allModels: "அனைத்து மாதிரிகள்",
-    validLatLonPrompt: "சரியான அலா. மற்றும் தீர்க்க. ஐ உள்ளிடவும்."
+    validLatLonPrompt: "சரியான அலா. மற்றும் தீர்க்க. ஐ உள்ளிடவும்.",
+    back: "பின்னால்"
   },
   gu: {
     title: "સ્થળ-સમય મહાસાગર તાપમાન પ્રોફાઇલિંગ",
@@ -1039,7 +1045,7 @@ export const translations = {
     githubProfile: "ગિટહબ પ્રોફાઇલ",
     aadiName: "આદિત્ય સરદાર",
     teestaName: "તીસ્તા મુખર્જી",
-    akashName: "આકાશ દત્તા",
+    akashName: "આકાશ દત્ત",
     ayushName: "આયુષ મંડળ",
     anuvabName: "અનુવભ કુંડુ",
     jishnuName: "જિષ્ણુ પાલ",
@@ -1152,10 +1158,11 @@ export const translations = {
     oceanLocFailed: "નજીકનું દરિયાઈ સ્થાન મળ્યું નથી. કૃપા કરીને બીજો કોઓર્ડિનેટ અજમાવો.",
     landRedirect: "જમીન કોઓર્ડિનેટ મળી આવ્યો. સ્થાનને નજીકના દરિયાઈ કોઓર્ડિનેટ્સ પર રીડાયરેક્ટ કરી રહ્યું છે.",
     futureDateError: "તમે આજના પછીની ભવિષ્યની તારીખો દાખલ કરી શકતા નથી",
-    restrictedDateError: "પસંદ કરેલી તારીખ પ્રતિબંધિત છે: છેલ્લા 3 દિવસની તારીખો માટેનો ಐತಿಹಾಸिक આર્કાઇવ ડેટા હાલમાં સિંક્રનાઇઝેશનની અપેક્ષામાં છે.",
+    restrictedDateError: "પસંદ કરેલી તારીખ પ્રતિબંધિત છે: છેલ્લા 3 દિવસની તારીખો માટેનો ઐતિહાસિક આર્કાઇવ ડેટા હાલમાં સિંક્રનાઇઝેશનની અપેક્ષામાં છે.",
     validStartDatePrompt: "કૃપા કરીને પહેલા માન્ય પ્રારંભ તારીખ દાખલ કરો.",
     allModels: "બધા મોડેલો",
-    validLatLonPrompt: "કૃપા કરીને માન્ય અક્ષાંશ અને રેખાંશ દાખલ કરો."
+    validLatLonPrompt: "કૃપા કરીને માન્ય અક્ષાંશ અને રેખાંશ દાખલ કરો.",
+    back: "પાછળ જાઓ"
   },
   kn: {
     title: "ಸ್ಪೇಷಿಯೋಟೆಂಪೊರಲ್ ಸಾಗರ ತಾಪಮಾನ ಪ್ರೊಫೈಲಿಂಗ್",
@@ -1320,7 +1327,8 @@ export const translations = {
     restrictedDateError: "ಆಯ್ಕೆಮಾಡಿದ ದಿನಾಂಕ ನಿರ್ಬಂಧಿಸಲಾಗಿದೆ: ಕಳೆದ 3 ದಿನಗಳೊಳಗಿನ ಐತಿಹಾಸಿಕ ಆರ್ಕೈವ್ ಡೇಟಾ ಪ್ರಸ್ತುತ ಸಿಂಕ್ರೊನೈಸೇಶನ್‌ಗಾಗಿ ಕಾಯುತ್ತಿದೆ.",
     validStartDatePrompt: "ದಯವಿಟ್ಟು ಮೊದಲು ಮಾನ್ಯವಾದ ಪ್ರಾರಂಭ ದಿನಾಂಕವನ್ನು ನಮೂದಿಸಿ.",
     allModels: "ಎಲ್ಲಾ ಮಾದರಿಗಳು",
-    validLatLonPrompt: "ದಯವಿಟ್ಟು ಮಾನ್ಯವಾದ ಅಕ್ಷಾಂಶ ಮತ್ತು ರೇಖಾಂಶವನ್ನು ನಮೂದಿಸಿ."
+    validLatLonPrompt: "ದಯವಿಟ್ಟು ಮಾನ್ಯವಾದ ಅಕ್ಷಾಂಶ ಮತ್ತು ರೇಖಾಂಶವನ್ನು ನಮೂದಿಸಿ.",
+    back: "ಹಿಂದೆ"
   },
   ml: {
     title: "സ്പേഷ്യോ ടെംപോറൽ സമുദ്ര താപനില പ്രൊഫൈലിംഗ്",
@@ -1485,7 +1493,8 @@ export const translations = {
     restrictedDateError: "തിരഞ്ഞെടുത്ത തീയതി പരിമിതപ്പെടുത്തിയിരിക്കുന്നു: കഴിഞ്ഞ 3 ദിവസത്തിനുള്ളിലെ ചരിത്രപരമായ ആർക്കൈവ് ഡാറ്റ നിലവിൽ സിൻക്രോണൈസേഷനായി കാത്തിരിക്കുന്നു.",
     validStartDatePrompt: "ദയവായി ആദ്യം സാധുവായ ആരംഭ തീയതി നൽകുക.",
     allModels: "എല്ലാ മോഡലുകളും",
-    validLatLonPrompt: "ദയവായി സാധുവായ അക്ഷാംശവും രേഖാംശവും നൽകുക."
+    validLatLonPrompt: "ദയവായി സാധുവായ അക്ഷാംശവും രേഖാംശവും നൽകുക.",
+    back: "പിന്നിലേക്ക്"
   },
   pa: {
     title: "ਸਥਾਨ-ਕਾਲ ਮਹਾਸਾਗਰ ਤਾਪਮਾਨ ਪ੍ਰੋਫਾਈਲਿੰਗ",
@@ -1534,7 +1543,7 @@ export const translations = {
     githubProfile: "ਗਿੱਟਹੱਬ ਪ੍ਰੋਫਾਈਲ",
     aadiName: "ਆਦਿਤਿਆ ਸਰਦਾਰ",
     teestaName: "ਤੀਸਤਾ ਮੁਖਰਜੀ",
-    akashName: "ਆਕਾਸ਼ ਦੱਤਾ",
+    akashName: "ਆਕਾਸ਼ ਦੱਤ",
     ayushName: "ਆਯੁਸ਼ ਮੰਡਲ",
     anuvabName: "ਅਨੁਵਭ ਕੁੰਡੂ",
     jishnuName: "ਜਿਸ਼ਣੂ ਪਾਲ",
@@ -1650,7 +1659,8 @@ export const translations = {
     restrictedDateError: "ਚੁਣੀ ਗਈ ਮਿਤੀ ਪ੍ਰਤੀਬੰਧਿਤ ਹੈ: ਪਿਛਲੇ 3 ਦਿਨਾਂ ਦੀਆਂ ਤਾਰੀਖਾਂ ਲਈ ਇਤਿਹਾਸਕ ਆਰਕਾਈਵ ਡਾਟਾ ਵਰਤਮਾਨ ਵਿੱਚ ਸਿੰਕ੍ਰੋਨਾਈਜ਼ੇਸ਼ਨ ਦੇ ਅਧੀਨ ਹੈ।",
     validStartDatePrompt: "ਕਿਰਪਾ ਕਰਕੇ ਪਹਿਲਾਂ ਇੱਕ ਵੈਧ ਸ਼ੁਰੂਆਤੀ ਮਿਤੀ ਦਾਖਲ ਕਰੋ।",
     allModels: "ਸਾਰੇ ਮਾਡਲ",
-    validLatLonPrompt: "ਕਿਰਪਾ ਕਰਕੇ ਇੱਕ ਵੈਧ ਅਕਸ਼ਾਂਸ਼ ਅਤੇ ਲੰਬਕਾਰ ਦਾਖل ਕਰੋ।"
+    validLatLonPrompt: "ਕਿਰਪਾ ਕਰਕੇ ਇੱਕ ਵੈਧ ਅਕਸ਼ਾਂਸ਼ ਅਤੇ ਲੰਬਕਾਰ ਦਾਖل ਕਰੋ।",
+    back: "ਵਾਪਸ"
   },
   or: {
     title: "ସ୍ଥାନ-କାଳ ମହାସାଗର ତାପମାତ୍ରା ପ୍ରୋଫାଇଲିଂ",
@@ -1812,10 +1822,11 @@ export const translations = {
     oceanLocFailed: "ପାଖରେ କୌଣସି ମହାସାଗରୀୟ ଅବସ୍ଥାନ ମିଳିଲା ନାହିଁ। ଦୟାକରି ଅନ୍ୟ ଏକ କୋଅର୍ଡିନେଟ୍ ଚେଷ୍ଟା କରନ୍ତୁ।",
     landRedirect: "ଭୂମି କୋଅର୍ଡିନେଟ୍ ଚିହ୍ନଟ ହେଲା। ଅବସ୍ଥାନକୁ ନିକଟସ୍ଥ ସମୁଦ୍ର କୋଅର୍ଡିନେଟ୍ କୁ ରିଡାଇରେକ୍ଟ କରାଯାଉଛି।",
     futureDateError: "ଆପଣ ଆଜି ପରର ଭବିଷ୍ୟତ ତାରିଖ ପ୍ରବେଶ କରିପାରିବେ ନାହିଁ",
-    restrictedDateError: "ନିର୍ବାଚିତ ତାରିଖ ପ୍ରତିବନ୍ଧିତ: ଗତ 3 ଦିନ ମଧ୍ୟରେ ଥିବା Historical archive ଡାଟା ବର୍ତ୍ତମାନ ସିଙ୍କ୍ରୋନାଇଜେସନ୍ ଅଧୀନରେ ଅଛି।",
+    restrictedDateError: "ନିର୍ବାଚିତ ତାରିଖ ପ୍ରତିବନ୍ଧିତ: ଗତ 3 ଦିନ ମଧ୍ୟରେ ଥିବା ଐତିହାସିକ ଅଭିଲେଖାଗାର ଡାଟା ବର୍ତ୍ତମାନ ସିଙ୍କ୍ରୋନାଇଜେସନ୍ ଅଧୀନରେ ଅଛି।",
     validStartDatePrompt: "ଦୟାକରି ପ୍ରଥମେ ଏକ ବୈଧ ଆରମ୍ଭ ତାରିଖ ପ୍ରବେଶ କରନ୍ତୁ।",
     allModels: "ସମସ୍ତ ମଡେଲ୍",
-    validLatLonPrompt: "ଦୟାକରି ଏକ ବୈଧ ଅକ୍ଷାଂଶ ଏବଂ ଦ୍ରାଘିମା ପ୍ରବେଶ କରନ୍ତୁ।"
+    validLatLonPrompt: "ଦୟାକରି ଏକ ବୈଧ ଅକ୍ଷାଂଶ ଏବଂ ଦ୍ରାଘିମା ପ୍ରବେଶ କରନ୍ତୁ।",
+    back: "ପଛକୁ"
   },
   as: {
     title: "স্থান-কাল মহাসাগৰ তাপমাত্ৰা প্ৰফাইলিং",
@@ -1980,7 +1991,8 @@ export const translations = {
     restrictedDateError: "নিৰ্বাচিত তাৰিখ প্ৰতিবন্ধিত: বিগত 3 দিনৰ ভিতৰৰ ঐতিহাসিক আৰ্কাইভ ডেটা বৰ্তমান চিনক্ৰ'নিজেশ্যনৰ অপেক্ষাত আছে।",
     validStartDatePrompt: "অনুগ্ৰহ কৰি প্ৰথমে এটা বৈধ আৰম্ভণি তাৰিখ প্ৰবিষ্ট কৰক।",
     allModels: "সকলো মডেল",
-    validLatLonPrompt: "অনুগ্ৰহ কৰি এটা বৈধ অক্ষাংশ আৰু দ্ৰাঘিমাংশ প্ৰবিষ্ট কৰক।"
+    validLatLonPrompt: "অনুগ্ৰহ কৰি এটা বৈধ অক্ষাংশ আৰু দ্ৰাঘিমাংশ প্ৰবিষ্ট কৰক।",
+    back: "পিছলৈ"
   },
   ur: {
     title: "مکان و زمان سمندری درجہ حرارت کی پروفائلنگ",
@@ -2145,7 +2157,8 @@ export const translations = {
     restrictedDateError: "منتخب کردہ تاریخ محدود ہے: پچھلے 3 دنوں کی تاریخی آرکائیو ڈیٹا فی الحال مطابقت پذیر ہونے کی منتظر ہے۔",
     validStartDatePrompt: "براہ کرم پہلے ایک درست شروعاتی تاریخ درج کریں۔",
     allModels: "تمام ماڈلز",
-    validLatLonPrompt: "براہ کرم ایک درست عرض بلد اور طول بلد درج کریں۔"
+    validLatLonPrompt: "براہ کرم ایک درست عرض بلد اور طول بلد درج کریں۔",
+    back: "پیچھے"
   },
   mai: {
     title: "स्थान-काल महासागर तापमान प्रोफाइलिंग",
@@ -2194,7 +2207,7 @@ export const translations = {
     githubProfile: "गिटहब प्रोफाइल",
     aadiName: "आदित्य सरदार",
     teestaName: "तीस्ता मुखर्जी",
-    akashName: "आकाश दत्ता",
+    akashName: "आकाश दत्त",
     ayushName: "आयुष मण्डल",
     anuvabName: "अनुभव कुण्डू",
     jishnuName: "जिष्णु पाल",
@@ -2310,7 +2323,8 @@ export const translations = {
     restrictedDateError: "चयनित मिति प्रतिबन्धित अछि: पछिला 3 दिनक ऐतिहासिक अभिलेख डेटा हाल सिंक्रनाइजेशक प्रतीक्षामे अछि।",
     validStartDatePrompt: "कृपया पहिने एकटा वैध सुरुआति मिति दर्ज करू।",
     allModels: "सभ माडल",
-    validLatLonPrompt: "कृपया एकटा वैध अक्षांश आ देशान्तर दर्ज करू।"
+    validLatLonPrompt: "कृपया एकटा वैध अक्षांश आ देशान्तर दर्ज करू।",
+    back: "पाछू"
   },
   sat: {
     title: "Space-time ᱫရိᱭᱟ ᱞᱚᱞᱚᱥᱚᱝ ᱯᱨᱚᱯᱷᱟᱭᱞᱤᱝ",
@@ -2325,9 +2339,9 @@ export const translations = {
     surfaceParameters: "ᱪᱮᱛᱟᱱ ᱯարᱟᱢᱤᱴᱟᱨ",
     verticalProfile: " ଠᱟᱲ ᱞᱚᱞᱚᱥᱚᱝ ᱯᱨᱚᱯᱷᱟᱭᱤᱞ",
     argo: "ᱟᱨᱜᱳ",
-    prediction: "Prakalan",
+    prediction: "ᱯᱨᱮᱣᱟᱱ",
     error: "ᱵᱷᱩᱞ",
-    cancel: "← ᱵᱟatil",
+    cancel: "← ᱨᱤᱫᱟᱹᱣ",
     chooseDepth: "ᱜᱟᱦᱤᱨ ᱵᱟᱪᱷᱟᱣ",
     go: "ᱪᱟᱞᱟᱜ",
     latPlaceholder: "ᱞᱮᱴᱤᱴᱭᱩᱰ ᱚᱞ ᱢᱮ",
@@ -2339,7 +2353,7 @@ export const translations = {
     stepInstructions: "ᱫᱷᱟᱯ-ᱫᱷᱟᱯ ᱠᱟᱹᱢᱤᱦᱚᱨᱟ",
     step1Title: "1. ᱢᱟᱬᱟᱝ ᱢᱟᱦᱟᱸ ᱟᱨ ᱵᱤᱪᱷᱱᱟᱹᱣ ᱣᱤᱱᱰᱳ ᱵᱟᱪᱷᱟᱣ ᱢᱮ",
     step1Desc: "ᱠᱚᱱᱴᱨᱚᱞ ᱵᱟᱨ ᱨᱮ ᱟᱢᱟᱜ ᱮᱛᱚᱦᱚᱵ ᱢᱟᱦᱟᱸ ᱵᱟᱪᱷᱟᱣ ᱠᱟᱛᱮ ᱮᱦᱚᱵ ᱢᱮ। ᱥᱤᱥᱴᱚᱢ ᱫᱚ ᱫရိᱭᱟ ᱴᱚᱴᱷᱟ ᱨᱮ ᱞᱮᱛᱟᱲ ᱯᱨᱚᱠᱚᱞᱚᱱ ᱟᱨ ᱯᱚᱠᱷᱟᱱ ᱵᱷᱩᱞ ᱠᱚ ᱥᱟᱯᱲᱟᱣ ᱞᱟᱹᱜᱤᱫ ᱔ ᱢᱟᱦᱟᱸᱟᱜ ᱥᱯᱮᱥ-ᱴᱟᱭᱤᱢ ᱵᱤᱪᱷᱱᱟᱹᱣ ᱣᱤᱱᱰᱳ ᱟᱡ ᱛᱮᱜᱮᱭ ᱞᱮᱠᱷᱟᱭᱟ।",
-    step2Title: "2. ᱴᱷᱟᱶ-ভিত্তিক ᱫရိᱭᱟ ᱯᱨᱚᱯᱷᱟᱭᱞᱤᱝ",
+    step2Title: "2. ᱫᱷᱟᱯ-ᱫᱷᱟᱯ ᱢᱮ ᱵᱤᱪᱷᱱᱟᱹᱣ ᱜᱟᱦᱤᱨ ᱯᱨᱚᱯᱷᱟᱭ",
     step2Desc: "ᱡᱚᱱᱚᱲᱟᱣ ᱢᱮᱯ ᱨᱮ ᱡᱟᱦᱟᱸᱨᱮ ᱜᱮ ᱠᱞᱤᱠ ᱢᱮ ᱵᱟᱝᱠᱷᱟᱱ ᱴᱷᱤᱠ ᱞᱮᱴᱤᱴᱭᱩᱰ ᱟᱨ ᱞᱚᱝᱜᱤᱴᱭᱩᱰ ᱮᱢ ᱢᱮ। ᱚᱛ ᱴᱷᱟᱶ ᱠᱚ ᱫᱚ ᱥᱟᱹᱦᱤ ᱫရိᱭᱟ ᱜᱨᱤᱰ ᱴᱷᱟᱶ ᱨᱮ ᱠᱚ ᱩᱫᱩᱜ ᱥᱚᱫᱚᱜᱟ।",
     step3Title: "3. ᱪᱮᱛᱟᱱ ᱟᱨ ᱜᱟᱦᱤᱨ ᱯᱟᱨᱟᱢᱤᱴᱟᱨ ᱠᱚ ᱵᱤᱪᱷᱱᱟᱹᱣ ᱢᱮ",
     step3Desc: "ᱰᱟᱭᱱᱟᱢᱤᱠ ᱥᱟᱭᱤᱰ ᱯᱟᱱᱮᱞ ᱨᱮ ᱥᱤ ᱥᱚᱨᱯᱷᱮᱥ ᱴᱮᱢᱯᱟᱨᱮᱪᱚᱨ (SST), ᱥᱤ ᱥᱚᱨᱯᱷᱮᱥ ᱥᱟᱞᱤᱱᱤᱴᱤ (SSS), ᱥᱤ ᱥᱚᱨᱯᱷᱮᱥ ᱦᱟᱭᱤᱴ (SSH), ᱟᱨ ᱥᱟᱢᱟᱝ/ᱠᱚᱧᱮ ᱱᱟᱹᱬᱤ ᱵᱮᱜᱽ (UO, VO) ᱧᱮᱚᱜᱼᱟ।",
@@ -2363,7 +2377,7 @@ export const translations = {
     ayushName: "ᱟᱭᱩᱥ ᱢᱚᱱᱰᱚᱞ",
     anuvabName: "ᱚᱱᱩᱵᱚᱵᱽ ᱠᱩᱱᱰᱩ",
     jishnuName: "ᱡᱤᱥᱱᱩ ᱯᱟᱞ",
-    spatialTitle: "ᱴᱷᱟᱶ-ভিত্তিক ᱞᱚᱞᱚᱥᱚᱝ ᱦᱟᱹᱴᱤᱧ",
+    spatialTitle: "ᱢᱤᱴᱚᱨ ᱜᱟᱦᱤᱨ ᱯᱨᱚᱯᱷᱟᱭ",
     spatialDepth: "ᱢᱤᱴᱚᱨ ᱜᱟᱦᱤᱨ ᱨᱮ",
     backToMap: "← ᱡᱚᱱᱚᱲᱟᱣ ᱢᱮᱯ ᱨᱮ ᱨᱩᱣᱟᱹᱲ ᱢᱮ",
     argoTruth: "ᱯᱷᱩᱨᱜᱟᱹᱞ ARGO (ᱜᱨᱟᱣᱩଣ୍ᱰ ᱴᱨᱩᱛᱷ)",
@@ -2475,7 +2489,8 @@ export const translations = {
     restrictedDateError: "ᱮᱛᱚᱦᱚᱵ ᱢᱟᱦᱟᱸ ᱢᱟᱬᱟᱝ ᱚᱞ ᱢᱮ ᱠᱚ ᱫᱚᱨᱭᱟ ᱴᱷᱤ ᱠᱚ ᱡᱟ।",
     validStartDatePrompt: "ᱴᱷᱤᱠ ᱢᱟᱦᱟᱸ ᱢᱟᱬᱟᱝ ᱚᱞ ᱢᱮ ᱠᱚ ᱫᱚᱨᱭᱟ ᱴᱷᱤ ᱠᱚ ᱡᱟ।",
     allModels: "ᱟᱨᱟᱯᱩᱨᱟ",
-    validLatLonPrompt: "ᱴᱷᱤᱠ ᱞᱮᱴᱤᱴᱭᱩᱰ ᱟᱨ ᱞᱚᱝᱜᱤᱴᱭᱚ ᱚᱚ ᱢᱚ।"
+    validLatLonPrompt: "ᱴᱷᱤᱠ ᱞᱮᱴᱤᱴᱭᱩᱰ ᱟᱨ ᱞᱚᱝᱜᱤᱴᱭᱚ ᱚᱚ ᱢᱚ।",
+    back: "← ᱡᱚᱱᱚᱲᱟᱣ ᱢᱮᱯ ᱨᱮ ᱨᱩᱣᱟᱹᱲ ᱢᱮ"
   },
   ks: {
     title: "اسپیشیوٹیمپل اوشین ٹمپریچر انٹیلی جنس پلیٹ فارم",
@@ -2630,7 +2645,7 @@ export const translations = {
     hormuzStrait: "آبنائے ہرمز",
     gibraltarStrait: "آبنائے جبل الطارق",
     bassStrait: "آبنائے باس",
-    cookStrait: "آبنائے কুক",
+    cookStrait: "آبنائے کک",
     floridaStrait: "آبنائے فلوریڈا",
     taiwanStrait: "آبنائے تائیوان",
     startDatePrompt: "براہ کرم پہلے شروعاتی تاریخ درج کریں۔",
@@ -2640,7 +2655,8 @@ export const translations = {
     restrictedDateError: "منتخب کردہ تاریخ محدود ہے: پچھلے 3 دنوں کی تاریخی آرکائیو ڈیٹا فی الحال مطابقت پذیر ہونے کی منتظر ہے۔",
     validStartDatePrompt: "براہ کرم پہلے ایک درست شروعاتی تاریخ درج کریں۔",
     allModels: "سڀ مودل",
-    validLatLonPrompt: "براہ کرم ایک درست عرض بلد اور طول بلد درج کریں۔"
+    validLatLonPrompt: "براہ کرم ایک درست عرض بلد اور طول بلد درج کریں۔",
+    back: "پوئتي"
   },
   ne: {
     title: "स्थान-काल महासागर तापमान प्रोफाइलिंग",
@@ -2689,7 +2705,7 @@ export const translations = {
     githubProfile: "गिटहब प्रोफाइल",
     aadiName: "आदित्य सरदार",
     teestaName: "तीस्ता मुखर्जी",
-    akashName: "आकाश दत्ता",
+    akashName: "आकाश दत्त",
     ayushName: "आयुष मण्डल",
     anuvabName: "अनुभव कुण्डू",
     jishnuName: "जिष्णु पाल",
@@ -2805,7 +2821,8 @@ export const translations = {
     restrictedDateError: "चयन गरिएको मिति प्रतिबन्धित छ: गत 3 दिन भित्रको ऐतिहासिक अभिलेख डेटा हाल सिङ्क्रोनाइजेशको प्रतीक्षामा छ।",
     validStartDatePrompt: "कृपया पहिले एक वैध सुरु मिति प्रविष्ट गर्नुहोस्।",
     allModels: "सबै मोडेलहरू",
-    validLatLonPrompt: "कृपया एक वैध अक्षांश र देशान्तर प्रविष्ट गर्नुहोस्।"
+    validLatLonPrompt: "कृपया एक वैध अक्षांश र देशान्तर प्रविष्ट गर्नुहोस्।",
+    back: "← नक्सामा फर्कनुहोस्"
   },
   sd: {
     title: "مقام ۽ وقت جي سمنڊ جي درجه حرارت جي پروفائلنگ",
@@ -2970,7 +2987,8 @@ export const translations = {
     restrictedDateError: "چونڊيل تاريخ محدود آهي: گذريل 3 ڏينهن جي تاريخن جو تاريخي آرڪائيو ڊيٽا هن وقت هم وقت سازي جي انتظار ۾ آهي.",
     validStartDatePrompt: "مهرباني ڪري پهرين صحيح شروعاتي تاريخ داخل ڪريو.",
     allModels: "سڀ مودل",
-    validLatLonPrompt: "مهرباني ڪري صحيح ويڪرائي ڦاڪ ۽ ڊگھائي ڦاڪ داخل ڪريو."
+    validLatLonPrompt: "مهرباني ڪري صحيح ويڪرائي ڦاڪ ۽ ڊگھائي ڦاڪ داخل ڪريو.",
+    back: "پوئتي"
   },
   kok: {
     title: "स्थान-काल महासागर तापमान प्रोफाइलिंग",
@@ -3019,7 +3037,7 @@ export const translations = {
     githubProfile: "गिटहब प्रोफाइल",
     aadiName: "आदित्य सरदार",
     teestaName: "तीस्ता मुखर्जी",
-    akashName: "आकाश दत्ता",
+    akashName: "आकाश दत्त",
     ayushName: "आयुष मोंडल",
     anuvabName: "अनुभव कुंडू",
     jishnuName: "जिष्णु पाल",
@@ -3185,7 +3203,7 @@ export const translations = {
     githubProfile: "गिटहब प्रोफाइल",
     aadiName: "आदित्य सरदार",
     teestaName: "तीस्ता मुखर्जी",
-    akashName: "आकाश दत्ता",
+    akashName: "आकाश दत्त",
     ayushName: "आयुष मण्डल",
     anuvabName: "अनुभव कुण्डू",
     jishnuName: "जिष्णु पाल",
@@ -3301,7 +3319,8 @@ export const translations = {
     restrictedDateError: "चयनित मिति प्रतिबंधित ऐ: पिछले 3 दिनां दी ऐतिहासिक आर्काइव डेटा इस वेले सिंक्रनाइजेशन दी प्रतीक्षा च ऐ।",
     validStartDatePrompt: "कृपया पैहले इक वैध शुरुआत दी मिति दर्ज करो।",
     allModels: "सारे मॉडल",
-    validLatLonPrompt: "कृपया इक वैध अक्षांश ते देशान्तर दर्ज करो।"
+    validLatLonPrompt: "कृपया इक वैध अक्षांश ते देशान्तर दर्ज करो।",
+    back: "पछें"
   },
   mni: {
     title: "স্পাসিওটেম্পোরাল ওসান তেম্পরেচর প্রোফাইলিং",
@@ -3466,11 +3485,12 @@ export const translations = {
     restrictedDateError: "খল্লবা তারিখ অদু রিস্রিক্ত তৌখ্রে",
     validStartDatePrompt: "চুম্বা তারিখ থাপ্পিয়ু।",
     allModels: "সকলো মডেল",
-    validLatLonPrompt: "চুম্বা লাতিচুদ অমসুং লংগিচুদ থাপ্পিয়ু।"
+    validLatLonPrompt: "চুম্বা লাতিচুদ অমসুং লংগিচুদ থাপ্পিয়ু।",
+    back: "পাছে"
   },
   brx: {
     title: "स्थान-काल महासागर तापमान प्रोफाइलिंग",
-    subtitle: "इन्टरेक्टिभ समुद्री तापमान बुद्धि • स्पेसियल मेपिং • गहिराइ-फार प्रोफाइलिंग",
+    subtitle: "इन्टरेक्टिभ समुद्री तापमान बुद्धि • स्पेसियल मैपिंग • गहिराइ-फार प्रोफाइलिंग",
     webGuidelines: "📖 वेब थुलुइ",
     aboutAuthors: "👥 सुजिगिरिफोरनि बागै",
     gridLocationData: "ग्रिद ओनसोल डेटा",
@@ -3515,7 +3535,7 @@ export const translations = {
     githubProfile: "गिटहब प्रोफाइल",
     aadiName: "आदित्य सरदार",
     teestaName: "तीस्ता मुखर्जी",
-    akashName: "आकाश दत्ता",
+    akashName: "आकाश दत्त",
     ayushName: "आयुष मण्डल",
     anuvabName: "अनुभव कुण्डू",
     jishnuName: "जिष्णु पाल",
@@ -3631,7 +3651,8 @@ export const translations = {
     restrictedDateError: "सायखनाय सानथुमा फ्बाय: गावनि सिंक जाबाय थानाय",
     validStartDatePrompt: "थार जागायजेननाय सानथुम थार।",
     allModels: "साबो मोडेल",
-    validLatLonPrompt: "थार अक्षांश आरो देशान्तर थार।"
+    validLatLonPrompt: "थार अक्षांश आरो देशान्तर थार।",
+    back: "फिन"
   },
   sa: {
     title: "स्थान-काल महासागर तापमान प्रोफाइलिंग",
@@ -3680,7 +3701,7 @@ export const translations = {
     githubProfile: "गिटहब प्रोफाइल",
     aadiName: "आदित्य सरदार",
     teestaName: "तीस्ता मुखर्जी",
-    akashName: "आकाश दत्ता",
+    akashName: "आकाश दत्त",
     ayushName: "आयुष मण्डल",
     anuvabName: "अनुभव कुण्डू",
     jishnuName: "जिष्णु पाल",
@@ -3796,6 +3817,7 @@ export const translations = {
     restrictedDateError: "चयनितदिनाङ्कः प्रतिबन्धितः: गत-3-दिनानाम् ऐतिहासिकं डेटा-अभिलेखः सिङ्क्रनाइजेशन् प्रतीक्षते।",
     validStartDatePrompt: "कृपया प्रथमम् एकं वैधम् आरम्भिकदिनाङ्कं प्रविशत।",
     allModels: "सर्वे मोडेलाः",
-    validLatLonPrompt: "कृपया वैधम् अक्षांशं देशान्तरं च प्रविशत।"
+    validLatLonPrompt: "कृपया वैधम् अक्षांशं देशान्तरं च प्रविशत।",
+    back: "पुनः प्रतिनिवर्तत"
   }
 };

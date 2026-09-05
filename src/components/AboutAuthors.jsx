@@ -114,12 +114,11 @@ export default function AboutAuthors({ onClose }) {
         </div>
       </div>
 
-      {/* WhatsApp-Style Photo Zoom Lightbox with Blur & Auto-Translation */}
       {zoomedMember && (
         <div className="photo-zoom-backdrop" onClick={() => setZoomedMember(null)}>
           <div className="photo-zoom-content" onClick={(e) => e.stopPropagation()}>
             <button className="zoom-back-btn" onClick={() => setZoomedMember(null)}>
-              ← Back
+              ← {t("back") || "Back"}
             </button>
             <div className="zoomed-image-wrapper">
               <img src={zoomedMember.img} alt={t(zoomedMember.nameKey)} className="zoomed-target-img" />

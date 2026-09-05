@@ -18,6 +18,23 @@ const pointerIcon = L.divIcon({
   popupAnchor: [0, -34],
 });
 
+// Geographic bounding-box fallback for regional seas around Vietnam, Thailand, and the Andaman basin
+const getRegionalSeaFallback = (lat, lng) => {
+  // Andaman Sea
+  if (lat >= 5 && lat <= 16 && lng >= 92 && lng <= 99) {
+    return "Andaman Sea";
+  }
+  // Gulf of Thailand
+  if (lat >= 7 && lat <= 14 && lng >= 99 && lng <= 105) {
+    return "Gulf of Thailand";
+  }
+  // South China Sea
+  if (lat >= 1 && lat <= 23 && lng >= 99 && lng <= 121) {
+    return "South China Sea";
+  }
+  return null;
+};
+
 export default function LocationMarker({
   position,
   setPosition,
@@ -85,6 +102,17 @@ export default function LocationMarker({
 
     if (onSeaNameResolved) {
       onSeaNameResolved(loadingText);
+    }
+
+    // Check regional bounding box fallback first for immediate and reliable naming in SE Asia
+    const regionalMatch = getRegionalSeaFallback(position.lat, position.lng);
+    if (regionalMatch) {
+      const finalSeaName = parseAndTranslateApiSeaName(regionalMatch, t);
+      setSeaName(finalSeaName);
+      if (onSeaNameResolved) {
+        onSeaNameResolved(finalSeaName);
+      }
+      return;
     }
 
     const controller = new AbortController();

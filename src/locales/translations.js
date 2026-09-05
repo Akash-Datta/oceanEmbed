@@ -428,7 +428,7 @@ export const translations = {
     arcticOcean: "উত্তর মহাসাগর",
     northSea: "উত্তর সাগর",
     balticSea: "বল্টিক সাগর",
-    blackSea: "কালো সাগর",
+    blackSea: "কৃষ্ণ সাগর",
     sargassoSea: "সর্গাসো সাগর",
     norwegianSea: "নরওয়েজিয়ান সাগর",
     labradorSea: "ল্যাব্রেডর সাগর",

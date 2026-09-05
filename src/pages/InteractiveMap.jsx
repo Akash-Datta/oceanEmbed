@@ -69,6 +69,28 @@ const getFormattedDateOffset = (offsetDays) => {
   return `${year}-${month}-${day}`;
 };
 
+const getLocaleCode = (lang) => {
+  const localeMap = {
+    en: "en-US",
+    hi: "hi-IN",
+    bn: "bn-IN",
+    mr: "mr-IN",
+    te: "te-IN",
+    ta: "ta-IN",
+    gu: "gu-IN",
+    ur: "ur-IN",
+    kn: "kn-IN",
+    ml: "ml-IN",
+    pa: "pa-IN",
+    or: "or-IN",
+    as: "as-IN",
+    ne: "ne-NP",
+    sd: "sd-IN",
+    sa: "sa-IN",
+  };
+  return localeMap[lang] || `${lang}-IN`;
+};
+
 export default function InteractiveMap({ onMapLoaded }) {
   const { t, language } = useLanguage();
   const [position, setPosition] = useState(null);
@@ -76,7 +98,8 @@ export default function InteractiveMap({ onMapLoaded }) {
   const [currentSeaName, setCurrentSeaName] = useState("");
   const [mapInstance, setMapInstance] = useState(null);
 
-  const [startDate, setStartDate] = useState(() => getFormattedDateOffset(-4));
+  // Default dynamic window: 3-day interval span (e.g., -3 days ago to today)
+  const [startDate, setStartDate] = useState(() => getFormattedDateOffset(-3));
   const [endDate, setEndDate] = useState(() => getFormattedDateOffset(0));
 
   const [depth, setDepth] = useState("");
@@ -117,7 +140,7 @@ export default function InteractiveMap({ onMapLoaded }) {
 
   const validateAndSetStartDate = (value) => {
     if (!value) {
-      setStartDate(getFormattedDateOffset(-4));
+      setStartDate(getFormattedDateOffset(-3));
       setEndDate(getFormattedDateOffset(0));
       return;
     }
@@ -126,7 +149,7 @@ export default function InteractiveMap({ onMapLoaded }) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const localeCode = language === "en" ? "en-US" : "hi-IN";
+    const localeCode = getLocaleCode(language);
     const formattedToday = today.toLocaleDateString(localeCode, {
       month: "long",
       day: "numeric",
@@ -136,7 +159,7 @@ export default function InteractiveMap({ onMapLoaded }) {
     if (selectedDate > today) {
       const baseMsg = t("futureDateError") || "You cannot enter future dates beyond today";
       triggerNotification(`${baseMsg} (${formattedToday}).`);
-      setStartDate(getFormattedDateOffset(-4));
+      setStartDate(getFormattedDateOffset(-3));
       setEndDate(getFormattedDateOffset(0));
       return;
     }
@@ -144,15 +167,16 @@ export default function InteractiveMap({ onMapLoaded }) {
     const diffTime = today - selectedDate;
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-    if (diffDays >= 0 && diffDays <= 2) {
+    // Enforce the 3-day synchronization lag gap (dates within the last 3 days or future/recent restricted window)
+    if (diffDays >= 0 && diffDays < 3) {
       const targetDateStr = selectedDate.toLocaleDateString(localeCode, {
         month: "long",
         day: "numeric",
         year: "numeric",
       });
-      const restrictedMsg = t("restrictedDateError") || "Selected date is restricted: Historical archive data for dates within the last 4 days is currently pending synchronization.";
+      const restrictedMsg = t("restrictedDateError") || "Selected date is restricted: Historical archive data for dates within the last 3 days is currently pending synchronization.";
       triggerNotification(`(${targetDateStr}) ${restrictedMsg}`);
-      setStartDate(getFormattedDateOffset(-4));
+      setStartDate(getFormattedDateOffset(-3));
       setEndDate(getFormattedDateOffset(0));
       return;
     }
@@ -172,7 +196,7 @@ export default function InteractiveMap({ onMapLoaded }) {
       return;
     }
 
-    date.setDate(date.getDate() + 4);
+    date.setDate(date.getDate() + 3);
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);

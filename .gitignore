@@ -7,17 +7,15 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-<<<<<<< HEAD
-=======
+
 # Dependencies & build output
->>>>>>> origin/main
+
 node_modules
 dist
 dist-ssr
 *.local
 
-<<<<<<< HEAD
-=======
+
 # Env files — never commit API keys (map tiles, Gemini, LiteRouter, …)
 .env
 .env.local
@@ -31,16 +29,14 @@ dist-ssr
 .vite
 *.tsbuildinfo
 
->>>>>>> origin/main
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
 .idea
 .DS_Store
-<<<<<<< HEAD
-=======
+
 Thumbs.db
->>>>>>> origin/main
+
 *.suo
 *.ntvs*
 *.njsproj

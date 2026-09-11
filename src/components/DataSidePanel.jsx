@@ -12,6 +12,7 @@ export default function DataSidePanel({
   position,
   depth,
   seaName,
+  profileData,
   onClose,
 }) {
   const [isExpanded, setIsExpanded] =
@@ -294,11 +295,9 @@ export default function DataSidePanel({
               "height 0.3s",
           }}
         >
-          <TemperatureProfile
-            selectedDepth={depth}
-            profileData={
-              metrics.profileData
-            }
+         <TemperatureProfile
+         selectedDepth={depth}
+         profileData={profileData}
           />
         </div>
 

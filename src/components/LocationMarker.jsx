@@ -23,6 +23,7 @@ export default function LocationMarker({
   startDate,
   onSeaNameResolved,
   triggerNotification,
+  onProfileRequest,
 }) {
   const markerRef = useRef(null);
   const [seaName, setSeaName] = useState("");
@@ -31,23 +32,41 @@ export default function LocationMarker({
   useMapEvents({
     click(event) {
       if (!startDate) {
-        triggerNotification("Please enter the starting date first.");
+        triggerNotification(
+          "Please enter the starting date first."
+        );
         return;
       }
 
       const lat = event.latlng.lat;
       const lng = event.latlng.lng;
 
+      console.log(
+        "Clicked location:",
+        lat,
+        lng
+      );
+
       try {
-        const snapped = snapToNearestOcean(lat, lng);
+        // -----------------------------------------
+        // 1. Snap clicked coordinate to ocean
+        // -----------------------------------------
+        const snapped = snapToNearestOcean(
+          lat,
+          lng
+        );
 
         if (snapped.failed) {
-          triggerNotification("Unable to find a nearby ocean location. Please try another coordinate.");
+          triggerNotification(
+            "Unable to find a nearby ocean location. Please try another coordinate."
+          );
           return;
         }
 
         if (snapped.redirected) {
-          triggerNotification("Land coordinate detected. Redirecting location to the nearest sea coordinates.");
+          triggerNotification(
+            "Land coordinate detected. Redirecting location to the nearest sea coordinates."
+          );
         }
 
         const newPos = {
@@ -56,22 +75,55 @@ export default function LocationMarker({
           isOnLand: false,
         };
 
+        console.log(
+          "Snapped location:",
+          snapped.lat,
+          snapped.lng
+        );
+
+        // -----------------------------------------
+        // 2. Put marker on map
+        // -----------------------------------------
         setSeaName("Loading sea name...");
         setPosition(newPos);
+
+        // -----------------------------------------
+        // 3. Ask InteractiveMap to fetch profile
+        // -----------------------------------------
+        if (onProfileRequest) {
+          onProfileRequest(
+            snapped.lat,
+            snapped.lng
+          );
+        }
+
       } catch (error) {
-        console.error("Ocean redirection failed:", error);
+        console.error(
+          "Ocean redirection failed:",
+          error
+        );
+
+        triggerNotification(
+          "Unable to find a nearby ocean location. Please try another coordinate."
+        );
       }
     },
   });
 
+  // ============================================================
+  // SEA NAME LOOKUP
+  // ============================================================
   useEffect(() => {
     if (!position) {
       setSeaName("");
       return;
     }
 
-    const currentRequestId = ++requestIdRef.current;
-    const loadingText = "Loading sea name...";
+    const currentRequestId =
+      ++requestIdRef.current;
+
+    const loadingText =
+      "Loading sea name...";
 
     setSeaName(loadingText);
 
@@ -79,64 +131,99 @@ export default function LocationMarker({
       onSeaNameResolved(loadingText);
     }
 
-    const controller = new AbortController();
+    const controller =
+      new AbortController();
 
     const fetchSeaName = async () => {
       try {
         const response = await fetch(
           `https://marineregions.org/rest/getGazetteerRecordsByLatLong.json/${position.lat}/${position.lng}/`,
-          { signal: controller.signal }
+          {
+            signal:
+              controller.signal,
+          }
         );
 
         if (!response.ok) {
-          throw new Error(`Marine Regions API returned ${response.status}`);
+          throw new Error(
+            `Marine Regions API returned ${response.status}`
+          );
         }
 
-        const data = await response.json();
+        const data =
+          await response.json();
 
-        if (currentRequestId !== requestIdRef.current) {
+        if (
+          currentRequestId !==
+          requestIdRef.current
+        ) {
           return;
         }
 
-        let resolvedName = "Open Ocean";
+        let resolvedName =
+          "Open Ocean";
 
-        if (Array.isArray(data) && data.length > 0) {
-          const waterBody = data.find((item) => {
-            const name = (item?.preferredGazetteerName || "").toUpperCase();
-            return (
-              name.includes("SEA") ||
-              name.includes("BAY") ||
-              name.includes("GULF") ||
-              name.includes("OCEAN") ||
-              name.includes("STRAIT") ||
-              name.includes("CHANNEL")
-            );
-          });
+        if (
+          Array.isArray(data) &&
+          data.length > 0
+        ) {
+          const waterBody =
+            data.find((item) => {
+              const name = (
+                item?.preferredGazetteerName ||
+                ""
+              ).toUpperCase();
 
-          if (waterBody?.preferredGazetteerName) {
-            resolvedName = waterBody.preferredGazetteerName;
+              return (
+                name.includes("SEA") ||
+                name.includes("BAY") ||
+                name.includes("GULF") ||
+                name.includes("OCEAN") ||
+                name.includes("STRAIT") ||
+                name.includes("CHANNEL")
+              );
+            });
+
+          if (
+            waterBody?.preferredGazetteerName
+          ) {
+            resolvedName =
+              waterBody.preferredGazetteerName;
           }
         }
 
         setSeaName(resolvedName);
 
         if (onSeaNameResolved) {
-          onSeaNameResolved(resolvedName);
+          onSeaNameResolved(
+            resolvedName
+          );
         }
+
       } catch (error) {
-        if (error.name === "AbortError") {
+        if (
+          error.name ===
+          "AbortError"
+        ) {
           return;
         }
 
-        if (currentRequestId !== requestIdRef.current) {
+        if (
+          currentRequestId !==
+          requestIdRef.current
+        ) {
           return;
         }
 
-        const fallbackName = "Open Ocean";
+        const fallbackName =
+          "Open Ocean";
+
         setSeaName(fallbackName);
 
         if (onSeaNameResolved) {
-          onSeaNameResolved(fallbackName);
+          onSeaNameResolved(
+            fallbackName
+          );
         }
       }
     };
@@ -153,7 +240,10 @@ export default function LocationMarker({
       clearTimeout(timer);
       controller.abort();
     };
-  }, [position, onSeaNameResolved]);
+  }, [
+    position,
+    onSeaNameResolved,
+  ]);
 
   if (!position) {
     return null;
@@ -163,7 +253,10 @@ export default function LocationMarker({
     <Marker
       key={`${position.lat}-${position.lng}`}
       ref={markerRef}
-      position={[position.lat, position.lng]}
+      position={[
+        position.lat,
+        position.lng,
+      ]}
       icon={pointerIcon}
       eventHandlers={{
         add: (event) => {
@@ -171,19 +264,26 @@ export default function LocationMarker({
             event.target.openPopup();
           }, 30);
         },
+
         click: (event) => {
           event.target.openPopup();
         },
       }}
     >
-      <Popup autoPan={true} autoPanPadding={[35, 35]} closeButton={true}>
+      <Popup
+        autoPan={true}
+        autoPanPadding={[35, 35]}
+        closeButton={true}
+      >
         <div
           style={{
             minWidth: "190px",
             textAlign: "center",
-            fontFamily: "Inter, Arial, sans-serif",
+            fontFamily:
+              "Inter, Arial, sans-serif",
           }}
         >
+
           <div
             style={{
               fontSize: "15px",
@@ -199,13 +299,20 @@ export default function LocationMarker({
             style={{
               fontSize: "13px",
               fontWeight: "600",
-              color: seaName === "Loading sea name..." ? "#64748b" : "#0ea5e9",
+              color:
+                seaName ===
+                "Loading sea name..."
+                  ? "#64748b"
+                  : "#0ea5e9",
               marginBottom: "8px",
-              textTransform: "uppercase",
-              letterSpacing: "0.5px",
+              textTransform:
+                "uppercase",
+              letterSpacing:
+                "0.5px",
             }}
           >
-            {seaName || "Loading sea name..."}
+            {seaName ||
+              "Loading sea name..."}
           </div>
 
           <div
@@ -215,17 +322,31 @@ export default function LocationMarker({
               color: "#374151",
             }}
           >
-            <strong>Latitude:</strong> {position.lat.toFixed(6)}°
+            <strong>
+              Latitude:
+            </strong>{" "}
+            {position.lat.toFixed(6)}°
+
             <br />
-            <strong>Longitude:</strong> {position.lng.toFixed(6)}°
+
+            <strong>
+              Longitude:
+            </strong>{" "}
+            {position.lng.toFixed(6)}°
           </div>
+
         </div>
       </Popup>
     </Marker>
   );
 }
 
-export function MapController({ targetPosition }) {
+// ============================================================
+// MAP CONTROLLER
+// ============================================================
+export function MapController({
+  targetPosition,
+}) {
   const map = useMap();
 
   useEffect(() => {
@@ -234,18 +355,30 @@ export function MapController({ targetPosition }) {
     }
 
     map.flyTo(
-      [targetPosition.lat, targetPosition.lng],
-      Math.max(map.getZoom(), 5),
+      [
+        targetPosition.lat,
+        targetPosition.lng,
+      ],
+      Math.max(
+        map.getZoom(),
+        5
+      ),
       {
         duration: 1.2,
         easeLinearity: 0.25,
       }
     );
-  }, [targetPosition, map]);
+  }, [
+    targetPosition,
+    map,
+  ]);
 
   return null;
 }
 
+// ============================================================
+// TOUCH CONTROLLER
+// ============================================================
 export function MapTouchController() {
   const map = useMap();
 

@@ -42,7 +42,7 @@ Thumbs.db
 *.njsproj
 *.sln
 *.sw?
-<<<<<<< HEAD
+
 .env
 =======
 
@@ -51,4 +51,4 @@ Thumbs.db
 *.key
 *.p12
 secrets/
->>>>>>> origin/main
+

@@ -33,12 +33,9 @@
         display: flex;
         align-items: center;
         justify-content: center;
-
-<<<<<<< HEAD
         background: #0f172a;
-=======
         background: linear-gradient(180deg, #020617 0%, #0c1e3a 45%, #0a3550 75%, #06283d 100%);
->>>>>>> origin/main
+
         color: white;
 
         overflow: hidden;
@@ -50,7 +47,7 @@
           transform 0.8s ease;
       }
 
-<<<<<<< HEAD
+
       #boot-message {
         width: 90%;
         max-width: 1200px;
@@ -63,16 +60,11 @@
 
         line-height: 1.25;
       }
-
-=======
->>>>>>> origin/main
       #boot-loader.boot-hidden {
         opacity: 0;
         transform: translateY(-100%);
         pointer-events: none;
       }
-<<<<<<< HEAD
-=======
 
       /* ---- animated ocean scene ---- */
       .boot-ocean {
@@ -224,7 +216,6 @@
         0% { left: -40%; }
         100% { left: 100%; }
       }
->>>>>>> origin/main
     </style>
   </head>
 
@@ -259,14 +250,12 @@
         <h1 class="boot-title">OceanEmbed</h1>
         <p class="boot-subtitle">Diving into marine intelligence</p>
         <div class="boot-bar"></div>
->>>>>>> origin/main
       </div>
     </div>
 
     <div id="root"></div>
 
     <script>
-<<<<<<< HEAD
       const bootGreetings = [
         "আপোনাাক আমাৰ ৱেবপেজলৈ স্বাগতম",
         "আমাদের ওয়েবপেজে আপনাকে স্বাগতম",
@@ -309,7 +298,6 @@
       }
 
       bootTimeout = setTimeout(stepBoot, BOOT_INTERVAL);
-=======
       // Scatter rising bubbles across the boot ocean
       (function () {
         const holder = document.getElementById("boot-bubbles");
@@ -327,18 +315,14 @@
           holder.appendChild(b);
         });
       })();
->>>>>>> origin/main
 
       /*
        * React calls this immediately when it is ready
        * to take over the screen.
        */
       window.finishOceanBootLoader = () => {
-<<<<<<< HEAD
-        clearTimeout(bootTimeout);
 
-=======
->>>>>>> origin/main
+        clearTimeout(bootTimeout);
         const loader = document.getElementById("boot-loader");
 
         if (!loader) return;

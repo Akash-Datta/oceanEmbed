@@ -1,5 +1,14 @@
 import * as turf from "@turf/turf";
 import landGeoJSON from "../data/landMask.json";
+<<<<<<< HEAD
+
+// ============================================================
+// COORDINATE FORMATTING
+// ============================================================
+
+export function formatLongitude(value) {
+  let longitude = Number(value);
+=======
 import marineGeoJSON from "../data/marineRegions.json";
 
 // ============================================================
@@ -57,10 +66,36 @@ negativeMarkers.sort((a, b) => b.length - a.length);
 export function formatLongitude(value, lang = "en") {
   let longitude = Number(value);
   if (!Number.isFinite(longitude)) return "";
+>>>>>>> origin/main
 
   while (longitude > 180) longitude -= 360;
   while (longitude < -180) longitude += 360;
 
+<<<<<<< HEAD
+  if (Math.abs(longitude) < 0.000001) {
+    return "0°";
+  }
+
+  const formatted = parseFloat(Math.abs(longitude).toFixed(6));
+
+  return longitude > 0
+    ? `${formatted}° E`
+    : `${formatted}° W`;
+}
+
+export function formatLatitude(value) {
+  const latitude = Number(value);
+
+  if (Math.abs(latitude) < 0.000001) {
+    return "0°";
+  }
+
+  const formatted = parseFloat(Math.abs(latitude).toFixed(6));
+
+  return latitude > 0
+    ? `${formatted}° N`
+    : `${formatted}° S`;
+=======
   if (Math.abs(longitude) < 0.0000005) return "0°";
 
   const formattedNum = new Intl.NumberFormat(lang === "en" ? "en-US" : "hi-IN", { 
@@ -83,6 +118,7 @@ export function formatLatitude(value, lang = "en") {
 
   const dirs = cardinalDirections[lang] || cardinalDirections.en;
   return latitude > 0 ? `${formattedNum}° ${dirs.N}` : `${formattedNum}° ${dirs.S}`;
+>>>>>>> origin/main
 }
 
 // ============================================================
@@ -90,6 +126,44 @@ export function formatLatitude(value, lang = "en") {
 // ============================================================
 
 export function parseCoordinate(value, type) {
+<<<<<<< HEAD
+  if (!value || !value.trim()) {
+    return null;
+  }
+
+  let text = value.trim().toUpperCase();
+  let direction = null;
+
+  if (/[NSEW]$/.test(text)) {
+    direction = text.slice(-1);
+    text = text.slice(0, -1).trim();
+  }
+
+  text = text.replace(/°/g, "").trim();
+
+  const number = parseFloat(text);
+
+  if (Number.isNaN(number)) {
+    return null;
+  }
+
+  let result = number;
+
+  if (direction === "S" || direction === "W") {
+    result = -Math.abs(number);
+  }
+
+  if (direction === "N" || direction === "E") {
+    result = Math.abs(number);
+  }
+
+  if (type === "latitude") {
+    if (result < -90 || result > 90) {
+      return null;
+    }
+  }
+
+=======
   if (value === null || value === undefined) return null;
 
   const raw = String(value).trim();
@@ -125,28 +199,86 @@ export function parseCoordinate(value, type) {
   }
 
   if (type === "latitude" && (result < -90 || result > 90)) return null;
+>>>>>>> origin/main
   if (type === "longitude") {
     while (result > 180) result -= 360;
     while (result < -180) result += 360;
   }
 
+<<<<<<< HEAD
+  return result;
+=======
   return Number(result.toFixed(COORDINATE_DECIMALS));
+>>>>>>> origin/main
 }
 
 // ============================================================
 // COORDINATE SUGGESTIONS
 // ============================================================
 
+<<<<<<< HEAD
+export function getCoordinateSuggestions(input, type) {
+  if (!input || !input.trim()) {
+    return [];
+  }
+
+  const text = input.trim().toUpperCase();
+  const numericMatch = text.match(/^-?\d+(\.\d+)?/);
+
+  if (!numericMatch) {
+    return [];
+  }
+=======
 export function getCoordinateSuggestions(input, type, lang = "en") {
   if (!input || !String(input).trim()) return [];
 
   const text = String(input).trim().toUpperCase();
   const numericMatch = text.match(/^-?\d+(?:\.\d+)?/);
   if (!numericMatch) return [];
+>>>>>>> origin/main
 
   const search = numericMatch[0].replace("-", "");
   const max = type === "latitude" ? 90 : 180;
   const suggestions = [];
+<<<<<<< HEAD
+
+  for (let value = 0; value <= max; value++) {
+    const valueText = String(value);
+
+    if (valueText.startsWith(search)) {
+      if (type === "latitude") {
+        suggestions.push({
+          value: `${value}° N`,
+          coordinate: value,
+        });
+
+        if (value !== 0) {
+          suggestions.push({
+            value: `${value}° S`,
+            coordinate: -value,
+          });
+        }
+      } else {
+        suggestions.push({
+          value: `${value}° E`,
+          coordinate: value,
+        });
+
+        if (value !== 0) {
+          suggestions.push({
+            value: `${value}° W`,
+            coordinate: -value,
+          });
+        }
+      }
+    }
+
+    if (suggestions.length >= 18) {
+      break;
+    }
+  }
+
+=======
   const dirs = cardinalDirections[lang] || cardinalDirections.en;
 
   for (let value = 0; value <= max; value++) {
@@ -163,6 +295,7 @@ export function getCoordinateSuggestions(input, type, lang = "en") {
 
     if (suggestions.length >= 18) break;
   }
+>>>>>>> origin/main
   return suggestions;
 }
 
@@ -172,14 +305,67 @@ export function getCoordinateSuggestions(input, type, lang = "en") {
 
 function normalizeLongitude(lng) {
   let longitude = Number(lng);
+<<<<<<< HEAD
+
+  while (longitude > 180) {
+    longitude -= 360;
+  }
+
+  while (longitude < -180) {
+    longitude += 360;
+  }
+
+=======
   if (!Number.isFinite(longitude)) return longitude;
 
   while (longitude > 180) longitude -= 360;
   while (longitude < -180) longitude += 360;
+>>>>>>> origin/main
   return longitude;
 }
 
 // ============================================================
+<<<<<<< HEAD
+// LAND MASK HELPERS & PERFORMANCE OPTIMIZATION (BBOX CACHING)
+// ============================================================
+
+function getLandFeatures() {
+  if (!landGeoJSON) {
+    return [];
+  }
+
+  let rawFeatures = [];
+
+  if (landGeoJSON.type === "FeatureCollection") {
+    rawFeatures = (landGeoJSON.features || []).filter(
+      (feature) =>
+        feature &&
+        feature.geometry &&
+        (
+          feature.geometry.type === "Polygon" ||
+          feature.geometry.type === "MultiPolygon"
+        )
+    );
+  } else if (landGeoJSON.type === "Feature" && landGeoJSON.geometry) {
+    rawFeatures = [landGeoJSON];
+  } else if (
+    landGeoJSON.type === "Polygon" ||
+    landGeoJSON.type === "MultiPolygon"
+  ) {
+    rawFeatures = [turf.feature(landGeoJSON)];
+  }
+
+  return rawFeatures.map((feature) => ({
+    feature,
+    bbox: turf.bbox(feature),
+  }));
+}
+
+const landFeaturesWithBbox = getLandFeatures();
+
+// ============================================================
+// LAND DETECTION
+=======
 // GEOJSON FEATURE EXTRACTION
 // ============================================================
 
@@ -238,22 +424,111 @@ function pointInsideBbox(longitude, latitude, bbox) {
 
 // ============================================================
 // LAND CHECK
+>>>>>>> origin/main
 // ============================================================
 
 export function checkIfLand(lat, lng) {
   const latitude = Number(lat);
   const longitude = normalizeLongitude(lng);
 
+<<<<<<< HEAD
+  if (
+    !Number.isFinite(latitude) ||
+    !Number.isFinite(longitude) ||
+    latitude < -90 ||
+    latitude > 90
+  ) {
+    return false;
+  }
+
+  // Explicit regional safeguard for coastal/peninsula vector artifacts
+  if (
+    latitude >= 16.0 && latitude <= 26.0 &&
+    longitude >= 52.0 && longitude <= 60.0
+  ) {
+    // Check if it's strictly over water features or land
+    // Let bounding boxes handle general regions, but allow coastal waters through
+  }
+
+  if (!landFeaturesWithBbox.length) {
+    console.error("High-resolution land mask is unavailable.");
+    return false;
+  }
+=======
   if (!Number.isFinite(latitude) || !Number.isFinite(longitude) || latitude < -90 || latitude > 90) return false;
 
   const key = `${latitude.toFixed(6)},${longitude.toFixed(6)}`;
   if (landCache.has(key)) return landCache.get(key);
   if (!landFeaturesWithBbox.length) return false;
+>>>>>>> origin/main
 
   const point = turf.point([longitude, latitude]);
 
   try {
     for (const item of landFeaturesWithBbox) {
+<<<<<<< HEAD
+      const [minLng, minLat, maxLng, maxLat] = item.bbox;
+
+      if (
+        longitude >= minLng &&
+        longitude <= maxLng &&
+        latitude >= minLat &&
+        latitude <= maxLat
+      ) {
+        if (
+          turf.booleanPointInPolygon(point, item.feature, {
+            ignoreBoundary: false,
+          })
+        ) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  } catch (error) {
+    console.error("Land detection failed:", error);
+    return true;
+  }
+}
+
+// ============================================================
+// SAFE OCEAN TEST (COASTAL FRIENDLY)
+// ============================================================
+
+function isSafeOceanPoint(lat, lng) {
+  if (checkIfLand(lat, lng)) {
+    return false;
+  }
+
+  /*
+   * Reduced to 3 km and 8 directions so coastal waters, 
+   * bays, and gulfs are fully accessible without false rejections.
+   */
+  const safetyRadiusKm = 3;
+  const directions = 8;
+
+  for (let angle = 0; angle < 360; angle += 360 / directions) {
+    const destination = turf.destination(
+      turf.point([lng, lat]),
+      safetyRadiusKm,
+      angle,
+      { units: "kilometers" }
+    );
+
+    const [checkLng, checkLat] = destination.geometry.coordinates;
+
+    if (checkIfLand(checkLat, checkLng)) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+// ============================================================
+// SNAP LAND LOCATION TO SAFE OCEAN
+=======
       if (!pointInsideBbox(longitude, latitude, item.bbox)) continue;
       if (turf.booleanPointInPolygon(point, item.feature, { ignoreBoundary: false })) {
         landCache.set(key, true);
@@ -605,12 +880,34 @@ export function getWaterBodyName(lat, lng) {
 
 // ============================================================
 // SNAP TO NEAREST OCEAN (Robust 2000km Radial Search)
+>>>>>>> origin/main
 // ============================================================
 
 export function snapToNearestOcean(lat, lng) {
   const originalLat = Number(lat);
   const originalLng = normalizeLongitude(lng);
 
+<<<<<<< HEAD
+  if (
+    !Number.isFinite(originalLat) ||
+    !Number.isFinite(originalLng) ||
+    originalLat < -90 ||
+    originalLat > 90
+  ) {
+    return {
+      lat: originalLat,
+      lng: originalLng,
+      redirected: false,
+      failed: true,
+    };
+  }
+
+  if (!checkIfLand(originalLat, originalLng)) {
+    return {
+      lat: originalLat,
+      lng: originalLng,
+      redirected: false,
+=======
   if (!Number.isFinite(originalLat) || !Number.isFinite(originalLng) || originalLat < -90 || originalLat > 90) {
     return { lat: originalLat, lng: originalLng, redirected: false, failed: true };
   }
@@ -674,10 +971,118 @@ export function snapToNearestOcean(lat, lng) {
       lat: Number(finalLat.toFixed(6)),
       lng: Number(finalLng.toFixed(6)),
       redirected: true,
+>>>>>>> origin/main
       failed: false,
     };
   }
 
+<<<<<<< HEAD
+  const directions = 16;
+  const searchDistances = [
+    2, 5, 10, 15, 20, 30, 45, 60, 80, 100, 130, 170, 220, 280, 350, 450,
+    600, 800, 1000, 1300, 1600, 2000, 2500, 3000,
+  ];
+
+  let bestCandidate = null;
+
+  for (const distance of searchDistances) {
+    for (let angle = 0; angle < 360; angle += 360 / directions) {
+      const destination = turf.destination(
+        turf.point([originalLng, originalLat]),
+        distance,
+        angle,
+        { units: "kilometers" }
+      );
+
+      const [candidateLng, candidateLat] = destination.geometry.coordinates;
+
+      if (candidateLat < -90 || candidateLat > 90) {
+        continue;
+      }
+
+      const normalizedLng = normalizeLongitude(candidateLng);
+
+      if (checkIfLand(candidateLat, normalizedLng)) {
+        continue;
+      }
+
+      if (!isSafeOceanPoint(candidateLat, normalizedLng)) {
+        continue;
+      }
+
+      bestCandidate = {
+        lat: Number(candidateLat.toFixed(6)),
+        lng: Number(normalizedLng.toFixed(6)),
+        redirected: true,
+        failed: false,
+      };
+
+      break;
+    }
+
+    if (bestCandidate) {
+      break;
+    }
+  }
+
+  if (bestCandidate) {
+    if (checkIfLand(bestCandidate.lat, bestCandidate.lng)) {
+      return {
+        lat: originalLat,
+        lng: originalLng,
+        redirected: false,
+        failed: true,
+      };
+    }
+
+    return bestCandidate;
+  }
+
+  return {
+    lat: originalLat,
+    lng: originalLng,
+    redirected: false,
+    failed: true,
+  };
+}
+
+// ============================================================
+// REGIONAL WATER BODY DETECTION
+// ============================================================
+
+export function getRegionalWaterBodyName(lat, lng) {
+  const latitude = Number(lat);
+  const longitude = normalizeLongitude(lng);
+
+  if (
+    latitude >= 5 &&
+    latitude <= 30 &&
+    longitude >= 50 &&
+    longitude <= 78
+  ) {
+    return "Arabian Sea";
+  }
+
+  if (
+    latitude >= 5 &&
+    latitude <= 25 &&
+    longitude > 78 &&
+    longitude <= 100
+  ) {
+    return "Bay of Bengal";
+  }
+
+  if (
+    latitude >= 5 &&
+    latitude <= 18 &&
+    longitude > 96 &&
+    longitude <= 101
+  ) {
+    return "Andaman Sea";
+  }
+
+  return "Indian Ocean";
+=======
   return { lat: originalLat, lng: originalLng, redirected: false, failed: true };
 }
 
@@ -884,4 +1289,5 @@ export function parseAndTranslateApiSeaName(name, t) {
 
   const cleanName = String(name).replace(/\([^)]*\)/g, "").replace(/\s+/g, " ").trim();
   return cleanName;
+>>>>>>> origin/main
 }

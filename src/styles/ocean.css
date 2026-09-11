@@ -1,8 +1,11 @@
+<<<<<<< HEAD
+=======
 /* =====================================================
    CLEANED & DEDUPLICATED STYLESHEET
    All unique properties preserved (last definition wins)
    ===================================================== */
 
+>>>>>>> origin/main
 * {
     box-sizing: border-box;
 }
@@ -12,6 +15,8 @@ html {
 }
 
 /* =====================================================
+<<<<<<< HEAD
+=======
    KEYFRAMES
    ===================================================== */
 
@@ -116,6 +121,7 @@ html {
 }
 
 /* =====================================================
+>>>>>>> origin/main
    GLOBAL RESET - LOCKING THE MAIN PAGE 
    ===================================================== */
 html,
@@ -140,10 +146,13 @@ body,
     flex-direction: column;
     font-family: Inter, Arial, Helvetica, sans-serif;
     color: #0f172a;
+<<<<<<< HEAD
+=======
     position: relative;
     isolation: isolate;
     background: linear-gradient(135deg, #0d2a7c 0%, #296d9a 50%, #0698e1 100%);
     box-sizing: border-box;
+>>>>>>> origin/main
 }
 
 /* =====================================================
@@ -176,6 +185,60 @@ body,
 /* =====================================================
    TITLE
    ===================================================== */
+<<<<<<< HEAD
+@keyframes titleEntrance {
+    0% {
+        opacity: 0;
+        transform: translateY(-25px) scale(0.95);
+        filter: blur(7px);
+    }
+
+    60% {
+        opacity: 1;
+        transform: translateY(4px) scale(1.02);
+        filter: blur(0);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes titleGradient {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@keyframes titleUnderline {
+    0% {
+        width: 0;
+        opacity: 0;
+    }
+
+    100% {
+        width: 110px;
+        opacity: 1;
+    }
+}
+
+.ocean-title {
+    margin: 5px 0 8px;
+    text-align: center;
+    font-size: clamp(28px, 3vw, 44px);
+    font-weight: 850;
+    letter-spacing: 0.4px;
+    background: linear-gradient(90deg, #0f172a, #0369a1, #0891b2, #2563eb, #0f172a);
+=======
 .ocean-title {
     margin: 0;
     text-align: center;
@@ -183,12 +246,16 @@ body,
     font-weight: 850;
     letter-spacing: 0.3px;
     background: linear-gradient(90deg, #0f172a, #0369a1, #2563eb);
+>>>>>>> origin/main
     background-size: 250% auto;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
     animation: titleEntrance 1s ease-out forwards, titleGradient 5s ease-in-out 1s infinite;
+<<<<<<< HEAD
+=======
     line-height: 1.2;
+>>>>>>> origin/main
 }
 
 .ocean-title::after {
@@ -204,12 +271,19 @@ body,
 
 .ocean-subtitle {
     text-align: center;
+<<<<<<< HEAD
+    margin: 0 auto 22px;
+    color: #64748b;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+=======
     margin: 0;
     color: #64748b;
     font-size: 12px;
     letter-spacing: 0.3px;
     line-height: 1.2;
     white-space: nowrap;
+>>>>>>> origin/main
 }
 
 /* =====================================================
@@ -221,6 +295,19 @@ body,
     top: 16px;
     left: 16px;
     right: 16px;
+<<<<<<< HEAD
+    display: grid;
+    grid-template-columns: minmax(135px, 1.05fr) minmax(135px, 1.05fr) minmax(120px, 0.9fr) minmax(150px, 1.15fr) minmax(150px, 1.15fr) 75px;
+    gap: 12px;
+    padding: 13px;
+    border-radius: 17px;
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(24px) saturate(170%);
+    -webkit-backdrop-filter: blur(24px) saturate(170%);
+    border: 1px solid rgba(255, 255, 255, 0.82);
+    box-shadow: 0 12px 35px rgba(15, 23, 42, 0.20), inset 0 1px 0 rgba(255, 255, 255, 0.75);
+    touch-action: auto;
+=======
     display: flex;
     grid-template-columns: minmax(135px, 1.05fr) minmax(135px, 1.05fr) minmax(120px, 0.9fr) minmax(150px, 1.15fr) minmax(150px, 1.15fr) 75px;
     gap: 12px;
@@ -234,6 +321,7 @@ body,
     touch-action: auto;
     align-items: center;
     flex-wrap: wrap;
+>>>>>>> origin/main
 }
 
 /* =====================================================
@@ -243,6 +331,18 @@ body,
     width: 100%;
     min-width: 0;
     height: 42px;
+<<<<<<< HEAD
+    padding: 0 12px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.95);
+    background: rgba(255, 255, 255, 0.62);
+    color: #111827;
+    font-size: 13px;
+    outline: none;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+    transition: background 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease, transform 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+=======
     padding: 10px 14px;
     border-radius: 12px;
     border: 1px solid #bae6fd;
@@ -254,6 +354,7 @@ body,
     transition: all 0.3s ease;
     -webkit-tap-highlight-color: transparent;
     font-weight: 600;
+>>>>>>> origin/main
 }
 
 .ocean-control::placeholder {
@@ -262,12 +363,24 @@ body,
 
 .ocean-control:focus {
     background: rgba(255, 255, 255, 0.98);
+<<<<<<< HEAD
+    border-color: #38bdf8;
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.14), 0 7px 18px rgba(0, 0, 0, 0.12);
+    transform: translateY(-1px);
+}
+
+input[type="date"] {
+    cursor: pointer;
+}
+
+=======
     border-color: #0284c7;
     box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.2);
     transform: translateY(-1px);
 }
 
 input[type="date"],
+>>>>>>> origin/main
 select.ocean-control {
     cursor: pointer;
 }
@@ -329,6 +442,19 @@ select.ocean-control {
     width: 100%;
     min-width: 0;
     height: 42px;
+<<<<<<< HEAD
+    padding: 0 10px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #0284c7, #2563eb);
+    color: white;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 7px 18px rgba(37, 99, 235, 0.32);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+=======
     padding: 10px 24px;
     border: none;
     border-radius: 12px;
@@ -341,6 +467,7 @@ select.ocean-control {
     transition: all 0.3s ease;
     -webkit-tap-highlight-color: transparent;
     letter-spacing: 0.5px;
+>>>>>>> origin/main
 }
 
 .ocean-go:hover {
@@ -476,6 +603,23 @@ select.ocean-control {
     animation: pulseDot 1.5s infinite;
 }
 
+<<<<<<< HEAD
+@keyframes pulseDot {
+    0% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.45);
+    }
+
+    70% {
+        box-shadow: 0 0 0 7px rgba(16, 185, 129, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    }
+}
+
+=======
+>>>>>>> origin/main
 .chart-container {
     height: 320px;
 }
@@ -583,14 +727,46 @@ select.ocean-control {
     display: flex;
     justify-content: space-between;
     align-items: center;
+<<<<<<< HEAD
+    pointer-events: none;
+    animation: fadeIn 0.3s ease-out;
+=======
     pointer-events: auto;
     animation: fadeIn 0.3s ease-out;
     width: 100%;
     gap: 12px;
+>>>>>>> origin/main
 }
 
 .layer-buttons {
     display: flex;
+<<<<<<< HEAD
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(24px) saturate(170%);
+    padding: 8px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.15);
+    pointer-events: auto;
+}
+
+.layer-btn {
+    padding: 10px 18px;
+    border-radius: 10px;
+    border: none;
+    background: transparent;
+    color: #475569;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.layer-btn:hover {
+    background: rgba(255, 255, 255, 0.95);
+    color: #0f172a;
+=======
     gap: 8px;
     background: rgba(235, 235, 251, 0.85);
     backdrop-filter: blur(20px) saturate(180%);
@@ -622,12 +798,30 @@ select.ocean-control {
 .layer-btn:hover {
     background: rgba(15, 63, 86, 0.08);
     color: #04537a;
+>>>>>>> origin/main
     transform: translateY(-1px);
 }
 
 .layer-btn.active {
     background: linear-gradient(135deg, #0284c7, #2563eb);
     color: white;
+<<<<<<< HEAD
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.back-to-map-btn {
+    padding: 10px 20px;
+    border-radius: 14px;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    color: #1e293b;
+    font-weight: 800;
+    font-size: 13px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+    transition: transform 0.2s ease;
+    pointer-events: auto;
+=======
     box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3);
     transform: translateY(-1px);
 }
@@ -653,14 +847,19 @@ select.ocean-control {
     box-sizing: border-box;
     width: max-content;
     padding-right: auto;
+>>>>>>> origin/main
 }
 
 .back-to-map-btn:hover {
     transform: translateY(-2px);
+<<<<<<< HEAD
+    background: #f8fafc;
+=======
     background: linear-gradient(135deg, #0284c7, #2563eb);
     color: white;
     border-color: transparent;
     box-shadow: 0 10px 30px rgba(37, 99, 235, 0.3);
+>>>>>>> origin/main
 }
 
 /* =====================================================
@@ -672,7 +871,11 @@ select.ocean-control {
     right: 16px;
     bottom: 16px;
     width: 320px;
+<<<<<<< HEAD
+    z-index: 4000;
+=======
     z-index: 9999 !important;
+>>>>>>> origin/main
     background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(24px) saturate(170%);
     -webkit-backdrop-filter: blur(24px) saturate(170%);
@@ -687,6 +890,21 @@ select.ocean-control {
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+<<<<<<< HEAD
+@keyframes slideInRight {
+    0% {
+        transform: translateX(120%);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+=======
+>>>>>>> origin/main
 .panel-header {
     display: flex;
     justify-content: space-between;
@@ -704,6 +922,17 @@ select.ocean-control {
 }
 
 .close-btn {
+<<<<<<< HEAD
+    background: none;
+    border: none;
+    font-size: 26px;
+    line-height: 1;
+    color: #64748b;
+    cursor: pointer;
+    padding: 0 4px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+=======
     background: #f1f5f9;
     border: 1px solid #cbd5e1;
     font-size: 22px;
@@ -719,13 +948,18 @@ select.ocean-control {
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+>>>>>>> origin/main
 }
 
 .close-btn:hover {
     color: #ef4444;
+<<<<<<< HEAD
+    background: rgba(254, 226, 226, 0.5);
+=======
     background: #fee2e2;
     border-color: #fca5a5;
     transform: scale(1.08);
+>>>>>>> origin/main
 }
 
 .panel-content {
@@ -806,6 +1040,31 @@ select.ocean-control {
 }
 
 /* =====================================================
+<<<<<<< HEAD
+   SPATIAL DISTRIBUTION DASHBOARD (3-MAP VIEW)
+   ===================================================== */
+.spatial-dashboard-container {
+    width: 100%;
+    background: #ffffff;
+    border-radius: 18px;
+    border: 1px solid rgba(148, 163, 184, 0.45);
+    box-shadow: 0 20px 60px rgba(15, 23, 42, 0.12);
+    padding: 24px;
+    min-height: 500px;
+    animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+=======
    SPATIAL DISTRIBUTION DASHBOARD (3-MAP VIEW - DESKTOP)
    ===================================================== */
 .spatial-dashboard-container {
@@ -833,6 +1092,7 @@ select.ocean-control {
     flex-direction: column;
     box-sizing: border-box;
     padding-right: 20px;
+>>>>>>> origin/main
 }
 
 .spatial-header {
@@ -841,13 +1101,22 @@ select.ocean-control {
     align-items: center;
     margin-bottom: 24px;
     padding-bottom: 16px;
+<<<<<<< HEAD
+    border-bottom: 1px solid #e2e8f0;
+=======
     border-bottom: 1px solid rgba(56, 189, 248, 0.15);
     padding: 18px 26px;
     background: linear-gradient(90deg, #07162c, #0a2240);
+>>>>>>> origin/main
 }
 
 .spatial-title {
     margin: 0;
+<<<<<<< HEAD
+    font-size: 20px;
+    color: #334155;
+    font-weight: 700;
+=======
     font-size: 18px;
     color: #f1f5f9;
     font-weight: 700;
@@ -855,21 +1124,31 @@ select.ocean-control {
     align-items: center;
     gap: 8px;
     letter-spacing: 0.3px;
+>>>>>>> origin/main
 }
 
 .spatial-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 20px;
+<<<<<<< HEAD
+=======
     padding: 24px;
     flex: 1;
     overflow-y: auto;
     background: #050b14 !important;
+>>>>>>> origin/main
 }
 
 .spatial-card {
     display: flex;
     flex-direction: column;
+<<<<<<< HEAD
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    cursor: pointer;
+    border-radius: 12px;
+    border: 2px solid transparent;
+=======
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     cursor: pointer;
     border-radius: 12px;
@@ -878,6 +1157,7 @@ select.ocean-control {
     overflow: hidden;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     background-color: #0b172a !important;
+>>>>>>> origin/main
 }
 
 .spatial-card-header {
@@ -885,17 +1165,26 @@ select.ocean-control {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 12px;
+<<<<<<< HEAD
+=======
     padding: 12px 18px;
     background: #0f1f38 !important;
     border-bottom: 1px solid rgba(56, 189, 248, 0.15) !important;
     background-color: #0f1f38 !important;
+>>>>>>> origin/main
 }
 
 .spatial-card-header h4 {
     margin: 0;
+<<<<<<< HEAD
+    font-size: 13px;
+    color: #475569;
+    font-weight: 700;
+=======
     font-size: 14px;
     color: #f8fafc;
     font-weight: 600;
+>>>>>>> origin/main
 }
 
 .mock-toolbar {
@@ -908,15 +1197,22 @@ select.ocean-control {
     position: relative;
     width: 100%;
     aspect-ratio: 4 / 3;
+<<<<<<< HEAD
+    background: #f8fafc;
+=======
     background: radial-gradient(circle at center, #0a1931 0%, #060e1d 100%);
+>>>>>>> origin/main
     border: 1px solid #e2e8f0;
     border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
+<<<<<<< HEAD
+=======
     flex: 1;
     min-height: 280px;
+>>>>>>> origin/main
 }
 
 .heatmap-img {
@@ -924,11 +1220,14 @@ select.ocean-control {
     height: 100%;
     object-fit: contain;
     border-radius: 8px;
+<<<<<<< HEAD
+=======
     max-width: 95%;
     max-height: 95%;
     transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     user-select: none;
     filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
+>>>>>>> origin/main
 }
 
 .loading-text {
@@ -963,6 +1262,39 @@ select.ocean-control {
     transform: translateY(-50%);
 }
 
+<<<<<<< HEAD
+.mock-colorbar span:nth-child(1) {
+    top: 0%;
+}
+
+.mock-colorbar span:nth-child(2) {
+    top: 14%;
+}
+
+.mock-colorbar span:nth-child(3) {
+    top: 28%;
+}
+
+.mock-colorbar span:nth-child(4) {
+    top: 42%;
+}
+
+.mock-colorbar span:nth-child(5) {
+    top: 57%;
+}
+
+.mock-colorbar span:nth-child(6) {
+    top: 71%;
+}
+
+.mock-colorbar span:nth-child(7) {
+    top: 85%;
+}
+
+.mock-colorbar span:nth-child(8) {
+    top: 100%;
+}
+=======
 .mock-colorbar span:nth-child(1) { top: 0%; }
 .mock-colorbar span:nth-child(2) { top: 14%; }
 .mock-colorbar span:nth-child(3) { top: 28%; }
@@ -971,12 +1303,16 @@ select.ocean-control {
 .mock-colorbar span:nth-child(6) { top: 71%; }
 .mock-colorbar span:nth-child(7) { top: 85%; }
 .mock-colorbar span:nth-child(8) { top: 100%; }
+>>>>>>> origin/main
 
 .spatial-grid.has-focus .spatial-card:not(.focused) {
     opacity: 0.4;
     transform: scale(0.95);
     filter: grayscale(60%);
+<<<<<<< HEAD
+=======
     display: none;
+>>>>>>> origin/main
 }
 
 .spatial-grid .spatial-card.focused {
@@ -991,6 +1327,327 @@ select.ocean-control {
     border-color: transparent;
 }
 
+<<<<<<< HEAD
+/* =====================================================
+   RESPONSIVE QUERIES
+   ===================================================== */
+@media (max-width: 1150px) {
+    .ocean-controls {
+        grid-template-columns: repeat(3, minmax(130px, 1fr));
+        gap: 10px;
+    }
+
+    .longitude-label {
+        top: 123px;
+    }
+
+    .analytics-section {
+        grid-template-columns: 1fr;
+    }
+
+    .stats-column {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 1024px) {
+    .spatial-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .spatial-image-wrapper {
+        aspect-ratio: 16 / 9;
+    }
+}
+
+@media (max-width: 700px) {
+    .ocean-page {
+        padding: 10px;
+    }
+
+    .ocean-title {
+        font-size: clamp(25px, 7vw, 31px);
+        line-height: 1.15;
+        margin-top: 3px;
+    }
+
+    .ocean-title::after {
+        height: 3px;
+        width: 85px;
+        margin-top: 8px;
+    }
+
+    .ocean-subtitle {
+        font-size: 10px;
+        line-height: 1.5;
+        margin: 0 auto 12px;
+        padding: 0 12px;
+    }
+
+    .ocean-map-wrapper {
+        height: 590px;
+        border-radius: 18px;
+    }
+
+    .ocean-controls {
+        top: 9px;
+        left: 9px;
+        right: 9px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        padding: 9px;
+        border-radius: 15px;
+        background: rgba(255, 255, 255, 0.66);
+        backdrop-filter: blur(22px) saturate(170%);
+        box-shadow: 0 10px 28px rgba(15, 23, 42, 0.18);
+    }
+
+    .ocean-control {
+        height: 40px;
+        padding: 0 9px;
+        font-size: 12px;
+        border-radius: 9px;
+    }
+
+    .ocean-go {
+        height: 40px;
+        font-size: 12px;
+        border-radius: 9px;
+    }
+
+    .suggestions-box {
+        top: 45px;
+        max-height: 125px;
+        border-radius: 9px;
+    }
+
+    .suggestion-item {
+        min-height: 34px;
+        padding: 8px 9px;
+        font-size: 11px;
+    }
+
+    .longitude-label {
+        top: 188px;
+        font-size: 9px;
+        padding: 3px 5px;
+    }
+
+    .latitude-label {
+        left: 4px;
+        font-size: 9px;
+        padding: 3px 5px;
+    }
+
+    .leaflet-control-zoom {
+        margin-top: 205px !important;
+        margin-right: 8px !important;
+    }
+
+    .leaflet-control-zoom a {
+        width: 34px !important;
+        height: 34px !important;
+        line-height: 34px !important;
+        font-size: 20px !important;
+    }
+
+    .selected-location {
+        margin-top: 12px;
+        padding: 13px 12px;
+        border-radius: 13px;
+    }
+
+    .selected-title {
+        font-size: 14px;
+    }
+
+    .selected-data {
+        font-size: 11px;
+        line-height: 1.9;
+    }
+
+    .analytics-section {
+        margin-top: 14px;
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .analytics-card {
+        padding: 14px;
+        border-radius: 15px;
+    }
+
+    .analytics-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 9px;
+        margin-bottom: 13px;
+    }
+
+    .analytics-title {
+        font-size: 15px;
+    }
+
+    .analytics-description {
+        font-size: 11px;
+        line-height: 1.5;
+    }
+
+    .live-badge {
+        font-size: 10px;
+        padding: 5px 9px;
+    }
+
+    .chart-container {
+        height: 270px;
+    }
+
+    .stats-column {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .stat-card {
+        padding: 15px;
+        border-radius: 14px;
+    }
+
+    .stat-value {
+        font-size: 24px;
+    }
+
+    .stat-icon {
+        font-size: 22px;
+    }
+
+    .side-data-panel {
+        top: auto;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        width: 100%;
+        height: 40vh;
+        border-radius: 24px 24px 0 0;
+        animation: slideInUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes slideInUp {
+        0% {
+            transform: translateY(100%);
+            opacity: 0;
+        }
+
+        100% {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+}
+
+@media (max-width: 420px) {
+    .ocean-page {
+        padding: 7px;
+    }
+
+    .ocean-title {
+        font-size: 24px;
+    }
+
+    .ocean-subtitle {
+        font-size: 9px;
+        margin-bottom: 9px;
+    }
+
+    .ocean-map-wrapper {
+        height: 570px;
+        border-radius: 16px;
+    }
+
+    .ocean-controls {
+        top: 7px;
+        left: 7px;
+        right: 7px;
+        gap: 7px;
+        padding: 8px;
+    }
+
+    .ocean-control {
+        height: 38px;
+        font-size: 11px;
+        padding: 0 8px;
+    }
+
+    .ocean-go {
+        height: 38px;
+        font-size: 11px;
+    }
+
+    .longitude-label {
+        top: 178px;
+        font-size: 8px;
+    }
+
+    .latitude-label {
+        font-size: 8px;
+    }
+
+    .leaflet-control-zoom {
+        margin-top: 194px !important;
+    }
+
+    .chart-container {
+        height: 250px;
+    }
+}
+
+@media (max-width: 340px) {
+    .ocean-map-wrapper {
+        height: 550px;
+    }
+
+    .ocean-controls {
+        gap: 6px;
+        padding: 7px;
+    }
+
+    .ocean-control {
+        font-size: 10px;
+    }
+
+    .ocean-title {
+        font-size: 22px;
+    }
+}
+
+/* =========================================================
+   PARTICLE BACKGROUND
+   ========================================================= */
+
+.ocean-page {
+    position: relative;
+    min-height: 100vh;
+    overflow: hidden;
+    isolation: isolate;
+    background: #6f95f5;
+}
+
+.particles-background {
+    position: fixed;
+    inset: 0;
+
+    width: 100vw;
+    height: 100vh;
+
+    pointer-events: none;
+
+    z-index: -1;
+}
+
+/*
+ * Keep all actual website content above the particles.
+ */
+
+=======
 /* =========================================================
    PARTICLE BACKGROUND
    ========================================================= */
@@ -1003,11 +1660,55 @@ select.ocean-control {
     z-index: -1;
 }
 
+>>>>>>> origin/main
 .ocean-page>*:not(.particles-background) {
     position: relative;
     z-index: 1;
 }
 
+<<<<<<< HEAD
+
+/* =====================================================
+   SPATIAL DISTRIBUTION MODAL OVERLAY (LIGHT BLURRED BACKDROP)
+   ===================================================== */
+.spatial-dashboard-container {
+    position: fixed;
+    inset: 0;
+    z-index: 6000;
+    background: rgba(255, 255, 255, 0);
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    overflow-y: auto;
+    animation: modalFadeIn 5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes modalFadeIn {
+    from {
+        background: rgba(255, 255, 255, 0);
+        backdrop-filter: blur(0px);
+        -webkit-backdrop-filter: blur(0px);
+    }
+
+    to {
+        background: rgba(240, 249, 255, 0.55);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+    }
+}
+
+.spatial-dashboard-inner {
+    width: 100%;
+    max-width: 1450px;
+    background: rgba(137, 191, 218, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 22px;
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    box-shadow: 0 30px 80px rgba(15, 23, 42, 0.2);
+=======
 /* =====================================================
    SPATIAL DISTRIBUTION MODAL OVERLAY (DESKTOP)
    ===================================================== */
@@ -1020,11 +1721,22 @@ select.ocean-control {
     border: 1px solid rgba(56, 189, 248, 0.25);
     box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), 
               0 0 40px rgba(2, 132, 199, 0.15);
+>>>>>>> origin/main
     padding: 28px;
     max-height: 90vh;
     overflow-y: auto;
     opacity: 0;
     transform: translateY(25px) scale(0.98);
+<<<<<<< HEAD
+    animation: modalContentSlide 5s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
+}
+
+@keyframes modalContentSlide {
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+=======
     animation: slideUpModal 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     height: 88vh;
     display: flex;
@@ -1032,6 +1744,7 @@ select.ocean-control {
     overflow: hidden;
     min-height: 100%;
     box-sizing: border-box;
+>>>>>>> origin/main
 }
 
 /* =====================================================
@@ -1041,22 +1754,49 @@ select.ocean-control {
     display: flex;
     justify-content: space-between;
     align-items: center;
+<<<<<<< HEAD
+    padding: 6px 16px;
+=======
     padding: 0 24px;
+>>>>>>> origin/main
     background: rgba(255, 255, 255, 0.75);
     backdrop-filter: blur(14px);
     border-radius: 14px;
     border: 1px solid rgba(255, 255, 255, 0.9);
     box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08);
     margin-bottom: 8px;
+<<<<<<< HEAD
+=======
     position: relative !important;
     z-index: 2000 !important;
     height: 76px;
     box-sizing: border-box;
+>>>>>>> origin/main
 }
 
 .navbar-brand {
     display: flex;
     flex-direction: column;
+<<<<<<< HEAD
+}
+
+.ocean-title {
+    margin: 0;
+    font-size: clamp(18px, 2.2vw, 26px);
+    font-weight: 850;
+    letter-spacing: 0.3px;
+    background: linear-gradient(90deg, #0f172a, #0369a1, #2563eb);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.ocean-subtitle {
+    margin: 0;
+    color: #64748b;
+    font-size: 11px;
+    letter-spacing: 0.3px;
+=======
     justify-content: center;
     gap: 2px;
 }
@@ -1065,6 +1805,7 @@ select.ocean-control {
     display: flex;
     gap: 10px;
     align-items: center;
+>>>>>>> origin/main
 }
 
 .about-authors-nav-btn {
@@ -1088,6 +1829,12 @@ select.ocean-control {
 }
 
 /* =====================================================
+<<<<<<< HEAD
+   CUSTOM NOTIFICATION POPUP (REPLACING BROWSER ALERT)
+   ===================================================== */
+/* =====================================================
+=======
+>>>>>>> origin/main
    CUSTOM NOTIFICATION POPUP (TOP-CENTER TOAST BELOW NAVBAR)
    ===================================================== */
 .custom-notification-popup {
@@ -1110,10 +1857,38 @@ select.ocean-control {
     animation: notificationSlideDown 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+<<<<<<< HEAD
+@keyframes notificationSlideDown {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -20px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0) scale(1);
+    }
+}
+
+
+=======
+>>>>>>> origin/main
 /* =====================================================
    ABOUT AUTHORS MODAL STYLING
    ===================================================== */
 .about-modal-backdrop {
+<<<<<<< HEAD
+    position: fixed;
+    inset: 0;
+    z-index: 70000;
+    background: rgba(15, 23, 42, 0.5);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: modalFadeIn 0.3s ease-out forwards;
+=======
     position: absolute;
     inset: 0;
     z-index: 70000;
@@ -1125,10 +1900,19 @@ select.ocean-control {
     padding: 0;
     animation: fadeIn 0.3s ease-out forwards;
     -webkit-backdrop-filter: blur(8px);
+>>>>>>> origin/main
 }
 
 .about-modal-content {
     width: 100%;
+<<<<<<< HEAD
+    max-width: 600px;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 25px 60px rgba(15, 23, 42, 0.3);
+    padding: 24px;
+    animation: modalContentSlide 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+=======
     max-width: 480px;
     background: #ffffff;
     border-radius: 0;
@@ -1140,6 +1924,7 @@ select.ocean-control {
     flex-direction: column;
     overflow: hidden;
     height: 100%;
+>>>>>>> origin/main
 }
 
 .about-modal-header {
@@ -1147,9 +1932,14 @@ select.ocean-control {
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid #e2e8f0;
+<<<<<<< HEAD
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+=======
     padding-bottom: 14px;
     margin-bottom: 16px;
     flex-shrink: 0;
+>>>>>>> origin/main
 }
 
 .about-modal-header h3 {
@@ -1181,6 +1971,13 @@ select.ocean-control {
 }
 
 .member-card {
+<<<<<<< HEAD
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+=======
     background: #ffffff;
     border: 1px solid #e2e8f0;
     border-radius: 14px;
@@ -1192,11 +1989,43 @@ select.ocean-control {
     justify-content: space-between;
     box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
     transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+>>>>>>> origin/main
 }
 
 .member-avatar {
     font-size: 32px;
     margin-bottom: 8px;
+<<<<<<< HEAD
+}
+
+.member-card h5 {
+    margin: 0 0 4px;
+    color: #0f172a;
+    font-size: 14px;
+}
+
+.member-role {
+    margin: 0 0 10px;
+    color: #64748b;
+    font-size: 11px;
+}
+
+.github-link {
+    display: inline-block;
+    padding: 5px 12px;
+    background: #e0f2fe;
+    color: #0369a1;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background 0.2s;
+}
+
+.github-link:hover {
+    background: #bae6fd;
+}
+=======
     width: 72px;
     height: 72px;
     margin: 0 auto 10px;
@@ -1247,10 +2076,42 @@ select.ocean-control {
     box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 
+>>>>>>> origin/main
 /* =====================================================
    OCEAN NOTIFICATION BANNER (FLOW-BASED BELOW NAVBAR)
    ===================================================== */
 .ocean-notification-banner {
+<<<<<<< HEAD
+  width: 100%;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  color: #e0f2fe;
+  padding: 10px 20px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  border-bottom: 2px solid #0ea5e9;
+  box-shadow: 0 4px 15px rgba(15, 23, 42, 0.2);
+  margin-bottom: 6px;
+  border-radius: 8px;
+  animation: bannerSlideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes bannerSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.ocean-page {
+  background: linear-gradient(135deg, #0d2a7c 0%, #296d9a 50%, #0698e1 100%);
+  position: relative;
+  overflow: hidden;
+}
+=======
     width: 100%;
     background: linear-gradient(135deg, #0f172a, #1e293b);
     color: #e0f2fe;
@@ -2419,3 +3280,4 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
         line-height: 1.3 !important;
     }
 }
+>>>>>>> origin/main

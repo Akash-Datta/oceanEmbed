@@ -1,10 +1,15 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useMap } from "react-leaflet";
 import { formatLongitude, formatLatitude } from "../utils/coordinateUtils";
+<<<<<<< HEAD
+
+export default function DynamicGrid() {
+=======
 import { useLanguage } from "../context/LanguageContext";
 
 export default function DynamicGrid() {
   const { t, language } = useLanguage();
+>>>>>>> origin/main
   const map = useMap();
   const [bounds, setBounds] = useState(map.getBounds());
 
@@ -24,7 +29,14 @@ export default function DynamicGrid() {
 
   const grid = useMemo(() => {
     if (!bounds) {
+<<<<<<< HEAD
+      return {
+        horizontal: [],
+        vertical: [],
+      };
+=======
       return { vertical: [], horizontal: [], specialVertical: [], specialHorizontal: [] };
+>>>>>>> origin/main
     }
 
     let west = bounds.getWest();
@@ -32,6 +44,11 @@ export default function DynamicGrid() {
     const north = bounds.getNorth();
     const south = bounds.getSouth();
 
+<<<<<<< HEAD
+    if (east - west > 360) {
+      west = -180;
+      east = 180;
+=======
     while (west > 180) west -= 360;
     while (west < -180) west += 360;
     while (east > 180) east -= 360;
@@ -39,26 +56,41 @@ export default function DynamicGrid() {
 
     if (east <= west) {
       east += 360;
+>>>>>>> origin/main
     }
 
     const longitudeStep = (east - west) / 12;
     const vertical = [];
+<<<<<<< HEAD
+
+    for (let i = 0; i <= 12; i++) {
+      const longitude = west + longitudeStep * i;
+=======
     for (let i = 0; i <= 12; i++) {
       let longitude = west + longitudeStep * i;
       if (longitude > 180) longitude -= 360;
       if (longitude < -180) longitude += 360;
+>>>>>>> origin/main
       const x = (i / 12) * 100;
       vertical.push({ longitude, x });
     }
 
     const latitudeStep = (north - south) / 6;
     const horizontal = [];
+<<<<<<< HEAD
+
+=======
+>>>>>>> origin/main
     for (let i = 0; i <= 6; i++) {
       const latitude = north - latitudeStep * i;
       const y = (i / 6) * 100;
       horizontal.push({ latitude, y });
     }
 
+<<<<<<< HEAD
+    return { vertical, horizontal };
+  }, [bounds]);
+=======
     const specialLngs = [
       { lng: 0, label: t("primeMeridian") || "Prime Meridian (0°)" },
       { lng: 180, label: t("idlLabel") || "180° Longitude (IDL)" },
@@ -90,23 +122,51 @@ export default function DynamicGrid() {
 
     return { vertical, horizontal, specialVertical, specialHorizontal };
   }, [bounds, t]);
+>>>>>>> origin/main
 
   return (
     <div className="dynamic-grid">
       {grid.vertical.map((item, index) => (
         <React.Fragment key={`lng-${index}`}>
+<<<<<<< HEAD
+          <div
+            className="grid-vertical-line"
+            style={{ left: `${item.x}%` }}
+          />
+          <div
+            className="longitude-label"
+            style={{ 
+              left: `${item.x}%`, 
+              bottom: "5px", /* Pushes the label to the bottom */
+              top: "auto"    /* Prevents CSS from pulling it back to the top */
+            }}
+          >
+            {formatLongitude(item.longitude)}
+=======
           <div className="grid-vertical-line" style={{ left: `${item.x}%` }} />
           <div
             className="longitude-label"
             style={{ left: `${item.x}%`, bottom: "5px", top: "auto" }}
           >
             {formatLongitude(item.longitude, language)}
+>>>>>>> origin/main
           </div>
         </React.Fragment>
       ))}
 
       {grid.horizontal.map((item, index) => (
         <React.Fragment key={`lat-${index}`}>
+<<<<<<< HEAD
+          <div
+            className="grid-horizontal-line"
+            style={{ top: `${item.y}%` }}
+          />
+          <div
+            className="latitude-label"
+            style={{ top: `${item.y}%` }}
+          >
+            {formatLatitude(item.latitude)}
+=======
           <div className="grid-horizontal-line" style={{ top: `${item.y}%` }} />
           <div className="latitude-label" style={{ top: `${item.y}%` }}>
             {formatLatitude(item.latitude, language)}
@@ -140,6 +200,7 @@ export default function DynamicGrid() {
             style={{ top: `${item.y}%`, left: "7px" }}
           >
             {item.label}
+>>>>>>> origin/main
           </div>
         </React.Fragment>
       ))}

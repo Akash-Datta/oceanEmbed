@@ -1,4 +1,70 @@
 // ============================================================
+<<<<<<< HEAD
+// SECTION 1: ARABIAN SEA & BAY OF BENGAL (REGIONAL)
+// ============================================================
+
+export const regionalTemperatureData = [
+  {
+    depth: 0,
+    argo: 26.2,
+    convformer: 27.5,
+  },
+  {
+    depth: 50,
+    argo: 26.8,
+    convformer: 27.2,
+  },
+  {
+    depth: 100,
+    argo: 25.5,
+    convformer: 26.8,
+  },
+  {
+    depth: 200,
+    argo: 15.0,
+    convformer: 14.8,
+  },
+  {
+    depth: 300,
+    argo: 12.1,
+    convformer: 11.5,
+  },
+  {
+    depth: 400,
+    argo: 11.0,
+    convformer: 11.8,
+  },
+  {
+    depth: 500,
+    argo: 10.2,
+    convformer: 10.8,
+  },
+  {
+    depth: 600,
+    argo: 9.5,
+    convformer: 10.1,
+  },
+  {
+    depth: 700,
+    argo: 9.0,
+    convformer: 9.5,
+  },
+  {
+    depth: 800,
+    argo: 8.7,
+    convformer: 8.9,
+  },
+  {
+    depth: 900,
+    argo: 8.4,
+    convformer: 8.5,
+  },
+  {
+    depth: 1000,
+    argo: 8.2,
+    convformer: 8.1,
+  },
+=======
 // SECTION 1: ARABIAN SEA (BACKEND INTEGRATION READY)
 // ============================================================
 
@@ -15,10 +81,42 @@ export const arabianSeaTemperatureData = [
   { depth: 800, argo: 8.8, transformer: 8.7 },
   { depth: 900, argo: 8.5, transformer: 8.4 },
   { depth: 1000, argo: 8.3, transformer: 8.2 },
+>>>>>>> origin/main
 ];
 
 
 // ============================================================
+<<<<<<< HEAD
+// SECTION 2: REST OF THE WORLD
+// ============================================================
+
+const globalDummyData = [
+  {
+    depth: 0,
+    argo: 15.2,
+    convformer: 15.0,
+  },
+  {
+    depth: 200,
+    argo: 13.5,
+    convformer: 13.1,
+  },
+  {
+    depth: 400,
+    argo: 9.1,
+    convformer: 9.4,
+  },
+  {
+    depth: 600,
+    argo: 7.6,
+    convformer: 7.9,
+  },
+  {
+    depth: 1000,
+    argo: 4.2,
+    convformer: 4.5,
+  },
+=======
 // SECTION 2: BAY OF BENGAL (BACKEND INTEGRATION READY)
 // ============================================================
 
@@ -48,6 +146,7 @@ const globalDummyData = [
   { depth: 400, argo: 9.1, transformer: 9.4 },
   { depth: 600, argo: 7.6, transformer: 7.9 },
   { depth: 1000, argo: 4.2, transformer: 4.5 },
+>>>>>>> origin/main
 ];
 
 
@@ -55,6 +154,37 @@ const globalDummyData = [
 // DATA EXPORT HELPERS
 // ============================================================
 
+<<<<<<< HEAD
+export const getLocationMetrics = (
+  lat,
+  lng
+) => {
+
+  const isRegional =
+    lat >= 0 &&
+    lat <= 30 &&
+    lng >= 50 &&
+    lng <= 100;
+
+  return {
+    profileData: isRegional
+      ? regionalTemperatureData
+      : globalDummyData,
+
+    surfaceData: isRegional
+      ? {
+          sst: 26.2,
+          sss: 35.4,
+          ssh: 0.45,
+          sla: 0.12,
+        }
+      : {
+          sst: 15.2,
+          sss: 34.1,
+          ssh: 0.20,
+          sla: -0.05,
+        },
+=======
 export const getLocationMetrics = (lat, lng) => {
   const isArabianSea =
     lat >= 5 && lat <= 25 && lng >= 55 && lng <= 75;
@@ -94,6 +224,7 @@ export const getLocationMetrics = (lat, lng) => {
   return {
     profileData,
     surfaceData,
+>>>>>>> origin/main
   };
 };
 
@@ -102,13 +233,61 @@ export const getLocationMetrics = (lat, lng) => {
 // FALLBACK EXPORT
 // ============================================================
 
+<<<<<<< HEAD
+export const dummyTemperatureData =
+  regionalTemperatureData;
+=======
 export const dummyTemperatureData = arabianSeaTemperatureData;
+>>>>>>> origin/main
 
 
 // ============================================================
 // SPATIAL MAPS
 // ============================================================
 
+<<<<<<< HEAD
+export const fetchSpatialMaps = async (
+  depth
+) => {
+
+  /*
+   * Simulate backend loading.
+   *
+   * Later, replace this function with your
+   * actual ConvFormer API call.
+   */
+
+  await new Promise((resolve) =>
+    setTimeout(resolve, 600)
+  );
+
+
+  /*
+   * IMPORTANT:
+   *
+   * These files are assumed to be inside:
+   *
+   * public/
+   *
+   * Therefore Vite serves them from the root.
+   *
+   * Correct:
+   *     /argo.jpeg
+   *     /pred.jpeg
+   *     /error.jpeg
+   *
+   * NOT:
+   *     ../public/argo.jpeg
+   */
+
+  return {
+    argo: "/argo.jpeg",
+
+    convformer: "/pred.jpeg",
+
+    error: "/error.jpeg",
+  };
+=======
 export const fetchSpatialMaps = async (depth) => {
   await new Promise((resolve) => setTimeout(resolve, 600));
 
@@ -182,4 +361,5 @@ export const generateGridData = (latMin, latMax, lngMin, lngMax, resolution = 0.
     }
   }
   return grid;
+>>>>>>> origin/main
 };

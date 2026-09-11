@@ -34,7 +34,11 @@
         align-items: center;
         justify-content: center;
 
+<<<<<<< HEAD
+        background: #0f172a;
+=======
         background: linear-gradient(180deg, #020617 0%, #0c1e3a 45%, #0a3550 75%, #06283d 100%);
+>>>>>>> origin/main
         color: white;
 
         overflow: hidden;
@@ -46,11 +50,29 @@
           transform 0.8s ease;
       }
 
+<<<<<<< HEAD
+      #boot-message {
+        width: 90%;
+        max-width: 1200px;
+
+        text-align: center;
+
+        font-size: clamp(2rem, 5vw, 4.5rem);
+
+        font-weight: 700;
+
+        line-height: 1.25;
+      }
+
+=======
+>>>>>>> origin/main
       #boot-loader.boot-hidden {
         opacity: 0;
         transform: translateY(-100%);
         pointer-events: none;
       }
+<<<<<<< HEAD
+=======
 
       /* ---- animated ocean scene ---- */
       .boot-ocean {
@@ -202,12 +224,17 @@
         0% { left: -40%; }
         100% { left: 100%; }
       }
+>>>>>>> origin/main
     </style>
   </head>
 
   <body>
 
     <div id="boot-loader">
+<<<<<<< HEAD
+      <div id="boot-message">
+        আপোনাাক আমাৰ ৱেবপেজলৈ স্বাগতম
+=======
       <div class="boot-ocean">
         <div class="boot-glow"></div>
         <div class="boot-sonar s1"></div>
@@ -232,12 +259,57 @@
         <h1 class="boot-title">OceanEmbed</h1>
         <p class="boot-subtitle">Diving into marine intelligence</p>
         <div class="boot-bar"></div>
+>>>>>>> origin/main
       </div>
     </div>
 
     <div id="root"></div>
 
     <script>
+<<<<<<< HEAD
+      const bootGreetings = [
+        "আপোনাাক আমাৰ ৱেবপেজলৈ স্বাগতম",
+        "আমাদের ওয়েবপেজে আপনাকে স্বাগতম",
+        "सांतरे वेबपेज पर तुंदा स्वागत ऐ",
+        "અમારી વેબપેજ પર આપનું સ્વાગત છે",
+        "हमारे वेबपेज पर आपका स्वागत है",
+        "ನಮ್ಮ ವೆಬ್‌ಪುಟಕ್ಕೆ ನಿಮಗೆ ಸ್ವಾಗತ",
+        "پُنٛنس ویب پۆجس پؠٹھ چھُ توہِہ خوش آمدید",
+        "आमच्या वेबपाचेर तुका स्वागत आसा",
+        "हमारे वेबपेज पर स्वागत अछि",
+        "ഞങ്ങളുടെ വെബ്‌പേജിലേക്ക് സ്വാഗതം",
+        "ঐখোয়গী ৱেবপেজদা তরাম্না ওকচরি",
+        "आमच्या वेबपेजवर आपले स्वागत आहे",
+        "हाम्रो वेबपेजमा तपाईलाई स्वागत छ",
+        "ଆମର ୱେବ୍‌ପେଜ୍‌କୁ ସ୍ୱାଗତ",
+        "ਸਾਡੇ ਵੈੱਬਪੇਜ 'ਤੇ ਤੁਹਾਡਾ ਸਵਾਗതം ਹੈ",
+        "अस्मदीये वेबपुट्जे भवतां स्वागतम्",
+        "ᱟᱞᱮᱭᱟᱜ ᱣᱮᱵᱽᱯᱮᱡᱽ ᱨᱮ ᱡᱚᱛᱚ ᱠᱚ ᱜᱮ ᱜᱚᱭᱟᱨ",
+        "اسان جي ويب پيج تي اوهان جي مهرباني",
+        "எங்கள் வலைப்பக்கத்திற்கு உங்களை வரவேற்கிறோம்",
+        "మా వెబ్‌పేజీకి మీకు స్వాగతం",
+        "ہمارے ویب صفحے پر خوش آمدید",
+        "Welcome to our webpage"
+      ];
+
+      const bootMessage = document.getElementById("boot-message");
+      let bootIndex = 0;
+      const BOOT_INTERVAL = 120;
+      let bootTimeout;
+
+      function stepBoot() {
+        if (bootIndex < bootGreetings.length - 1) {
+          bootIndex++;
+          bootMessage.textContent = bootGreetings[bootIndex];
+          bootTimeout = setTimeout(stepBoot, BOOT_INTERVAL);
+        } else {
+          // Linger on the final greeting ("Welcome to our webpage") until React takes over
+          bootMessage.textContent = bootGreetings[bootGreetings.length - 1];
+        }
+      }
+
+      bootTimeout = setTimeout(stepBoot, BOOT_INTERVAL);
+=======
       // Scatter rising bubbles across the boot ocean
       (function () {
         const holder = document.getElementById("boot-bubbles");
@@ -255,12 +327,18 @@
           holder.appendChild(b);
         });
       })();
+>>>>>>> origin/main
 
       /*
        * React calls this immediately when it is ready
        * to take over the screen.
        */
       window.finishOceanBootLoader = () => {
+<<<<<<< HEAD
+        clearTimeout(bootTimeout);
+
+=======
+>>>>>>> origin/main
         const loader = document.getElementById("boot-loader");
 
         if (!loader) return;

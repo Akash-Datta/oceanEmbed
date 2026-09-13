@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+
+/* Dynamic viewport defaults (JS in viewport.js keeps --app-vh/--app-vw
+   synced to the real window size; 1vh/1vw fallbacks apply pre-JS). */
+:root {
+  --app-vh: 1vh;
+  --app-vw: 1vw;
+}
+
+html,
+body {
+  width: 100%;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+  min-height: calc(var(--app-vh, 1vh) * 100);
+  min-height: 100dvh;
+}

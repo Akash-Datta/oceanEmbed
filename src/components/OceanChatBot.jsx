@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useTheme } from "../context/ThemeContext";
 import { useLanguage } from "../context/LanguageContext";
 import { sendOceanChat } from "../utils/oceanChat";
+import { getPalette } from "../theme";
 
 const SUGGESTIONS = [
   "What is sea surface temperature?",
@@ -79,45 +80,8 @@ export default function OceanChatBot() {
     }
   };
 
-  const pal = isDark
-    ? {
-        fabBg: "linear-gradient(135deg, #7c3aed, #d946ef)",
-        fabShadow: "0 0 24px rgba(217, 70, 239, 0.6)",
-        panelBg: "rgba(16, 10, 36, 0.97)",
-        panelBorder: "1px solid rgba(168, 85, 247, 0.5)",
-        headerBg: "linear-gradient(135deg, rgba(76,29,149,0.6), rgba(112,26,117,0.45))",
-        titleColor: "#f0abfc",
-        subColor: "#c4b5fd",
-        userBg: "linear-gradient(135deg, #7c3aed, #d946ef)",
-        botBg: "rgba(30, 16, 64, 0.9)",
-        botBorder: "1px solid rgba(168, 85, 247, 0.35)",
-        botColor: "#f5f3ff",
-        inputBg: "rgba(10, 6, 24, 0.9)",
-        inputBorder: "1px solid rgba(168, 85, 247, 0.45)",
-        inputColor: "#f5f3ff",
-        chipBg: "rgba(124, 58, 237, 0.2)",
-        chipBorder: "1px solid rgba(168, 85, 247, 0.5)",
-        chipColor: "#e9d5ff",
-      }
-    : {
-        fabBg: "linear-gradient(135deg, #0284c7, #2563eb)",
-        fabShadow: "0 8px 24px rgba(2, 132, 199, 0.45)",
-        panelBg: "rgba(255, 255, 255, 0.97)",
-        panelBorder: "1px solid rgba(186, 230, 253, 0.9)",
-        headerBg: "linear-gradient(135deg, #0284c7, #2563eb)",
-        titleColor: "#ffffff",
-        subColor: "rgba(255,255,255,0.85)",
-        userBg: "linear-gradient(135deg, #0284c7, #2563eb)",
-        botBg: "#f0f9ff",
-        botBorder: "1px solid #bae6fd",
-        botColor: "#0f172a",
-        inputBg: "#ffffff",
-        inputBorder: "1px solid #bae6fd",
-        inputColor: "#0f172a",
-        chipBg: "#e0f2fe",
-        chipBorder: "1px solid #bae6fd",
-        chipColor: "#0369a1",
-      };
+  // Shared theme palette (src/theme.js)
+  const pal = getPalette(isDark);
 
   const waveBlue =
     "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='20' viewBox='0 0 56 20'%3E%3Cpath d='M0,10 Q7,0 14,10 T28,10 T42,10 T56,10 V20 H0 Z' fill='%233B82F6'/%3E%3C/svg%3E";

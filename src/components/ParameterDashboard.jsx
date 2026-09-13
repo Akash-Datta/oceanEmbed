@@ -5,6 +5,7 @@ import CustomDropdown from "./CustomDropdown";
 import { useLanguage } from "../context/LanguageContext";
 import { useTheme } from "../context/ThemeContext";
 import { getTileUrl } from "../utils/mapTiles";
+import { getPalette } from "../theme";
 import { checkIfLand, getWaterBodyName, parseAndTranslateApiSeaName } from "../utils/coordinateUtils";
 
 const formatDir = (val, isLat, t) => {
@@ -229,56 +230,8 @@ export default function ParameterDashboard({ parameter, date, gridData, onShowAl
 
   const paramLabel = t(`${parameter}Full`) || parameter.toUpperCase();
 
-  // Theme palette — light = clean ocean blue/white, dark = deep violet neon
-  const pal = isDark ? {
-    pageBg: "#0a0618",
-    mapBg: "#0a0618",
-    maskColor: "#0a0618",
-    loadingBg: "rgba(10,6,24,0.88)",
-    loadingText: "#f0abfc",
-    loadingSub: "rgba(240,171,252,0.75)",
-    cardBg: "linear-gradient(135deg, rgba(76,29,149,0.45), rgba(112,26,117,0.28))",
-    cardBorder: "1px solid rgba(217, 70, 239, 0.4)",
-    labelBlue: "#67e8f9",
-    textMain: "#f5f3ff",
-    textAccent: "#f0abfc",
-    chipOn: "#a855f7",
-    chipOff: "rgba(30,16,64,0.9)",
-    chipOffText: "#d8b4fe",
-    selCardBg: "linear-gradient(135deg, rgba(76,29,149,0.35), rgba(34,211,238,0.12))",
-    selCardBorder: "1px solid rgba(217, 70, 239, 0.4)",
-    tableBorder: "#3b2a63",
-    theadBg: "#170d33",
-    theadText: "#c4b5fd",
-    rowA: "#150b31",
-    rowB: "#1c1140",
-    rowText: "#e9d5ff",
-    pagerBg: "#150b31",
-  } : {
-    pageBg: "#eef6fd",
-    mapBg: "#dbeafe",
-    maskColor: "#dbeafe",
-    loadingBg: "rgba(240,249,255,0.92)",
-    loadingText: "#0284c7",
-    loadingSub: "rgba(2,132,199,0.7)",
-    cardBg: "linear-gradient(135deg, rgba(14, 165, 233, 0.1), rgba(37, 99, 235, 0.05))",
-    cardBorder: "1px solid #bae6fd",
-    labelBlue: "#0369a1",
-    textMain: "#0f172a",
-    textAccent: "#0284c7",
-    chipOn: "#0284c7",
-    chipOff: "#ffffff",
-    chipOffText: "#0369a1",
-    selCardBg: "linear-gradient(135deg, rgba(34, 197, 94, 0.08), rgba(20, 184, 166, 0.08))",
-    selCardBorder: "1px solid rgba(34, 197, 94, 0.3)",
-    tableBorder: "#e2e8f0",
-    theadBg: "#f8fafc",
-    theadText: "#475569",
-    rowA: "#ffffff",
-    rowB: "#f1f5f9",
-    rowText: "#475569",
-    pagerBg: "#f8fafc",
-  };
+  // Shared theme palette (src/theme.js) — light = clean ocean blue/white, dark = deep violet neon
+  const pal = getPalette(isDark);
 
   const handleGridClick = async (cell) => {
     try {

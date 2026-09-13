@@ -5,6 +5,7 @@ import CustomDropdown from "./CustomDropdown";
 import { useLanguage } from "../context/LanguageContext";
 import { useTheme } from "../context/ThemeContext";
 import { getTileUrl } from "../utils/mapTiles";
+import { getPalette } from "../theme";
 import { checkIfLand, getWaterBodyName, parseAndTranslateApiSeaName } from "../utils/coordinateUtils";
 
 const formatDir = (val, isLat, t) => {
@@ -57,53 +58,8 @@ export default function AllHeatMapsDashboard({ gridData, date, onSelectParameter
   const { isDark } = useTheme();
   const tileUrl = getTileUrl(isDark);
 
-  const pal = isDark ? {
-    pageBg: "#0a0618",
-    mapAreaBg: "#0a0618",
-    miniBg: "#150b31",
-    maskColor: "#0a0618",
-    loadingBg: "rgba(10,6,24,0.88)",
-    loadingText: "#f0abfc",
-    cardBg: "linear-gradient(135deg, rgba(76,29,149,0.45), rgba(112,26,117,0.28))",
-    cardBorder: "1px solid rgba(217, 70, 239, 0.4)",
-    labelBlue: "#67e8f9",
-    textMain: "#f5f3ff",
-    textAccent: "#f0abfc",
-    muted: "#c4b5fd",
-    chipOn: "#a855f7",
-    chipOff: "rgba(30,16,64,0.9)",
-    chipOffText: "#d8b4fe",
-    avgBg: "rgba(30,16,64,0.9)",
-    avgBorder: "1px solid rgba(168, 85, 247, 0.4)",
-    tableBorder: "#3b2a63",
-    theadBg: "#170d33",
-    rowA: "#150b31",
-    rowB: "#1c1140",
-    dotsBg: "#150b31",
-  } : {
-    pageBg: "#eef6fd",
-    mapAreaBg: "#f8fafc",
-    miniBg: "#ffffff",
-    maskColor: "#ffffff",
-    loadingBg: "rgba(248,250,252,0.88)",
-    loadingText: "#0284c7",
-    cardBg: "linear-gradient(135deg, rgba(14, 165, 233, 0.1), rgba(37, 99, 235, 0.05))",
-    cardBorder: "1px solid #bae6fd",
-    labelBlue: "#0369a1",
-    textMain: "#0f172a",
-    textAccent: "#0284c7",
-    muted: "#64748b",
-    chipOn: "#0284c7",
-    chipOff: "#ffffff",
-    chipOffText: "#0369a1",
-    avgBg: "#f8fafc",
-    avgBorder: "1px solid #e2e8f0",
-    tableBorder: "#e2e8f0",
-    theadBg: "#f8fafc",
-    rowA: "#ffffff",
-    rowB: "#f1f5f9",
-    dotsBg: "#f8fafc",
-  };
+  // Shared theme palette (src/theme.js)
+  const pal = getPalette(isDark);
   const [spanDays, setSpanDays] = useState(7);
   const [seaFilter, setSeaFilter] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);

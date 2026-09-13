@@ -1,0 +1,148 @@
+/* ============================================================
+   OceanEmbed design tokens — Phase 1 of the UI overhaul.
+   Single source of truth for the rebrand. Tailwind config
+   (font-sans/display/mono, abyss/ink/ocean/lagoon/foam,
+   shadow-soft/lift) mirrors these values.
+   Phase 2 migrates components to these vars + Tailwind
+   utilities and retires ocean.css / cyberpunk.css.
+   ============================================================ */
+
+:root {
+  /* ---- type ---- */
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+  --font-display: "Sora", "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  /* ---- brand ramp ---- */
+  --color-abyss: #06283d;
+  --color-ink: #0f172a;
+  --color-ocean-500: #0284c7;
+  --color-ocean-600: #0369a1;
+  --color-ocean-700: #075985;
+  --color-lagoon: #22d3ee;
+  --color-foam: #f0f9ff;
+
+  /* ---- light theme surfaces ---- */
+  --surface-page: #eef6fd;
+  --surface-map: #dbeafe;
+  --surface-card: #ffffff;
+  --surface-row-a: #ffffff;
+  --surface-row-b: #f1f5f9;
+  --surface-thead: #f8fafc;
+  --surface-input: #ffffff;
+  --surface-overlay: rgba(240, 249, 255, 0.92);
+
+  /* ---- light theme text ---- */
+  --text-main: #0f172a;
+  --text-accent: #0284c7;
+  --text-muted: #64748b;
+  --text-faint: #94a3b8;
+
+  /* ---- light theme borders ---- */
+  --border-soft: #e2e8f0;
+  --border-accent: #bae6fd;
+
+  /* ---- status ---- */
+  --status-live: #065f46;
+  --status-live-bg: rgba(16, 185, 129, 0.15);
+  --status-live-border: rgba(16, 185, 129, 0.4);
+  --status-fallback: #92400e;
+  --status-fallback-bg: rgba(245, 158, 11, 0.15);
+  --status-fallback-border: rgba(245, 158, 11, 0.4);
+  --status-error: #b91c1c;
+  --status-error-bg: rgba(239, 68, 68, 0.08);
+  --status-error-border: rgba(239, 68, 68, 0.35);
+
+  /* ---- shape ---- */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-pill: 999px;
+
+  /* ---- elevation ---- */
+  --shadow-soft: 0 4px 16px rgba(2, 132, 199, 0.12);
+  --shadow-lift: 0 12px 32px rgba(2, 132, 199, 0.18);
+
+  /* ---- focus (WCAG 2.4.7) ---- */
+  --focus-ring: 0 0 0 3px rgba(34, 211, 238, 0.45);
+
+  /* ---- motion ---- */
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 400ms;
+
+  /* ---- z-index scale (replaces 15+ ad-hoc levels) ---- */
+  --z-map-pane: 400;
+  --z-map-control: 1000;
+  --z-panel: 2000;
+  --z-dropdown: 3000;
+  --z-toast: 4000;
+  --z-modal: 5000;
+  --z-boot: 6000;
+}
+
+.dark {
+  /* ---- dark theme surfaces ---- */
+  --surface-page: #0a0618;
+  --surface-map: #0a0618;
+  --surface-card: #150b31;
+  --surface-row-a: #150b31;
+  --surface-row-b: #1c1140;
+  --surface-thead: #170d33;
+  --surface-input: rgba(10, 6, 24, 0.9);
+  --surface-overlay: rgba(10, 6, 24, 0.88);
+
+  /* ---- dark theme text ---- */
+  --text-main: #f5f3ff;
+  --text-accent: #f0abfc;
+  --text-muted: #c4b5fd;
+  --text-faint: #8b7bb8;
+
+  /* ---- dark theme borders ---- */
+  --border-soft: #3b2a63;
+  --border-accent: rgba(217, 70, 239, 0.4);
+
+  /* ---- dark elevation ---- */
+  --shadow-soft: 0 4px 16px rgba(0, 0, 0, 0.5);
+  --shadow-lift: 0 12px 32px rgba(168, 85, 247, 0.25);
+}
+
+/* ---- reduced motion (WCAG 2.3.3) ---- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ---- shared primitives (used by Phase 2 migration) ---- */
+.oe-focus-visible:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.oe-live-badge {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+
+.oe-live-badge.is-live {
+  color: var(--status-live);
+  background: var(--status-live-bg);
+  border: 1px solid var(--status-live-border);
+}
+
+.oe-live-badge.is-fallback {
+  color: var(--status-fallback);
+  background: var(--status-fallback-bg);
+  border: 1px solid var(--status-fallback-border);
+}

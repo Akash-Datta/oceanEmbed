@@ -5,7 +5,7 @@ import { arabianSeaTemperatureData, bayOfBengalTemperatureData } from "../data/d
 import { useLanguage } from "../context/LanguageContext";
 import { useTheme } from "../context/ThemeContext";
 import { getTileUrl } from "../utils/mapTiles";
-import { getPalette } from "../theme";
+import Icon from "./icons";
 import { checkIfLand, getWaterBodyName, parseAndTranslateApiSeaName } from "../utils/coordinateUtils";
 
 // Fallback open-ocean profile (matches dummyOceanData global curve)
@@ -101,22 +101,15 @@ function DashboardMapController({ gridBounds, paddedBounds, isGeneratingGrid }) 
   return null;
 }
 
-function MapControlOverlay({ onZoomIn, onZoomOut, onReset, isDark }) {
-  const btnStyle = {
-    width: "38px", height: "38px", borderRadius: "10px",
-    background: isDark ? "rgba(20, 10, 44, 0.9)" : "rgba(255, 255, 255, 0.92)",
-    backdropFilter: "blur(10px)",
-    border: isDark ? "1px solid rgba(168, 85, 247, 0.55)" : "1px solid rgba(186, 230, 253, 0.9)",
-    color: isDark ? "#f0abfc" : "#0284c7",
-    boxShadow: isDark ? "0 0 14px rgba(168,85,247,0.35)" : "0 4px 12px rgba(2,132,199,0.15)",
-    fontSize: "18px", fontWeight: "700", cursor: "pointer",
-    display: "flex", alignItems: "center", justifyContent: "center",
-  };
+function MapControlOverlay({ onZoomIn, onZoomOut, onReset }) {
+  const btn = "oe-focus-visible flex h-[38px] w-[38px] items-center justify-center rounded-lg border text-[18px] font-bold backdrop-blur-md cursor-pointer border-ink/10 bg-paper/90 text-accent dark:border-paper/20 dark:bg-ink dark:text-paper";
   return (
-    <div style={{ position: "absolute", top: "16px", right: "16px", zIndex: 1000, display: "flex", flexDirection: "row", gap: "8px", filter: "drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3))" }} onClick={(e) => e.stopPropagation()}>
-      <button type="button" onClick={onZoomIn} title="Zoom In" style={btnStyle}>+</button>
-      <button type="button" onClick={onZoomOut} title="Zoom Out" style={btnStyle}>−</button>
-      <button type="button" onClick={onReset} title="Reset View" style={{ ...btnStyle, fontSize: "16px" }}>↻</button>
+    <div className="absolute right-4 top-4 z-[1000] flex flex-row gap-2" onClick={(e) => e.stopPropagation()}>
+      <button type="button" onClick={onZoomIn} title="Zoom In" aria-label="Zoom in" className={btn}>+</button>
+      <button type="button" onClick={onZoomOut} title="Zoom Out" aria-label="Zoom out" className={btn}>−</button>
+      <button type="button" onClick={onReset} title="Reset View" aria-label="Reset view" className={`${btn} text-[16px]`}>
+        <Icon name="reset" size={16} />
+      </button>
     </div>
   );
 }
@@ -388,56 +381,53 @@ export default function SpatialDistribution({
     }
   };
 
-  // ---- shared theme palette (src/theme.js; same tokens as surface dashboards) ----
-  const pal = getPalette(isDark);
+  const maskColor = isDark ? "#132730" : "#F7F4ED";
+  const mapBg = isDark ? "#132730" : "#F7F4ED";
+
+  const chip = (active) =>
+    `cursor-pointer rounded-lg border px-2 py-[3px] text-[11px] font-bold transition-colors
+      ${active
+        ? "border-transparent bg-accent text-white dark:bg-accent"
+        : "border-ink/10 bg-paper text-accent hover:bg-ink/[0.06] dark:border-paper/15 dark:bg-paper/[0.05] dark:text-paper dark:hover:bg-paper/10"}`;
+
+  const th = "border-b-2 border-ink/10 p-2 font-bold dark:border-paper/10";
+  const td = "border-b border-ink/10 p-1.5 dark:border-paper/10";
+  const cornerBadge = "inline-flex gap-1 rounded-lg border border-ink/10 bg-paper px-2 py-[3px] font-mono text-[11px] text-ink/70 dark:border-paper/10 dark:bg-paper/[0.05] dark:text-paper/70";
+
+  const tabActive = {
+    argo: "bg-ink text-paper border-transparent dark:bg-paper dark:text-ink",
+    transformer: "bg-ink text-paper border-transparent dark:bg-paper dark:text-ink",
+    error: "bg-ink text-paper border-transparent dark:bg-paper dark:text-ink",
+  };
 
   return (
-    <div className={`parameter-dashboard-page spatial-depth-dashboard ${isDark ? "dash-dark" : "dash-light"}`} style={isMobile ? {
-      display: "flex", flexDirection: "column", gap: "12px",
-      padding: "8px 12px 16px 8px",
-      flex: 1, height: "auto", minHeight: "100%",
-      boxSizing: "border-box", overflowY: "visible", WebkitOverflowScrolling: "touch", background: pal.pageBg,
-    } : {
-      display: "flex", flexDirection: "row", gap: "16px", padding: "12px", flex: 1, minHeight: 0, height: "100%", boxSizing: "border-box", background: pal.pageBg,
-    }}>
-      <style>{`
-  .spatial-dashboard-titlebar { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 10px 6px; flex-wrap: wrap; flex-shrink: 0; }
-  .spatial-dashboard-title { margin: 0; font-size: 12px; font-weight: 800; color: ${isDark ? "#f0abfc" : "#0c4a6e"}; display: flex; align-items: center; gap: 6px; }
-  .spatial-depth-badge { background: ${isDark ? "rgba(168,85,247,0.25)" : "rgba(2,132,199,0.12)"}; color: ${isDark ? "#f0abfc" : "#0284c7"}; padding: 2px 10px; border-radius: 6px; font-size: 13px; border: 1px solid ${isDark ? "rgba(217,70,239,0.55)" : "rgba(2,132,199,0.35)"}; font-weight: 700; box-shadow: ${isDark ? "0 0 12px rgba(217,70,239,0.4)" : "none"}; }
-  .spatial-model-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
-  .spatial-model-tab { padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer; transition: all 0.2s ease; border: ${isDark ? "1px solid rgba(168,85,247,0.45)" : "1px solid #bae6fd"}; background: transparent; color: ${isDark ? "#d8b4fe" : "#0369a1"}; }
-  .spatial-model-tab.active-argo { background: #0284c7; color: #fff; border-color: transparent; box-shadow: ${isDark ? "0 0 14px rgba(34,211,238,0.5)" : "0 4px 12px rgba(2,132,199,0.3)"}; }
-  .spatial-model-tab.active-transformer { background: #059669; color: #fff; border-color: transparent; box-shadow: ${isDark ? "0 0 14px rgba(52,211,153,0.5)" : "0 4px 12px rgba(5,150,105,0.3)"}; }
-  .spatial-model-tab.active-error { background: ${isDark ? "#a21caf" : "#e11d48"}; color: #fff; border-color: transparent; box-shadow: ${isDark ? "0 0 14px rgba(217,70,239,0.5)" : "0 4px 12px rgba(225,29,72,0.3)"}; }
-  .dash-corner-badge {
-    background: ${isDark ? "rgba(10,6,24,0.9)" : "#ffffff"}; border: ${isDark ? "1px solid rgba(217,70,239,0.45)" : "1px solid #bbf7d0"}; padding: 3px 8px; border-radius: 20px;
-    color: ${isDark ? "#f0abfc" : "#166534"}; font-size: 9.5px; font-family: 'JetBrains Mono', monospace; font-weight: 700;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04); display: inline-flex; gap: 4px;
-  }
-  .matrix-table-row { transition: background 0.15s ease; cursor: pointer; }
-  .matrix-table-row:hover:not(.selected-row) { background: ${isDark ? "rgba(168,85,247,0.18)" : "#e0f2fe"} !important; }
-`}</style>
+    <div className={isMobile
+      ? "flex min-h-full flex-1 flex-col gap-3 bg-paper px-2 pb-4 pt-2 dark:bg-ink"
+      : "flex h-full min-h-0 flex-1 flex-row gap-4 bg-paper p-3 dark:bg-ink"}>
 
       {/* LEFT: live map engine (same as surface maps) */}
-      <div className="dashboard-map-area" style={isMobile ? {
-        flex: "none", width: "100%", height: "calc(var(--app-vh, 1vh) * 45)", minHeight: "350px", background: pal.mapBg, padding: 0,
-        boxSizing: "border-box", position: "relative", borderRadius: "14px", overflow: "hidden", isolation: "isolate", transform: "translateZ(0)",
-        display: "flex", flexDirection: "column",
-      } : {
-        flex: "0 0 62%", background: pal.mapBg, position: "relative", borderRadius: "14px",
-        overflow: "hidden", isolation: "isolate", height: "100%", minHeight: 0,
-        display: "flex", flexDirection: "column",
-        boxShadow: isDark ? "0 0 28px rgba(168,85,247,0.3)" : "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
-      }}>
-        <div className="spatial-dashboard-titlebar">
-          <h3 className="spatial-dashboard-title">
-            🌊 {t("spatialTitle")} <span className="spatial-depth-badge">{depthNum.toFixed(1)}m</span>
+      <div className={isMobile
+        ? "flex w-full flex-none flex-col rounded-lg bg-ink/[0.06] dark:bg-ink"
+        : "flex h-full min-h-0 flex-[0_0_62%] flex-col overflow-hidden rounded-lg border border-ink/10 bg-ink/[0.06] dark:border-paper/10 dark:bg-ink"}
+        style={isMobile ? { height: "max(350px, 45dvh)", minHeight: 350 } : undefined}>
+        <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 px-2.5 pb-1.5 pt-2">
+          <h3 className="m-0 flex items-center gap-1.5 text-[12px] font-bold text-accent dark:text-paper">
+            <Icon name="waves" size={14} />
+            {t("spatialTitle")}
+            <span className="rounded-lg border border-ink/15 bg-accent/10 px-2.5 py-0.5 text-[13px] font-bold text-accent dark:border-paper/20 dark:bg-accent/20 dark:text-paper">
+              {depthNum.toFixed(1)}m
+            </span>
           </h3>
-          <div className="spatial-model-tabs">
+          <div className="flex flex-wrap gap-1.5" role="tablist" aria-label="Depth model">
             {MODELS.map((m) => (
               <button
                 key={m.id}
-                className={`spatial-model-tab ${model === m.id ? `active-${m.id}` : ""}`}
+                role="tab"
+                aria-selected={model === m.id}
+                className={`oe-focus-visible cursor-pointer rounded-lg border px-3 py-1.5 text-[12px] font-semibold transition-colors
+                  ${model === m.id
+                    ? tabActive[m.id]
+                    : "border-ink/10 bg-transparent text-accent hover:bg-ink/[0.06] dark:border-paper/20 dark:bg-transparent dark:text-paper dark:hover:bg-paper/10"}`}
                 onClick={() => setModel(m.id)}
               >
                 {m.short}
@@ -446,18 +436,18 @@ export default function SpatialDistribution({
           </div>
         </div>
 
-        <div style={{ flex: 1, minHeight: 0, position: "relative" }}>
+        <div className="relative min-h-0 flex-1">
           {(isGeneratingGrid || isRendering) && (
-            <div className="dash-loading-overlay" style={{ position: "absolute", inset: 0, zIndex: 9999, background: pal.loadingBg, backdropFilter: "blur(6px)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-              <div className={isDark ? "ocean-spinner" : "spinner"}></div>
-              <div style={{ color: pal.loadingText, marginTop: "16px", fontWeight: "bold", textAlign: "center", padding: "0 20px" }}>
+            <div className="absolute inset-0 z-modal flex flex-col items-center justify-center bg-paper/90 px-5 text-center backdrop-blur-md dark:bg-ink/95">
+              <div className="h-8 w-8 animate-spin rounded-full border-[3px] border-ink/10 border-t-accent dark:border-paper/15 dark:border-t-paper" />
+              <div className="mt-4 font-bold text-accent dark:text-paper">
                 {t("loadingHeatmap") || "Processing High-Resolution Data..."}<br />
-                <span style={{ fontSize: "12px", opacity: 0.8, fontWeight: "normal", color: pal.loadingSub }}>This may take a moment</span>
+                <span className="text-[12px] font-normal opacity-80">This may take a moment</span>
               </div>
             </div>
           )}
 
-          <MapContainer preferCanvas={true} ref={mapRef} center={[centerLat, centerLng]} zoomSnap={0} style={{ height: "100%", width: "100%", backgroundColor: pal.mapBg, position: "absolute", inset: 0 }} zoomControl={false} attributionControl={false}>
+          <MapContainer preferCanvas={true} ref={mapRef} center={[centerLat, centerLng]} zoomSnap={0} style={{ height: "100%", width: "100%", backgroundColor: mapBg, position: "absolute", inset: 0 }} zoomControl={false} attributionControl={false}>
             <TileLayer noWrap={true} url={tileUrl} />
             {!isGeneratingGrid && renderGrid && (
               <GridOverlay
@@ -469,47 +459,48 @@ export default function SpatialDistribution({
                 showTooltip={depthGrid && depthGrid.length < 1500}
               />
             )}
-            <MaskHole bounds={gridBounds} color={pal.maskColor} />
+            <MaskHole bounds={gridBounds} color={maskColor} />
             <DashboardMapController gridBounds={gridBounds} paddedBounds={paddedBounds} isGeneratingGrid={isGeneratingGrid} />
           </MapContainer>
-          <MapControlOverlay onZoomIn={handleZoomIn} onZoomOut={handleZoomOut} onReset={handleReset} isDark={isDark} />
+          <MapControlOverlay onZoomIn={handleZoomIn} onZoomOut={handleZoomOut} onReset={handleReset} />
         </div>
       </div>
 
       {/* RIGHT: same data engine as surface parameter maps, per depth */}
-      <div className="dashboard-data-area custom-scrollbar" style={isMobile ? {
-        position: "relative", display: "flex", flexDirection: "column", flex: "none", width: "100%", height: "auto", overflow: "visible",
-      } : {
-        position: "relative", display: "flex", flexDirection: "column", flex: "1", minWidth: 0, height: "100%", overflowY: "auto",
-      }}>
-        <div style={{ display: "flex", justifyContent: "flex-end", gap: "8px", marginBottom: "6px", flexShrink: 0 }}>
-          <button className="heatmap-action-btn fill" style={isMobile ? { flex: 1 } : undefined} onClick={onBack}>{t("back") || "Back to Map"}</button>
+      <div className={isMobile
+        ? "relative flex w-full flex-none flex-col"
+        : "relative flex h-full min-w-0 flex-1 flex-col overflow-y-auto"}>
+        <div className="mb-1.5 flex shrink-0 justify-end gap-2">
+          <button
+            type="button"
+            onClick={onBack}
+            className={`oe-focus-visible rounded-lg bg-accent px-4 py-2 text-[13px] font-semibold text-white transition-colors hover:brightness-95 ${isMobile ? "flex-1" : ""}`}
+          >
+            {t("back") || "Back to Map"}
+          </button>
         </div>
 
-        <div className="dash-water-card" style={{ background: pal.cardBg, padding: "8px 10px", borderRadius: "10px", border: pal.cardBorder, marginBottom: "6px", flexShrink: 0 }}>
-          <span style={{ fontSize: "10px", color: pal.labelBlue, fontWeight: "800", textTransform: "uppercase" }}>
+        <div className="mb-1.5 shrink-0 rounded-lg border border-ink/10 bg-ink/[0.03] px-2.5 py-2 dark:border-paper/20 dark:bg-paper/[0.04]">
+          <span className="text-[10px] font-bold text-accent dark:text-paper">
             {t("coveredWaterBodies") || t("waterBody") || "Water Bodies"} ({t("clickToFilter") || "Click to filter table"}) · {depthNum.toFixed(0)}m
           </span>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "5px", marginTop: "6px" }}>
-            <span
-              onClick={() => { setSeaFilter(null); setSelectedCell(null); setCurrentPage(1); }}
-              style={{ cursor: "pointer", background: seaFilter === null ? pal.chipOn : pal.chipOff, color: seaFilter === null ? "#ffffff" : pal.chipOffText, padding: "3px 8px", borderRadius: "6px", fontSize: "11px", fontWeight: "700", border: pal.cardBorder, transition: "all 0.2s ease" }}
-            >
-              🌍 {t("all") || "All"}
+          <div className="mt-1.5 flex flex-wrap gap-1">
+            <span onClick={() => { setSeaFilter(null); setSelectedCell(null); setCurrentPage(1); }} className={chip(seaFilter === null)}>
+              <span className="mr-1 inline-flex align-[-2px]"><Icon name="globe" size={12} /></span>{t("all") || "All"}
             </span>
             {waterBodiesArray.map((sea, idx) => (
               <span
                 key={idx}
                 onClick={() => { setSeaFilter(sea === seaFilter ? null : sea); setSelectedCell(null); setCurrentPage(1); }}
-                style={{ cursor: "pointer", background: seaFilter === sea ? pal.chipOn : pal.chipOff, color: seaFilter === sea ? "#ffffff" : pal.chipOffText, padding: "3px 8px", borderRadius: "6px", fontSize: "11px", fontWeight: "700", border: pal.cardBorder, transition: "all 0.2s ease" }}
+                className={chip(seaFilter === sea)}
               >
-                🌊 {sea}
+                <span className="mr-1 inline-flex align-[-2px]"><Icon name="waves" size={12} /></span>{sea}
               </span>
             ))}
           </div>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "6px", marginBottom: "6px", flexShrink: 0 }}>
+        <div className="mb-1.5 grid shrink-0 grid-cols-3 gap-1.5">
           {[
             { id: "argo", label: "ARGO Avg", val: averages.argo },
             { id: "transformer", label: "PRED Avg", val: averages.transformer },
@@ -518,30 +509,31 @@ export default function SpatialDistribution({
             <div
               key={a.id}
               onClick={() => setModel(a.id)}
-              className="dash-avg-card"
-              style={{ background: pal.avgBg, padding: "5px 10px", borderRadius: "8px", border: model === a.id ? `2px solid ${pal.chipOn}` : pal.avgBorder, cursor: "pointer" }}
+              className={`cursor-pointer rounded-lg border bg-ink/[0.03] px-2.5 py-1 dark:bg-paper/[0.05]
+                ${model === a.id ? "border-2 border-accent dark:border-accent" : "border-ink/10 dark:border-paper/10"}`}
             >
-              <span style={{ fontSize: "8.5px", color: pal.muted, fontWeight: "800", textTransform: "uppercase" }}>{a.label}</span>
-              <div style={{ fontSize: "13px", fontWeight: "900", color: pal.textAccent }}>{a.val}°C</div>
+              <span className="text-[11px] font-semibold text-ink/60 dark:text-paper/60">{a.label}</span>
+              <div className="font-mono text-[13px] text-ink tabular-nums dark:text-paper">{a.val}°C</div>
             </div>
           ))}
         </div>
 
         {selectedCell && (
-          <div className="dash-selected-card" style={{ background: pal.selCardBg, border: pal.selCardBorder, padding: "10px", borderRadius: "10px", marginBottom: "6px", textAlign: "center", flexShrink: 0 }}>
-            <div style={{ marginBottom: "8px", fontSize: "10px", color: isDark ? "#f0abfc" : "#14532d", fontWeight: "800", letterSpacing: "0.5px" }}>
-              📍 {t("selectedGrid")?.toUpperCase()} ({parseAndTranslateApiSeaName(getWaterBodyName(selectedCell.lat, selectedCell.lng), t)}) · {depthNum.toFixed(0)}m ➔{" "}
-              <span style={{ color: isDark ? "#67e8f9" : "#059669" }}>ARGO {selectedCell.argo}°C / PRED {selectedCell.transformer}°C / ERR {selectedCell.error}°C</span>
+          <div className="mb-1.5 shrink-0 rounded-lg border border-accent/40 bg-accent/[0.07] p-2.5 text-center dark:border-paper/20 dark:bg-accent/15">
+            <div className="mb-2 text-[10px] font-bold text-ink dark:text-paper">
+              <span className="mr-1 inline-flex align-[-2px]"><Icon name="pin" size={12} /></span>
+              {t("selectedGrid")} ({parseAndTranslateApiSeaName(getWaterBodyName(selectedCell.lat, selectedCell.lng), t)}) · {depthNum.toFixed(0)}m →{" "}
+              <span className="text-accent dark:text-paper">ARGO {selectedCell.argo}°C / PRED {selectedCell.transformer}°C / ERR {selectedCell.error}°C</span>
             </div>
-            <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "6px" }}>
+            <div className="flex flex-wrap justify-center gap-1.5">
               {(() => {
                 const c = getGridCorners(selectedCell.lat, selectedCell.lng, effectiveRes, t);
                 return (
                   <>
-                    <span className="dash-corner-badge"><span style={{ color: "#22c55e", opacity: 0.8 }}>{t("dirNW") || "NW"}</span>{c.nw.lat}, {c.nw.lng}</span>
-                    <span className="dash-corner-badge"><span style={{ color: "#22c55e", opacity: 0.8 }}>{t("dirNE") || "NE"}</span>{c.ne.lat}, {c.ne.lng}</span>
-                    <span className="dash-corner-badge"><span style={{ color: "#22c55e", opacity: 0.8 }}>{t("dirSW") || "SW"}</span>{c.sw.lat}, {c.sw.lng}</span>
-                    <span className="dash-corner-badge"><span style={{ color: "#22c55e", opacity: 0.8 }}>{t("dirSE") || "SE"}</span>{c.se.lat}, {c.se.lng}</span>
+                    <span className={cornerBadge}><span className="opacity-60">{t("dirNW") || "NW"}</span>{c.nw.lat}, {c.nw.lng}</span>
+                    <span className={cornerBadge}><span className="opacity-60">{t("dirNE") || "NE"}</span>{c.ne.lat}, {c.ne.lng}</span>
+                    <span className={cornerBadge}><span className="opacity-60">{t("dirSW") || "SW"}</span>{c.sw.lat}, {c.sw.lng}</span>
+                    <span className={cornerBadge}><span className="opacity-60">{t("dirSE") || "SE"}</span>{c.se.lat}, {c.se.lng}</span>
                   </>
                 );
               })()}
@@ -549,29 +541,26 @@ export default function SpatialDistribution({
           </div>
         )}
 
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "4px", padding: "0 2px", flexShrink: 0 }}>
-          <h4 style={{ margin: 0, fontSize: "11px", fontWeight: "800", color: pal.labelBlue, textTransform: "uppercase", letterSpacing: "0.5px" }}>
-            📊 {seaFilter ? `${seaFilter} ${t("matrix") || "Matrix"}` : (t("regionalGridDataMatrix") || "Regional Grid Data Matrix")} · {depthNum.toFixed(0)}m
+        <div className="mb-1 flex shrink-0 items-center justify-between px-0.5">
+          <h4 className="m-0 flex items-center gap-1 text-[11px] font-bold text-accent dark:text-paper">
+            <Icon name="grid" size={13} />
+            {seaFilter ? `${seaFilter} ${t("matrix") || "Matrix"}` : (t("regionalGridDataMatrix") || "Regional Grid Data Matrix")} · {depthNum.toFixed(0)}m
           </h4>
-          <span style={{ fontSize: "10px", fontWeight: "700", color: pal.muted }}>{filteredGridData.length} cells</span>
+          <span className="text-[10px] font-bold text-ink/60 dark:text-paper/60">{filteredGridData.length} cells</span>
         </div>
 
-        <div ref={tableContainerRef} className="custom-scrollbar dash-table-wrap" style={isMobile ? {
-          flex: "none", height: "400px", overflowX: "auto", overflowY: "auto", border: `1px solid ${pal.tableBorder}`,
-          borderTopLeftRadius: "10px", borderTopRightRadius: "10px", position: "relative", WebkitOverflowScrolling: "touch", paddingRight: "8px", background: pal.rowA,
-        } : {
-          flex: 1, minHeight: "220px", overflowX: "auto", overflowY: "auto", border: `1px solid ${pal.tableBorder}`,
-          borderTopLeftRadius: "10px", borderTopRightRadius: "10px", position: "relative", background: pal.rowA,
-        }}>
-          <table className="dash-table" style={{ width: "100%", borderCollapse: "collapse", fontSize: "12px", minWidth: "640px" }}>
-            <thead style={{ position: "sticky", top: 0, background: pal.theadBg, zIndex: 10 }}>
-              <tr>
-                <th style={{ padding: "8px", borderBottom: `2px solid ${pal.tableBorder}`, color: pal.muted, fontWeight: "700", textAlign: "left", width: "200px" }}>{t("gridCorners") || "Grid Corners"}</th>
-                <th style={{ padding: "8px", borderBottom: `2px solid ${pal.tableBorder}`, color: pal.muted, fontWeight: "700", textAlign: "left" }}>{t("depth") || "Depth"}</th>
-                <th style={{ padding: "8px", borderBottom: `2px solid ${pal.tableBorder}`, color: pal.muted, fontWeight: "700", textAlign: "center" }}>ARGO °C</th>
-                <th style={{ padding: "8px", borderBottom: `2px solid ${pal.tableBorder}`, color: pal.muted, fontWeight: "700", textAlign: "center" }}>PRED °C</th>
-                <th style={{ padding: "8px", borderBottom: `2px solid ${pal.tableBorder}`, color: pal.muted, fontWeight: "700", textAlign: "center" }}>ERR °C</th>
-                <th style={{ padding: "8px", borderBottom: `2px solid ${pal.tableBorder}`, color: pal.muted, fontWeight: "700", textAlign: "right" }}>{t("waterBody") || "Water Body"}</th>
+        <div ref={tableContainerRef} className={isMobile
+          ? "h-[400px] flex-none overflow-auto rounded-t-[10px] border border-ink/10 bg-paper pr-2 dark:border-paper/10 dark:bg-paper/[0.05]"
+          : "min-h-[220px] flex-1 overflow-auto rounded-t-[10px] border border-ink/10 bg-paper dark:border-paper/10 dark:bg-paper/[0.05]"}>
+          <table className="w-full min-w-[640px] border-collapse text-[12px]">
+            <thead className="sticky top-0 z-[10] bg-ink/[0.03] dark:bg-ink">
+              <tr className="text-left text-ink/60 dark:text-paper/60">
+                <th className={`${th} w-[200px] font-bold`}>{t("gridCorners") || "Grid Corners"}</th>
+                <th className={`${th} font-bold`}>{t("depth") || "Depth"}</th>
+                <th className={`${th} text-center font-bold`}>ARGO °C</th>
+                <th className={`${th} text-center font-bold`}>PRED °C</th>
+                <th className={`${th} text-center font-bold`}>ERR °C</th>
+                <th className={`${th} text-right font-bold`}>{t("waterBody") || "Water Body"}</th>
               </tr>
             </thead>
             <tbody>
@@ -585,22 +574,21 @@ export default function SpatialDistribution({
                     key={`${row.lat}-${row.lng}-${idx}`}
                     ref={isSelected ? selectedRowRef : null}
                     onClick={() => handleRowClick(row)}
-                    className={`matrix-table-row ${isSelected ? "selected-row" : ""}`}
-                    style={{ background: isSelected ? (isDark ? "rgba(168, 85, 247, 0.28)" : "rgba(14, 165, 233, 0.2)") : (idx % 2 === 0 ? pal.rowA : pal.rowB), cursor: "pointer" }}
+                    className={`cursor-pointer transition-colors ${isSelected ? "bg-accent/15 dark:bg-accent/25" : idx % 2 === 0 ? "bg-paper hover:bg-ink/[0.06] dark:bg-paper/[0.05] dark:hover:bg-paper/10" : "bg-ink/[0.03] hover:bg-ink/[0.06] dark:bg-paper/[0.02] dark:hover:bg-paper/10"}`}
                   >
-                    <td style={{ padding: "6px 8px", borderBottom: `1px solid ${pal.tableBorder}`, whiteSpace: "nowrap" }}>
-                      <div style={{ display: "grid", gridTemplateColumns: "max-content max-content", gap: "2px 8px", fontSize: "8.5px", color: isSelected ? pal.textAccent : pal.rowText, fontFamily: "'JetBrains Mono', monospace", letterSpacing: "-0.2px" }}>
-                        <span><b style={{ opacity: 0.5, fontWeight: 800 }}>{t("dirNW") || "NW"}</b> {corners.nw.lat}, {corners.nw.lng}</span>
-                        <span><b style={{ opacity: 0.5, fontWeight: 800 }}>{t("dirNE") || "NE"}</b> {corners.ne.lat}, {corners.ne.lng}</span>
-                        <span><b style={{ opacity: 0.5, fontWeight: 800 }}>{t("dirSW") || "SW"}</b> {corners.sw.lat}, {corners.sw.lng}</span>
-                        <span><b style={{ opacity: 0.5, fontWeight: 800 }}>{t("dirSE") || "SE"}</b> {corners.se.lat}, {corners.se.lng}</span>
+                    <td className={`${td} whitespace-nowrap`}>
+                      <div className={`grid grid-cols-[max-content_max-content] gap-x-2 gap-y-0.5 font-mono text-[8.5px] tracking-tight ${isSelected ? "text-accent dark:text-paper" : "text-ink/60 dark:text-paper/60"}`}>
+                        <span><b className="font-bold opacity-50">{t("dirNW") || "NW"}</b> {corners.nw.lat}, {corners.nw.lng}</span>
+                        <span><b className="font-bold opacity-50">{t("dirNE") || "NE"}</b> {corners.ne.lat}, {corners.ne.lng}</span>
+                        <span><b className="font-bold opacity-50">{t("dirSW") || "SW"}</b> {corners.sw.lat}, {corners.sw.lng}</span>
+                        <span><b className="font-bold opacity-50">{t("dirSE") || "SE"}</b> {corners.se.lat}, {corners.se.lng}</span>
                       </div>
                     </td>
-                    <td style={{ padding: "6px 8px", borderBottom: `1px solid ${pal.tableBorder}`, whiteSpace: "nowrap", fontSize: "11px", color: pal.rowText }}>{depthNum.toFixed(0)}m</td>
-                    <td style={{ padding: "6px 8px", borderBottom: `1px solid ${pal.tableBorder}`, textAlign: "center", fontWeight: isSelected ? "800" : "600", color: isSelected ? pal.textAccent : pal.textMain }}>{row.argo}</td>
-                    <td style={{ padding: "6px 8px", borderBottom: `1px solid ${pal.tableBorder}`, textAlign: "center", fontWeight: isSelected ? "800" : "600", color: isSelected ? pal.textAccent : pal.textMain }}>{row.transformer}</td>
-                    <td style={{ padding: "6px 8px", borderBottom: `1px solid ${pal.tableBorder}`, textAlign: "center", fontWeight: isSelected ? "800" : "600", color: isSelected ? pal.textAccent : pal.textMain }}>{row.error}</td>
-                    <td style={{ padding: "6px 8px", borderBottom: `1px solid ${pal.tableBorder}`, color: isLand ? pal.rowText : pal.textAccent, fontWeight: "600", whiteSpace: "nowrap", fontSize: "11px", textAlign: "right" }}>{rowWaterBody}</td>
+                    <td className={`${td} whitespace-nowrap text-[11px] text-ink/60 dark:text-paper/60`}>{depthNum.toFixed(0)}m</td>
+                    <td className={`${td} text-center font-semibold ${isSelected ? "font-bold text-accent dark:text-paper" : "text-ink dark:text-paper"}`}>{row.argo}</td>
+                    <td className={`${td} text-center font-semibold ${isSelected ? "font-bold text-accent dark:text-paper" : "text-ink dark:text-paper"}`}>{row.transformer}</td>
+                    <td className={`${td} text-center font-semibold ${isSelected ? "font-bold text-accent dark:text-paper" : "text-ink dark:text-paper"}`}>{row.error}</td>
+                    <td className={`${td} whitespace-nowrap text-right text-[11px] font-semibold ${isLand ? "text-ink/60 dark:text-paper/60" : "text-accent dark:text-paper"}`}>{rowWaterBody}</td>
                   </tr>
                 );
               })}
@@ -609,10 +597,10 @@ export default function SpatialDistribution({
         </div>
 
         {totalPages > 1 && (
-          <div className="dash-pager" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 12px", background: pal.dotsBg, border: `1px solid ${pal.tableBorder}`, borderTop: "none", borderBottomLeftRadius: "10px", borderBottomRightRadius: "10px", flexShrink: 0 }}>
-            <button className="heatmap-action-btn outline" style={{ padding: "4px 10px", fontSize: "11px", minHeight: "auto", opacity: currentPage === 1 ? 0.5 : 1, cursor: currentPage === 1 ? "not-allowed" : "pointer" }} disabled={currentPage === 1} onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}>Previous</button>
-            <span style={{ fontSize: "11px", fontWeight: "700", color: pal.muted }}>Page {currentPage} of {totalPages}</span>
-            <button className="heatmap-action-btn outline" style={{ padding: "4px 10px", fontSize: "11px", minHeight: "auto", opacity: currentPage === totalPages ? 0.5 : 1, cursor: currentPage === totalPages ? "not-allowed" : "pointer" }} disabled={currentPage === totalPages} onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}>Next</button>
+          <div className="flex shrink-0 items-center justify-between rounded-b-[10px] border border-t-0 border-ink/10 bg-ink/[0.03] px-3 py-2 dark:border-paper/10 dark:bg-paper/[0.05]">
+            <button type="button" disabled={currentPage === 1} onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} className="oe-focus-visible rounded-lg border border-accent px-2.5 py-1 text-[11px] text-accent disabled:cursor-not-allowed disabled:opacity-50 dark:border-paper/20 dark:text-paper">Previous</button>
+            <span className="text-[11px] font-bold text-ink/60 dark:text-paper/60">Page {currentPage} of {totalPages}</span>
+            <button type="button" disabled={currentPage === totalPages} onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} className="oe-focus-visible rounded-lg border border-accent px-2.5 py-1 text-[11px] text-accent disabled:cursor-not-allowed disabled:opacity-50 dark:border-paper/20 dark:text-paper">Next</button>
           </div>
         )}
       </div>

@@ -1,5 +1,6 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import TemperatureProfile from "./TemperatureProfile";
+import Icon from "./icons";
 import { getLocationMetrics } from "../data/dummyOceanData";
 import { useLanguage } from "../context/LanguageContext";
 
@@ -20,10 +21,32 @@ const getGridCorners = (lat, lng, resolution, t) => {
   };
 };
 
+function CornerCard({ title, dot, lat, lng }) {
+  return (
+    <div className="flex flex-col items-center rounded-lg border border-ink/10 bg-paper p-2.5 dark:border-paper/10 dark:bg-paper/[0.05]">
+      <div className="mb-2 flex w-full items-center justify-between px-0.5">
+        <span className="text-[11px] font-semibold text-ink/70 dark:text-paper/70">{title}</span>
+        <span className={`h-1.5 w-1.5 rounded-full ${dot}`} />
+      </div>
+      <div className="flex w-full flex-col gap-1">
+        {[
+          ["Lat", lat],
+          ["Lng", lng],
+        ].map(([label, value]) => (
+          <div key={label} className="flex items-center justify-between rounded-lg bg-ink/[0.03] px-2 py-1 dark:bg-paper/[0.05]">
+            <span className="text-[11px] font-semibold text-ink/60 dark:text-paper/60">{label}</span>
+            <span className="font-mono text-[12px] text-ink dark:text-paper" style={{ fontVariantNumeric: "tabular-nums" }}>{value}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function DataSidePanel({
   position,
   depth,
-  setDepth,           
+  setDepth,
   seaName,
   profileData = [],
   activeResolution,
@@ -38,7 +61,7 @@ export default function DataSidePanel({
   onRetrySurface,
   onClose,
   isMobile = false,
-  onExpand,           
+  onExpand,
 }) {
   const { t } = useLanguage();
   const [isExpanded, setIsExpanded] = useState(false);
@@ -76,6 +99,15 @@ export default function DataSidePanel({
   }, [isSurfaceLive, surfaceData, metrics]);
 
   const fmt = (v, digits = 2) => (Number.isFinite(Number(v)) ? Number(v).toFixed(digits) : "—");
+
+  // Escape closes the drawer (WCAG 2.1.1 keyboard access).
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === "Escape") onClose?.();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [onClose]);
 
   const chartProfileData = useMemo(() => {
     if (!Array.isArray(profileData) || profileData.length === 0) return [];
@@ -128,218 +160,136 @@ export default function DataSidePanel({
     depthOptions.push(value);
   }
 
+  const sectionTitle = "mb-2 mt-0 font-display text-[15px] font-bold text-ink dark:text-paper";
+
   return (
-    <div className={`side-data-panel ${isExpanded ? "expanded" : ""}`}>
-      
-      <style>{`
-        @keyframes slideInUpFade {
-          0% { opacity: 0; transform: translateY(12px) scale(0.98); }
-          100% { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        
-        .grid-corner-card {
-          background: #ffffff;
-          border: 1px solid #e2e8f0;
-          border-radius: 12px;
-          padding: 10px;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-          box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-        }
-        
-        .grid-corner-card:hover {
-          transform: translateY(-3px);
-          box-shadow: 0 8px 16px rgba(14, 165, 233, 0.12);
-          border-color: #7dd3fc;
-        }
-
-        .gcc-inner-row {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          background: #f8fafc;
-          padding: 5px 8px;
-          border-radius: 6px;
-          transition: background 0.3s ease;
-        }
-
-        .grid-corner-card:hover .gcc-inner-row {
-          background: #f0f9ff;
-        }
-
-        .gcc-dot {
-          height: 6px; width: 6px; border-radius: 50%;
-        }
-        .gcc-dot.ne { background: #38bdf8; box-shadow: 0 0 6px #38bdf8; }
-        .gcc-dot.sw { background: #10b981; box-shadow: 0 0 6px #10b981; }
-      `}</style>
-
-      <div className="panel-header">
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <span style={{ fontSize: "16px" }}>📊</span>
-          <h4>{t("gridLocationData")}</h4>
+    <div
+      role="complementary"
+      aria-label={t("gridLocationData")}
+      className={
+        isMobile
+          ? "relative flex w-full flex-col overflow-hidden rounded-lg border border-ink/10 bg-paper shadow-lift dark:border-paper/10 dark:bg-ink"
+          : isExpanded
+          ? "absolute inset-0 z-panel flex flex-col overflow-hidden rounded-lg border border-ink/10 bg-paper/95 shadow-lift dark:border-paper/10 dark:bg-ink/95"
+          : "absolute bottom-4 right-4 top-4 z-panel flex w-[clamp(300px,24vw,380px)] flex-col overflow-hidden rounded-lg border border-ink/10 bg-paper/95 shadow-lift dark:border-paper/10 dark:bg-ink/95"
+      }
+    >
+      <div className="flex items-center justify-between border-b border-ink/10 px-4 py-3 dark:border-paper/10">
+        <div className="flex items-center gap-2">
+          <Icon name="grid" size={14} className="text-accent" />
+          <h4 className="m-0 font-display text-[16px] font-bold text-ink dark:text-paper">{t("gridLocationData")}</h4>
         </div>
 
-        <div className="panel-actions">
+        <div className="flex items-center gap-1.5">
           {!isMobile && (
             <button
+              type="button"
               onClick={toggleExpand}
-              className="action-btn expand-btn"
+              className="oe-focus-visible flex h-8 w-8 items-center justify-center rounded-lg border border-ink/10 bg-transparent text-ink/70 hover:bg-ink/[0.05]
+                dark:border-paper/15 dark:text-paper/70 dark:hover:bg-paper/10"
               title={isExpanded ? "Collapse" : "Expand"}
+              aria-label={isExpanded ? "Collapse panel" : "Expand panel"}
+              aria-expanded={isExpanded}
             >
-              {isExpanded ? "🗗" : "⛶"}
+              <Icon name={isExpanded ? "minus" : "plus"} size={13} />
             </button>
           )}
-          <button onClick={onClose} className="action-btn close-btn" title="Close">
-            ×
+          <button
+            type="button"
+            onClick={onClose}
+            className="oe-focus-visible flex h-8 w-8 items-center justify-center rounded-lg border border-ink/10 bg-transparent text-ink/70 hover:bg-ink/[0.05]
+              dark:border-paper/15 dark:text-paper/70 dark:hover:bg-paper/10"
+            title="Close"
+            aria-label="Close panel"
+          >
+            <Icon name="close" size={13} />
           </button>
         </div>
       </div>
 
-      <div className="panel-content">
-        <>
+      <div className="flex-1 overflow-y-auto p-4 text-[14px] text-ink/80 dark:text-paper/60">
         {(profileMeta?.gridId || profileMeta?.forecastDate) && (
-          <div style={{ fontSize: "10px", color: "#64748b", fontWeight: 700, marginBottom: "10px", background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "6px 10px" }}>
-            {profileMeta?.gridId ? `GRID ${profileMeta.gridId}` : ""}
+          <div className="mb-2.5 font-mono text-[11px] text-ink/50 dark:text-paper/50" style={{ fontVariantNumeric: "tabular-nums" }}>
+            {profileMeta?.gridId ? `${profileMeta.gridId}` : ""}
             {profileMeta?.gridId && profileMeta?.forecastDate ? " · " : ""}
-            {profileMeta?.forecastDate ? `DATE ${profileMeta.forecastDate}` : ""}
+            {profileMeta?.forecastDate ? `${profileMeta.forecastDate}` : ""}
             {profileLoading ? " · fetching…" : ""}
           </div>
         )}
-        <div
-          className="water-body-card"
-          style={{
-            marginBottom: "16px",
-            padding: "12px 14px",
-            background: "linear-gradient(135deg, rgba(14, 165, 233, 0.12), rgba(37, 99, 235, 0.06))",
-            borderRadius: "12px",
-            border: "1px solid rgba(14, 165, 233, 0.25)",
-            boxShadow: "0 4px 15px rgba(14, 165, 233, 0.08)",
-          }}
-        >
-          <span
-            className="water-body-label"
-            style={{
-              fontSize: "10px",
-              color: "#0369a1",
-              display: "block",
-              fontWeight: "800",
-              textTransform: "uppercase",
-              letterSpacing: "0.8px",
-              marginBottom: "3px",
-            }}
-          >
+        <div className="mb-4 border-b border-ink/10 pb-3 dark:border-paper/10">
+          <div className="text-[12px] text-ink/60 dark:text-paper/60">
             {t("waterBody")}
-          </span>
-
-          <strong
-            className="water-body-value"
-            style={{
-              color: isLoading ? "#64748b" : "#0f172a",
-              fontSize: "14px",
-              letterSpacing: "0.3px",
-            }}
-          >
+          </div>
+          <strong className={`font-display text-[19px] font-bold ${isLoading ? "text-ink/50" : "text-ink dark:text-paper"}`}>
             {displaySeaName}
           </strong>
         </div>
 
-        <div style={{ marginBottom: "16px", display: "flex", flexDirection: "column", gap: "8px" }}>
-          
-          <div className="grid-boundaries-card" style={{ 
-            background: "linear-gradient(135deg, rgba(255,255,255,0.9), rgba(240, 249, 255, 0.6))", 
-            padding: "12px", 
-            borderRadius: "14px", 
-            border: "1px solid rgba(186, 230, 253, 0.8)", 
-            animation: "slideInUpFade 0.4s ease-out",
-            boxShadow: "0 4px 12px rgba(14, 165, 233, 0.06), inset 0 2px 4px rgba(255, 255, 255, 0.8)"
-          }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                <span className="grid-corners-icon" style={{ background: "#e0f2fe", color: "#0284c7", padding: "4px", borderRadius: "8px", fontSize: "12px", display: "flex", alignItems: "center", justifyContent: "center" }}>🧭</span>
-                <span className="grid-corners-title" style={{ fontSize: "10px", color: "#0369a1", fontWeight: "800", textTransform: "uppercase", letterSpacing: "0.6px" }}>{t("gridCorners") || "Grid Boundaries"}</span>
+        <div className="mb-4 flex flex-col gap-2">
+          <div className="rounded-lg border border-ink/10 p-3 dark:border-paper/10">
+            <div className="mb-2 flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <Icon name="compass" size={13} className="text-accent" />
+                <span className="text-[12px] font-semibold text-ink/70 dark:text-paper/70">
+                  {t("gridCorners") || "Grid boundaries"}
+                </span>
               </div>
-              <div className="res-badge" style={{ fontSize: "9px", color: "#64748b", fontWeight: "800", background: "#f1f5f9", padding: "3px 6px", borderRadius: "10px", border: "1px solid #e2e8f0" }}>±{activeResolution}°</div>
+              <div className="font-mono text-[11px] text-ink/50 dark:text-paper/50">
+                ±{activeResolution}°
+              </div>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
-              
-              <div className="grid-corner-card">
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", marginBottom: "8px", padding: "0 2px" }}>
-                  <span className="corner-title-ne" style={{ fontSize: "10px", fontWeight: "800", color: "#0284c7", letterSpacing: "0.5px" }}>{t("dirNE") || "NE"} {t("corner") || "CORNER"}</span>
-                  <span className="gcc-dot ne"></span>
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "4px", width: "100%" }}>
-                  <div className="gcc-inner-row">
-                    <span className="gcc-label" style={{ fontSize: "9px", color: "#64748b", fontWeight: "800", letterSpacing: "0.5px" }}>LAT</span>
-                    <span className="gcc-value" style={{ fontSize: "11px", color: "#0f172a", fontFamily: "'JetBrains Mono', monospace", fontWeight: "700" }}>{corners.ne.lat}</span>
-                  </div>
-                  <div className="gcc-inner-row">
-                    <span className="gcc-label" style={{ fontSize: "9px", color: "#64748b", fontWeight: "800", letterSpacing: "0.5px" }}>LNG</span>
-                    <span className="gcc-value" style={{ fontSize: "11px", color: "#0f172a", fontFamily: "'JetBrains Mono', monospace", fontWeight: "700" }}>{corners.ne.lng}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid-corner-card">
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", marginBottom: "8px", padding: "0 2px" }}>
-                  <span className="corner-title-sw" style={{ fontSize: "10px", fontWeight: "800", color: "#059669", letterSpacing: "0.5px" }}>{t("dirSW") || "SW"} {t("corner") || "CORNER"}</span>
-                  <span className="gcc-dot sw"></span>
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "4px", width: "100%" }}>
-                  <div className="gcc-inner-row">
-                    <span className="gcc-label" style={{ fontSize: "9px", color: "#64748b", fontWeight: "800", letterSpacing: "0.5px" }}>LAT</span>
-                    <span className="gcc-value" style={{ fontSize: "11px", color: "#0f172a", fontFamily: "'JetBrains Mono', monospace", fontWeight: "700" }}>{corners.sw.lat}</span>
-                  </div>
-                  <div className="gcc-inner-row">
-                    <span className="gcc-label" style={{ fontSize: "9px", color: "#64748b", fontWeight: "800", letterSpacing: "0.5px" }}>LNG</span>
-                    <span className="gcc-value" style={{ fontSize: "11px", color: "#0f172a", fontFamily: "'JetBrains Mono', monospace", fontWeight: "700" }}>{corners.sw.lng}</span>
-                  </div>
-                </div>
-              </div>
-
+            <div className="grid grid-cols-2 gap-2">
+              <CornerCard title={`${t("dirNE") || "NE"} corner`} dot="bg-accent" lat={corners.ne.lat} lng={corners.ne.lng} />
+              <CornerCard title={`${t("dirSW") || "SW"} corner`} dot="bg-ink/30 dark:bg-paper/40" lat={corners.sw.lat} lng={corners.sw.lng} />
             </div>
           </div>
 
           {depth && (
-            <div className="depth-card" style={{ background: "rgba(14, 165, 233, 0.1)", padding: "10px", borderRadius: "12px", textAlign: "center", border: "1px solid rgba(14, 165, 233, 0.3)" }}>
-              <span className="depth-card-label" style={{ fontSize: "10px", color: "#0369a1", display: "block", fontWeight: "800", textTransform: "uppercase", letterSpacing: "0.5px" }}>{t("depth")}</span>
-              <span className="depth-card-value" style={{ fontSize: "14px", fontWeight: "800", color: "#0284c7" }}>{depth} m</span>
+            <div className="flex items-baseline justify-between border-b border-ink/10 pb-2 dark:border-paper/10">
+              <span className="text-[13px] text-ink/70 dark:text-paper/70">{t("depth")}</span>
+              <span className="font-mono text-[15px] text-ink tabular-nums dark:text-paper">{depth} m</span>
             </div>
           )}
         </div>
 
         {isMobile && setDepth && (
-          <div className="mobile-depth-selector" style={{ marginBottom: "16px", position: "relative" }}>
-            <label style={{ display: "block", fontSize: "12px", fontWeight: "700", color: "#0369a1", marginBottom: "6px" }}>
+          <div className="relative mb-4">
+            <label className="mb-1.5 block text-[12px] font-bold text-accent dark:text-paper">
               {t("depth") || "Depth (m)"}
             </label>
             <button
               type="button"
-              className="ocean-control"
+              aria-haspopup="listbox"
+              aria-expanded={isMobileDepthOpen}
               onClick={() => setIsMobileDepthOpen(!isMobileDepthOpen)}
-              style={{
-                width: "100%", padding: "10px 12px", borderRadius: "10px", border: "1px solid #bae6fd",
-                background: "#ffffff", fontSize: "14px", fontWeight: "600", color: "#0f172a", display: "flex",
-                alignItems: "center", justifyContent: "space-between", textAlign: "left", cursor: "pointer",
-                boxShadow: "0 2px 8px rgba(14, 165, 233, 0.1)",
-              }}
+              className="oe-focus-visible flex w-full items-center justify-between rounded-lg border border-ink/10 bg-paper px-3 py-2.5 text-left text-[14px] font-semibold text-ink
+                dark:border-paper/20 dark:bg-paper/[0.07] dark:text-paper"
             >
               <span>{depth !== "" && depth !== undefined ? `${depth} m` : (t("selectDepth") || "Select depth")}</span>
-              <span>▾</span>
+              <Icon name="chevronDown" size={13} className={`opacity-75 transition-transform ${isMobileDepthOpen ? "rotate-180" : ""}`} />
             </button>
 
             {isMobileDepthOpen && (
               <>
-                <div style={{ position: "fixed", inset: 0, zIndex: 9998 }} onClick={() => setIsMobileDepthOpen(false)} />
-                <div className="mobile-inline-dropdown-list">
-                  <div className={`mobile-inline-dropdown-item ${depth === "" ? "selected" : ""}`} onClick={() => { setDepth(""); setIsMobileDepthOpen(false); }}>
+                <div className="fixed inset-0 z-[9998]" onClick={() => setIsMobileDepthOpen(false)} />
+                <div role="listbox" className="absolute inset-x-0 top-[calc(100%+4px)] z-dropdown max-h-44 overflow-y-auto rounded-lg border border-ink/10 bg-paper p-1.5 shadow-lift dark:border-paper/20 dark:bg-paper/[0.07]">
+                  <div
+                    role="option"
+                    aria-selected={depth === ""}
+                    onClick={() => { setDepth(""); setIsMobileDepthOpen(false); }}
+                    className="cursor-pointer rounded-lg px-3 py-2 text-[13px] font-semibold text-ink hover:bg-ink/[0.06] dark:text-paper dark:hover:bg-paper/10"
+                  >
                     {t("selectDepth") || "Select depth"}
                   </div>
                   {depthOptions.map((d) => (
-                    <div key={d} className={`mobile-inline-dropdown-item ${depth !== "" && Number(depth) === d ? "selected" : ""}`} onClick={() => { setDepth(d); setIsMobileDepthOpen(false); }}>
+                    <div
+                      key={d}
+                      role="option"
+                      aria-selected={depth !== "" && Number(depth) === d}
+                      onClick={() => { setDepth(d); setIsMobileDepthOpen(false); }}
+                      className={`cursor-pointer rounded-lg px-3 py-2 text-[13px] font-semibold ${depth !== "" && Number(depth) === d ? "bg-accent text-white dark:bg-accent" : "text-ink hover:bg-ink/[0.06] dark:text-paper dark:hover:bg-paper/10"}`}
+                    >
                       {d} m
                     </div>
                   ))}
@@ -349,71 +299,63 @@ export default function DataSidePanel({
           </div>
         )}
 
-        <hr className="panel-divider" style={{ border: "none", borderTop: "1px solid rgba(226, 232, 240, 0.8)", margin: "16px 0" }} />
-        <h5 className="panel-section-title" style={{ margin: "0 0 12px", fontSize: "12px", fontWeight: "800", color: "#475569", textTransform: "uppercase", letterSpacing: "0.6px" }}>{t("surfaceParameters")}</h5>
-        <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px", flexWrap: "wrap" }}>
-          <span
-            style={{
-              fontSize: "9px", fontWeight: 800, letterSpacing: "0.6px", textTransform: "uppercase",
-              padding: "2px 8px", borderRadius: "999px",
-              color: isSurfaceLive ? "#065f46" : "#92400e",
-              background: isSurfaceLive ? "rgba(16,185,129,0.15)" : "rgba(245,158,11,0.15)",
-              border: `1px solid ${isSurfaceLive ? "rgba(16,185,129,0.4)" : "rgba(245,158,11,0.4)"}`,
-            }}
-          >
+        <hr className="my-4 border-t border-ink/10 dark:border-paper/10" />
+        <h5 className={sectionTitle}>{t("surfaceParameters")}</h5>
+        <div className="mb-2 flex flex-wrap items-center gap-1.5">
+          <span className={`oe-live-badge ${surfaceLoading ? "is-fallback" : isSurfaceLive ? "is-live" : "is-fallback"}`}>
             {surfaceLoading ? "◌ Fetching live surface…" : isSurfaceLive ? `● Live · surface · ${surfaceMeta?.source || "model"}` : "○ Fallback · dummy data"}
           </span>
           {(surfaceMeta?.gridId || surfaceMeta?.date) && (
-            <span style={{ fontSize: "9px", fontWeight: 700, color: "#64748b" }}>
-              {surfaceMeta?.gridId ? `GRID ${surfaceMeta.gridId}` : ""}
+            <span className="font-mono text-[11px] text-ink/50 dark:text-paper/50">
+              {surfaceMeta?.gridId ? `${surfaceMeta.gridId}` : ""}
               {surfaceMeta?.gridId && surfaceMeta?.date ? " · " : ""}
-              {surfaceMeta?.date ? `DATE ${surfaceMeta.date}` : ""}
+              {surfaceMeta?.date ? `${surfaceMeta.date}` : ""}
             </span>
           )}
         </div>
         {surfaceError && !isSurfaceLive && (
-          <div style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.35)", borderRadius: "8px", padding: "8px 10px", marginBottom: "8px" }}>
-            <div style={{ fontSize: "11px", fontWeight: 700, color: "#b91c1c", marginBottom: "4px" }}>
+          <div className="mb-2 border-l-2 border-accent pl-3">
+            <div className="mb-1 text-[12px] text-ink dark:text-paper">
               Surface backend unavailable — showing fallback. {surfaceError}
             </div>
             {onRetrySurface && (
               <button
                 type="button"
                 onClick={onRetrySurface}
-                style={{ fontSize: "11px", fontWeight: 800, color: "#fff", background: "#0284c7", border: "none", borderRadius: "6px", padding: "5px 10px", cursor: "pointer" }}
+                className="oe-focus-visible rounded-lg border border-ink/15 px-2.5 py-1 text-[12px] font-semibold text-ink hover:bg-ink/[0.05]
+                  dark:border-paper/20 dark:text-paper dark:hover:bg-paper/10"
               >
                 Retry surface
               </button>
             )}
           </div>
         )}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "20px", opacity: surfaceLoading ? 0.6 : 1 }}>
-          {/* Surface Parameters — live from GET /surface/point, fallback to dummy */}
-          <div className="metric-card m-sst" style={{ background: "linear-gradient(135deg, rgba(254, 243, 199, 0.6), rgba(254, 226, 226, 0.4))", padding: "12px", borderRadius: "12px", border: "1px solid rgba(252, 211, 77, 0.4)", transition: "transform 0.2s ease" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}><span className="metric-label" style={{ fontSize: "10px", color: "#92400e", fontWeight: "800", textTransform: "uppercase" }}>{t("sstLabel")}</span><span style={{ fontSize: "14px" }}>🌡️</span></div>
-            <strong className="metric-value" style={{ color: "#78350f", fontSize: "16px", fontWeight: "850" }}>{fmt(displaySurface.sst)} °C</strong>
-          </div>
-          <div className="metric-card m-sss" style={{ background: "linear-gradient(135deg, rgba(224, 242, 254, 0.7), rgba(186, 230, 253, 0.4))", padding: "12px", borderRadius: "12px", border: "1px solid rgba(125, 211, 252, 0.4)", transition: "transform 0.2s ease" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}><span className="metric-label" style={{ fontSize: "10px", color: "#0369a1", fontWeight: "800", textTransform: "uppercase" }}>{t("sssLabel")}</span><span style={{ fontSize: "14px" }}>💧</span></div>
-            <strong className="metric-value" style={{ color: "#03698e", fontSize: "16px", fontWeight: "850" }}>{fmt(displaySurface.sss)} PSU</strong>
-          </div>
-          <div className="metric-card m-ssh" style={{ background: "linear-gradient(135deg, rgba(236, 253, 245, 0.7), rgba(209, 250, 229, 0.4))", padding: "12px", borderRadius: "12px", border: "1px solid rgba(110, 231, 183, 0.4)", transition: "transform 0.2s ease" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}><span className="metric-label" style={{ fontSize: "10px", color: "#047857", fontWeight: "800", textTransform: "uppercase" }}>{t("sshLabel")}</span><span style={{ fontSize: "14px" }}>🌊</span></div>
-            <strong className="metric-value" style={{ color: "#065f46", fontSize: "16px", fontWeight: "850" }}>{fmt(displaySurface.ssh, 3)} m</strong>
-          </div>
-          <div className="metric-card m-uo" style={{ background: "linear-gradient(135deg, rgba(243, 232, 255, 0.7), rgba(233, 213, 255, 0.4))", padding: "12px", borderRadius: "12px", border: "1px solid rgba(216, 180, 254, 0.4)", transition: "transform 0.2s ease" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}><span className="metric-label" style={{ fontSize: "10px", color: "#6b21a8", fontWeight: "800", textTransform: "uppercase" }}>{t("uoLabel")}</span><span style={{ fontSize: "14px" }}>🧭</span></div>
-            <strong className="metric-value" style={{ color: "#581c87", fontSize: "16px", fontWeight: "850" }}>{fmt(displaySurface.uo, 3)} m/s</strong>
-          </div>
-          <div className="metric-card m-vo" style={{ background: "linear-gradient(135deg, rgba(253, 230, 138, 0.2), rgba(254, 215, 170, 0.3))", padding: "12px", borderRadius: "12px", border: "1px solid rgba(252, 211, 77, 0.4)", gridColumn: "span 2", transition: "transform 0.2s ease" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}><span className="metric-label" style={{ fontSize: "10px", color: "#b45309", fontWeight: "800", textTransform: "uppercase" }}>{t("voLabel")}</span><span style={{ fontSize: "14px" }}>↗️</span></div>
-            <strong className="metric-value" style={{ color: "#92400e", fontSize: "16px", fontWeight: "850" }}>{fmt(displaySurface.vo, 3)} m/s</strong>
-          </div>
+        <div className={`mb-5 overflow-hidden rounded-lg border border-ink/10 dark:border-paper/10 ${surfaceLoading ? "opacity-60" : ""}`}>
+          {[
+            { icon: "thermometer", label: t("sstLabel"), value: fmt(displaySurface.sst), unit: "°C" },
+            { icon: "droplet", label: t("sssLabel"), value: fmt(displaySurface.sss), unit: "PSU" },
+            { icon: "waves", label: t("sshLabel"), value: fmt(displaySurface.ssh, 3), unit: "m" },
+            { icon: "compass", label: t("uoLabel"), value: fmt(displaySurface.uo, 3), unit: "m/s" },
+            { icon: "arrowUp", label: t("voLabel"), value: fmt(displaySurface.vo, 3), unit: "m/s" },
+          ].map((row, i, arr) => (
+            <div key={row.label} className={`flex items-center justify-between px-3 py-2 ${i < arr.length - 1 ? "border-b border-ink/10 dark:border-paper/10" : ""}`}>
+              <dt className="flex items-center gap-2 text-[13px] text-ink/70 dark:text-paper/70">
+                <Icon name={row.icon} size={13} className="text-accent" />
+                {row.label}
+              </dt>
+              <dd className="m-0 font-mono text-[15px] text-ink tabular-nums dark:text-paper">
+                {row.value} <span className="text-[12px] text-ink/50 dark:text-paper/50">{row.unit}</span>
+              </dd>
+            </div>
+          ))}
         </div>
 
-        <hr className="panel-divider" style={{ border: "none", borderTop: "1px solid rgba(226, 232, 240, 0.8)", margin: "16px 0" }} />
-        <h5 className="panel-section-title" style={{ margin: "0 0 12px", fontSize: "12px", fontWeight: "800", color: "#475569", textTransform: "uppercase", letterSpacing: "0.6px" }}>{t("verticalProfile")}</h5>
-        <div className="profile-chart-box" style={{ height: isExpanded ? "460px" : "270px", transition: "height 0.35s cubic-bezier(0.16, 1, 0.3, 1)", background: "rgba(255, 255, 255, 0.6)", borderRadius: "14px", padding: "8px", border: "1px solid #e2e8f0", boxShadow: "inset 0 2px 6px rgba(0, 0, 0, 0.02)", animation: "slideInUpFade 0.5s ease-out" }}>
+        <hr className="my-4 border-t border-ink/10 dark:border-paper/10" />
+        <h5 className={sectionTitle}>{t("verticalProfile")}</h5>
+        <div
+          className="rounded-lg border border-ink/10 p-2 dark:border-paper/10"
+          style={{ height: isExpanded ? "460px" : "270px", transition: "height 0.35s cubic-bezier(0.16, 1, 0.3, 1)" }}
+        >
           <TemperatureProfile
             selectedDepth={depth}
             profileData={chartProfileData}
@@ -425,7 +367,6 @@ export default function DataSidePanel({
             isExpanded={isExpanded}
           />
         </div>
-        </>
       </div>
     </div>
   );

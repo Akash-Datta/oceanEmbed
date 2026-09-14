@@ -2,10 +2,10 @@ import React, { useMemo, useEffect, useState } from "react";
 import { MapContainer, TileLayer, useMap, Polygon } from "react-leaflet";
 import GridOverlay from "./GridOverlay";
 import CustomDropdown from "./CustomDropdown";
+import Icon from "./icons";
 import { useLanguage } from "../context/LanguageContext";
 import { useTheme } from "../context/ThemeContext";
 import { getTileUrl } from "../utils/mapTiles";
-import { getPalette } from "../theme";
 import { checkIfLand, getWaterBodyName, parseAndTranslateApiSeaName } from "../utils/coordinateUtils";
 
 const formatDir = (val, isLat, t) => {
@@ -57,9 +57,8 @@ export default function AllHeatMapsDashboard({ gridData, date, onSelectParameter
   const { t } = useLanguage();
   const { isDark } = useTheme();
   const tileUrl = getTileUrl(isDark);
+  const maskColor = isDark ? "#132730" : "#F7F4ED";
 
-  // Shared theme palette (src/theme.js)
-  const pal = getPalette(isDark);
   const [spanDays, setSpanDays] = useState(7);
   const [seaFilter, setSeaFilter] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -84,7 +83,7 @@ export default function AllHeatMapsDashboard({ gridData, date, onSelectParameter
   const { startDateStr, endDateStr } = useMemo(() => {
     if (!date) return { startDateStr: "-", endDateStr: "-" };
     const endObj = new Date(date);
-    endObj.setHours(12, 0, 0, 0); 
+    endObj.setHours(12, 0, 0, 0);
     const startObj = new Date(endObj);
     startObj.setDate(endObj.getDate() - spanDays);
     return {
@@ -93,8 +92,8 @@ export default function AllHeatMapsDashboard({ gridData, date, onSelectParameter
     };
   }, [date, spanDays]);
 
-  useEffect(() => { 
-    setCurrentPage(1); 
+  useEffect(() => {
+    setCurrentPage(1);
     setSeaFilter(null);
   }, [gridData]);
 
@@ -131,7 +130,7 @@ export default function AllHeatMapsDashboard({ gridData, date, onSelectParameter
       if (cell.lng < mLng) mLng = cell.lng;
       if (cell.lng > mxLng) mxLng = cell.lng;
     });
-    
+
     const halfRes = activeResolution / 2;
     const gBounds = [[mLat - halfRes, mLng - halfRes], [mxLat + halfRes, mxLng + halfRes]];
     const pad = activeResolution * 1.5;
@@ -193,62 +192,59 @@ export default function AllHeatMapsDashboard({ gridData, date, onSelectParameter
     }
   }, [isGeneratingGrid, gridData, parameters.length]);
 
+  const chip = (active) =>
+    `cursor-pointer rounded-lg border px-2 py-[3px] text-[11px] font-bold transition-colors
+      ${active
+        ? "border-transparent bg-accent text-white dark:bg-accent"
+        : "border-ink/10 bg-paper text-accent hover:bg-ink/[0.06] dark:border-paper/15 dark:bg-paper/[0.05] dark:text-paper dark:hover:bg-paper/10"}`;
+
+  const th = "border-b-2 border-ink/10 p-2 font-bold dark:border-paper/10";
+  const td = "border-b border-ink/10 p-1.5 dark:border-paper/10";
+
   return (
-    <div className={`parameter-dashboard-page ${isDark ? "dash-dark" : "dash-light"}`} style={isMobile ? {
-      display: "flex", flexDirection: "column", gap: "8px", padding: "6px", flex: 1, 
-      height: "100%", minHeight: 0, 
-      boxSizing: "border-box", overflow: "hidden", background: pal.pageBg,
-    } : {
-      display: "flex", flexDirection: "row", gap: "16px", padding: "12px", flex: 1, minHeight: 0, height: "100%", boxSizing: "border-box", background: pal.pageBg,
-    }}>
-      
+    <div className={isMobile
+      ? "flex h-full min-h-0 flex-1 flex-col gap-2 overflow-hidden bg-paper p-1.5 dark:bg-ink"
+      : "flex h-full min-h-0 flex-1 flex-row gap-4 bg-paper p-3 dark:bg-ink"}>
       {/* MAPS AREA / CAROUSEL ON MOBILE */}
-      <div className="dashboard-map-area" style={isMobile ? {
-        flex: "0 0 calc(var(--app-vh, 1vh) * 35)", width: "100%", background: pal.mapAreaBg, padding: "6px", boxSizing: "border-box", position: "relative", borderRadius: "14px", overflow: "hidden", isolation: "isolate", transform: "translateZ(0)"
-      } : {
-        flex: "0 0 64%", background: pal.mapAreaBg, padding: "12px", boxSizing: "border-box", position: "relative", borderRadius: "14px", overflow: "hidden", isolation: "isolate", transform: "translateZ(0)"
-      }}>
-        
+      <div className={isMobile
+        ? "relative w-full flex-[0_0_35%] overflow-hidden rounded-lg bg-ink/[0.03] p-1.5 dark:bg-ink"
+        : "relative flex-[0_0_64%] overflow-hidden rounded-lg bg-ink/[0.03] p-3 dark:bg-ink"}>
+
         {(isGeneratingGrid || loadedMapsCount < parameters.length) && (
-          <div className="dash-loading-overlay" style={{ position: "absolute", inset: 0, zIndex: 9999, background: pal.loadingBg, backdropFilter: "blur(4px)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", borderRadius: "14px" }}>
-            <div className={isDark ? "ocean-spinner" : "spinner"}></div>
-            <div style={{ color: pal.loadingText, marginTop: "12px", fontWeight: "bold" }}>{t("optimizingView") || "Optimizing High-Res Grid..."}</div>
+          <div className="absolute inset-0 z-modal flex flex-col items-center justify-center rounded-lg bg-ink/[0.03]/90 backdrop-blur-sm dark:bg-ink/95">
+            <div className="h-8 w-8 animate-spin rounded-full border-[3px] border-ink/10 border-t-accent dark:border-paper/15 dark:border-t-paper" />
+            <div className="mt-3 font-bold text-accent dark:text-paper">{t("optimizingView") || "Optimizing High-Res Grid..."}</div>
           </div>
         )}
 
         {isMobile ? (
-          <div className="mini-map-card" style={{ padding: 0, overflow: "hidden", background: pal.miniBg, display: "flex", flexDirection: "column", height: "100%", position: "relative", borderRadius: "12px", border: pal.cardBorder, boxShadow: isDark ? "0 0 20px rgba(168,85,247,0.25)" : "0 4px 12px rgba(0,0,0,0.06)" }}>
-            <div className="mini-map-header" onClick={() => onSelectParameter(parameters[currentMapIndex].id)} style={{ padding: "6px 40px", textAlign: "center", flexShrink: 0, fontWeight: "800", fontSize: "12px", cursor: "pointer", color: isDark ? "#ffffff" : "#0369a1", background: isDark ? "linear-gradient(135deg, #7c3aed, #d946ef)" : "#f8fafc", borderBottom: pal.cardBorder }}>
-              {parameters[currentMapIndex].label} ➔
-            </div>
-            
-            {/* Clickable map wrapper to redirect to parameter dashboard */}
-            <div 
-              onClick={() => onSelectParameter(parameters[currentMapIndex].id)} 
-              style={{ flex: 1, position: "relative", background: pal.miniBg, width: "100%", overflow: "hidden", cursor: "pointer" }}
+          <div className="flex h-full flex-col overflow-hidden rounded-lg border border-ink/10 bg-paper dark:border-paper/10 dark:bg-paper/[0.05] dark:shadow-none">
+            <div
+              className="shrink-0 cursor-pointer border-b border-ink/10 bg-ink/[0.03] px-10 py-1.5 text-center text-[12px] font-bold text-accent dark:border-paper/10 dark:bg-transparent dark:text-paper"
+              onClick={() => onSelectParameter(parameters[currentMapIndex].id)}
             >
-              <MapContainer preferCanvas={true} center={[centerLat, centerLng]} zoomSnap={0} zoomControl={false} dragging={false} scrollWheelZoom={false} doubleClickZoom={false} touchZoom={false} attributionControl={false} style={{ position: "absolute", inset: 0, backgroundColor: pal.miniBg }}>
+              {parameters[currentMapIndex].label} →
+            </div>
+
+            {/* Clickable map wrapper to redirect to parameter dashboard */}
+            <div
+              onClick={() => onSelectParameter(parameters[currentMapIndex].id)}
+              className="relative w-full flex-1 cursor-pointer overflow-hidden bg-paper dark:bg-ink"
+            >
+              <MapContainer preferCanvas={true} center={[centerLat, centerLng]} zoomSnap={0} zoomControl={false} dragging={false} scrollWheelZoom={false} doubleClickZoom={false} touchZoom={false} attributionControl={false} style={{ position: "absolute", inset: 0, backgroundColor: isDark ? "#132730" : "#F7F4ED" }}>
                 <TileLayer noWrap={true} url={tileUrl} />
-                <MaskHole bounds={gridBounds} color={pal.maskColor} />
+                <MaskHole bounds={gridBounds} color={maskColor} />
                 {!isGeneratingGrid && <GridOverlay gridData={miniGridData} parameter={parameters[currentMapIndex].id} resolution={miniResolution} showTooltip={false} />}
                 <MiniMapController gridBounds={gridBounds} paddedBounds={paddedBounds} />
               </MapContainer>
 
               {/* Styled Left Arrow Button */}
               {currentMapIndex > 0 && (
-                <button 
+                <button
                   type="button"
                   onClick={(e) => { e.stopPropagation(); setCurrentMapIndex(prev => prev - 1); }}
-                  style={{
-                    position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)",
-                    zIndex: 10000, width: "38px", height: "38px", borderRadius: "50%",
-                    background: "rgba(15, 23, 42, 0.88)", backdropFilter: "blur(8px)",
-                    color: "#ffffff", border: "1px solid rgba(255,255,255,0.25)",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: "24px", fontWeight: "800", cursor: "pointer",
-                    boxShadow: "0 6px 20px rgba(0,0,0,0.35)", transition: "transform 0.15s ease"
-                  }}
-                  title="Previous Map"
+                  aria-label="Previous map"
+                  className="oe-focus-visible absolute left-2.5 top-1/2 z-[10000] flex h-[38px] w-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-white/25 bg-ink/90 text-[24px] font-bold text-white shadow-lift backdrop-blur"
                 >
                   ‹
                 </button>
@@ -256,45 +252,37 @@ export default function AllHeatMapsDashboard({ gridData, date, onSelectParameter
 
               {/* Styled Right Arrow Button */}
               {currentMapIndex < parameters.length - 1 && (
-                <button 
+                <button
                   type="button"
                   onClick={(e) => { e.stopPropagation(); setCurrentMapIndex(prev => prev + 1); }}
-                  style={{
-                    position: "absolute", right: "10px", top: "50%", transform: "translateY(-50%)",
-                    zIndex: 10000, width: "38px", height: "38px", borderRadius: "50%",
-                    background: "rgba(15, 23, 42, 0.88)", backdropFilter: "blur(8px)",
-                    color: "#ffffff", border: "1px solid rgba(255,255,255,0.25)",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: "24px", fontWeight: "800", cursor: "pointer",
-                    boxShadow: "0 6px 20px rgba(0,0,0,0.35)", transition: "transform 0.15s ease"
-                  }}
-                  title="Next Map"
+                  aria-label="Next map"
+                  className="oe-focus-visible absolute right-2.5 top-1/2 z-[10000] flex h-[38px] w-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-white/25 bg-ink/90 text-[24px] font-bold text-white shadow-lift backdrop-blur"
                 >
                   ›
                 </button>
               )}
             </div>
-            
+
             {/* Indicator Dots & Count */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "6px 12px", background: pal.dotsBg, borderTop: pal.cardBorder, flexShrink: 0 }}>
-              <span style={{ fontSize: "10px", fontWeight: "700", color: pal.muted }}>{currentMapIndex + 1} / {parameters.length}</span>
-              <div style={{ display: "flex", gap: "5px" }}>
+            <div className="flex shrink-0 items-center justify-between border-t border-ink/10 bg-ink/[0.03] px-3 py-1.5 dark:border-paper/10 dark:bg-paper/[0.05]">
+              <span className="text-[10px] font-bold text-ink/60 dark:text-paper/60">{currentMapIndex + 1} / {parameters.length}</span>
+              <div className="flex gap-1">
                 {parameters.map((_, idx) => (
-                  <span key={idx} style={{ width: idx === currentMapIndex ? "16px" : "5px", height: "5px", borderRadius: "3px", background: idx === currentMapIndex ? (isDark ? "#d946ef" : "#0284c7") : (isDark ? "#4c2a85" : "#cbd5e1"), transition: "all 0.2s" }} />
+                  <span key={idx} className={`h-[5px] rounded-full ${idx === currentMapIndex ? "w-4 bg-accent" : "w-[5px] bg-ink/20 dark:bg-paper/20"}`} />
                 ))}
               </div>
             </div>
           </div>
         ) : (
-          <div className="all-maps-grid">
+          <div className="grid h-full grid-cols-2 grid-rows-3 gap-3">
             {parameters.map((param, index) => (
-              <div key={param.id} className="mini-map-card" onClick={() => onSelectParameter(param.id)} style={{ padding: 0, overflow: "hidden", background: pal.miniBg, display: "flex", flexDirection: "column", cursor: "pointer" }}>
-                <div className="mini-map-header" style={{ padding: "8px", flexShrink: 0 }}>{param.label}</div>
-                <div style={{ flex: 1, position: "relative", background: pal.miniBg, width: "100%" }}>
+              <div key={param.id} onClick={() => onSelectParameter(param.id)} className="flex cursor-pointer flex-col overflow-hidden rounded-lg border border-ink/10 bg-paper transition-transform hover:-translate-y-0.5 dark:border-paper/10 dark:bg-paper/[0.05] dark:shadow-none">
+                <div className="shrink-0 p-2 text-[12px] font-bold text-accent dark:text-paper">{param.label}</div>
+                <div className="relative w-full flex-1 bg-paper dark:bg-ink">
                   {index < loadedMapsCount && (
-                    <MapContainer preferCanvas={true} center={[centerLat, centerLng]} zoomSnap={0} zoomControl={false} dragging={false} scrollWheelZoom={false} doubleClickZoom={false} touchZoom={false} attributionControl={false} style={{ position: "absolute", inset: 0, backgroundColor: pal.miniBg }}>
+                    <MapContainer preferCanvas={true} center={[centerLat, centerLng]} zoomSnap={0} zoomControl={false} dragging={false} scrollWheelZoom={false} doubleClickZoom={false} touchZoom={false} attributionControl={false} style={{ position: "absolute", inset: 0, backgroundColor: isDark ? "#132730" : "#F7F4ED" }}>
                       <TileLayer noWrap={true} url={tileUrl} />
-                      <MaskHole bounds={gridBounds} color={pal.maskColor} />
+                      <MaskHole bounds={gridBounds} color={maskColor} />
                       {!isGeneratingGrid && <GridOverlay gridData={miniGridData} parameter={param.id} resolution={miniResolution} showTooltip={false} />}
                       <MiniMapController gridBounds={gridBounds} paddedBounds={paddedBounds} />
                     </MapContainer>
@@ -302,70 +290,65 @@ export default function AllHeatMapsDashboard({ gridData, date, onSelectParameter
                 </div>
               </div>
             ))}
+            {/* 6th cell: live badge */}
+            <div className="flex items-center justify-center rounded-lg border border-dashed border-ink/20 bg-ink/[0.02] p-2 text-center dark:border-paper/20 dark:bg-paper/[0.03]">
+              <span className={`oe-live-badge ${isGeneratingGrid ? "is-fallback" : isGridLive ? "is-live" : "is-fallback"}`}>
+                {isGeneratingGrid ? "◌ Loading grid…" : isGridLive ? "● Live · model heatmaps" : "○ Synthetic grid"}
+              </span>
+            </div>
           </div>
         )}
       </div>
 
       {/* DATA SIDE PANEL */}
-      <div className="dashboard-data-area custom-scrollbar" style={isMobile ? {
-        position: "relative", display: "flex", flexDirection: "column", flex: 1, minHeight: 0, width: "100%", overflow: "hidden", 
-        paddingRight: "2px"
-      } : {
-        position: "relative", display: "flex", flexDirection: "column", flex: "1", minWidth: 0, height: "100%", overflowY: "auto"
-      }}>
+      <div className={isMobile
+        ? "relative flex min-h-0 w-full flex-1 flex-col overflow-hidden pr-0.5"
+        : "relative flex h-full min-w-0 flex-1 flex-col overflow-y-auto"}>
 
-        <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: "10px", marginBottom: "6px", flexShrink: 0 }}>
-          <span
-            style={{
-              fontSize: "9px", fontWeight: 800, letterSpacing: "0.6px", textTransform: "uppercase",
-              padding: "3px 9px", borderRadius: "999px",
-              color: isGridLive ? "#065f46" : "#92400e",
-              background: isGridLive ? "rgba(16,185,129,0.15)" : "rgba(245,158,11,0.15)",
-              border: `1px solid ${isGridLive ? "rgba(16,185,129,0.4)" : "rgba(245,158,11,0.4)"}`,
-            }}
-          >
+        <div className="mb-1.5 flex shrink-0 items-center justify-end gap-2.5">
+          <span className={`oe-live-badge ${isGeneratingGrid ? "is-fallback" : isGridLive ? "is-live" : "is-fallback"}`}>
             {isGeneratingGrid ? "◌ Loading grid…" : isGridLive ? "● Live · model heatmaps" : "○ Synthetic grid"}
           </span>
-          <button className="heatmap-action-btn fill" onClick={onBack}>{t("back") || "Back to Map"}</button>
+          <button
+            type="button"
+            onClick={onBack}
+            className="oe-focus-visible rounded-lg bg-accent px-4 py-2 text-[13px] font-semibold text-white transition-colors hover:brightness-95"
+          >
+            {t("back") || "Back to Map"}
+          </button>
         </div>
 
-        <div className="dash-water-card" style={{ background: pal.cardBg, padding: "8px 10px", borderRadius: "10px", border: pal.cardBorder, marginBottom: "6px", flexShrink: 0 }}>
-          <span style={{ fontSize: "10px", color: pal.labelBlue, fontWeight: "800", textTransform: "uppercase" }}>{t("coveredWaterBodies") || "Water Bodies"} ({t("clickToFilter") || "Click to filter table"})</span>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "5px", marginTop: "6px" }}>
-            <span 
-              onClick={() => { setSeaFilter(null); setCurrentPage(1); }}
-              style={{ cursor: "pointer", background: seaFilter === null ? pal.chipOn : pal.chipOff, color: seaFilter === null ? "#ffffff" : pal.chipOffText, padding: "3px 8px", borderRadius: "6px", fontSize: "11px", fontWeight: "700", border: pal.cardBorder, transition: "all 0.2s ease" }}
-            >
-              🌍 {t("all") || "All"}
+        <div className="mb-1.5 shrink-0 rounded-lg border border-ink/10 bg-ink/[0.03] px-2.5 py-2 dark:border-paper/20 dark:bg-paper/[0.04]">
+          <span className="text-[10px] font-bold text-accent dark:text-paper">{t("coveredWaterBodies") || "Water Bodies"} ({t("clickToFilter") || "Click to filter table"})</span>
+          <div className="mt-1.5 flex flex-wrap gap-1">
+            <span onClick={() => { setSeaFilter(null); setCurrentPage(1); }} className={chip(seaFilter === null)}>
+              <span className="mr-1 inline-flex align-[-2px]"><Icon name="globe" size={12} /></span>{t("all") || "All"}
             </span>
             {waterBodiesArray.map((sea, idx) => (
-              <span 
-                key={idx} 
-                onClick={() => { setSeaFilter(sea === seaFilter ? null : sea); setCurrentPage(1); }}
-                style={{ cursor: "pointer", background: seaFilter === sea ? pal.chipOn : pal.chipOff, color: seaFilter === sea ? "#ffffff" : pal.chipOffText, padding: "3px 8px", borderRadius: "6px", fontSize: "11px", fontWeight: "700", border: pal.cardBorder, transition: "all 0.2s ease" }}
-              >
-                🌊 {sea}
+              <span key={idx} onClick={() => { setSeaFilter(sea === seaFilter ? null : sea); setCurrentPage(1); }} className={chip(seaFilter === sea)}>
+                <span className="mr-1 inline-flex align-[-2px]"><Icon name="waves" size={12} /></span>{sea}
               </span>
             ))}
           </div>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px", marginBottom: "6px", flexShrink: 0 }}>
+        <div className="mb-1.5 grid shrink-0 grid-cols-2 gap-1.5">
           {parameters.map((p) => (
-            <div key={p.id} className="dash-avg-card" style={{ background: pal.avgBg, padding: "5px 10px", borderRadius: "8px", border: pal.avgBorder }}>
-              <span style={{ fontSize: "8.5px", color: pal.muted, fontWeight: "800", textTransform: "uppercase" }}>{p.id.toUpperCase()} {seaFilter ? `${seaFilter} Avg` : "Avg"}</span>
-              <div style={{ fontSize: "13px", fontWeight: "900", color: pal.textAccent }}>{averages[p.id]}</div>
+            <div key={p.id} className="rounded-lg border border-ink/10 bg-ink/[0.03] px-2.5 py-1 dark:border-paper/10 dark:bg-paper/[0.05]">
+              <span className="text-[11px] font-semibold text-ink/60 dark:text-paper/60">{p.id.toUpperCase()} {seaFilter ? `${seaFilter} Avg` : "Avg"}</span>
+              <div className="text-[13px] font-bold text-accent dark:text-paper">{averages[p.id]}</div>
             </div>
           ))}
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "4px", padding: "0 2px", flexShrink: 0 }}>
-          <h4 style={{ margin: 0, fontSize: "11px", fontWeight: "800", color: pal.labelBlue, textTransform: "uppercase", letterSpacing: "0.5px" }}>
-            📊 {seaFilter ? `${seaFilter} ${t("matrix") || "Matrix"}` : (t("regionalGridDataMatrix") || "Regional Grid Data Matrix")}
+        <div className="mb-1 flex shrink-0 items-center justify-between px-0.5">
+          <h4 className="m-0 flex items-center gap-1 text-[11px] font-bold text-accent dark:text-paper">
+            <Icon name="grid" size={13} />
+            {seaFilter ? `${seaFilter} ${t("matrix") || "Matrix"}` : (t("regionalGridDataMatrix") || "Regional Grid Data Matrix")}
           </h4>
-          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-            <span style={{ fontSize: "10px", fontWeight: "700", color: pal.muted }}>{t("timeSpan") || "Time Span"}:</span>
-            <div style={{ minWidth: "130px" }}>
+          <div className="flex items-center gap-1.5">
+            <span className="text-[10px] font-bold text-ink/60 dark:text-paper/60">{t("timeSpan") || "Time Span"}:</span>
+            <div className="min-w-[130px]">
               <CustomDropdown
                 value={String(spanDays)}
                 placeholder={t("timeSpan") || "Time Span"}
@@ -382,23 +365,21 @@ export default function AllHeatMapsDashboard({ gridData, date, onSelectParameter
           </div>
         </div>
 
-        <div className="custom-scrollbar dash-table-wrap" style={isMobile ? {
-          flex: 1, minHeight: 0, overflowX: "auto", overflowY: "auto", border: `1px solid ${pal.tableBorder}`, borderTopLeftRadius: "10px", borderTopRightRadius: "10px", borderBottomLeftRadius: totalPages > 1 ? 0 : "10px", borderBottomRightRadius: totalPages > 1 ? 0 : "10px", position: "relative", WebkitOverflowScrolling: "touch", paddingRight: "8px", background: pal.rowA,
-        } : {
-          flex: 1, minHeight: "220px", overflowX: "auto", overflowY: "auto", border: `1px solid ${pal.tableBorder}`, borderTopLeftRadius: "10px", borderTopRightRadius: "10px", position: "relative", background: pal.rowA,
-        }}>
-          <table className="dash-table" style={{ width: "100%", borderCollapse: "collapse", fontSize: "12px", minWidth: "700px" }}>
-            <thead style={{ position: "sticky", top: 0, background: pal.theadBg, zIndex: 10 }}>
-              <tr>
-                <th style={{ padding: "8px", borderBottom: `2px solid ${pal.tableBorder}`, color: pal.muted, fontWeight: "700", textAlign: "left", width: "200px" }}>{t("gridCorners") || "Grid Corners"}</th>
-                <th style={{ padding: "8px", borderBottom: `2px solid ${pal.tableBorder}`, color: pal.muted, fontWeight: "700", textAlign: "left" }}>{t("startDate") || "Start Date"}</th>
-                <th style={{ padding: "8px", borderBottom: `2px solid ${pal.tableBorder}`, color: pal.muted, fontWeight: "700", textAlign: "left" }}>{t("endDate") || "End Date"}</th>
-                <th style={{ padding: "8px", borderBottom: `2px solid ${pal.tableBorder}`, color: pal.muted, fontWeight: "700", textAlign: "center" }}>SST</th>
-                <th style={{ padding: "8px", borderBottom: `2px solid ${pal.tableBorder}`, color: pal.muted, fontWeight: "700", textAlign: "center" }}>SSH</th>
-                <th style={{ padding: "8px", borderBottom: `2px solid ${pal.tableBorder}`, color: pal.muted, fontWeight: "700", textAlign: "center" }}>SSS</th>
-                <th style={{ padding: "8px", borderBottom: `2px solid ${pal.tableBorder}`, color: pal.muted, fontWeight: "700", textAlign: "center" }}>SSCU</th>
-                <th style={{ padding: "8px", borderBottom: `2px solid ${pal.tableBorder}`, color: pal.muted, fontWeight: "700", textAlign: "center" }}>SSCV</th>
-                <th style={{ padding: "8px", borderBottom: `2px solid ${pal.tableBorder}`, color: pal.muted, fontWeight: "700", textAlign: "right" }}>{t("waterBody") || "Water Body"}</th>
+        <div className={isMobile
+          ? "relative min-h-0 flex-1 overflow-auto rounded-t-[10px] border border-ink/10 bg-paper pr-2 dark:border-paper/10 dark:bg-paper/[0.05]"
+          : "relative min-h-[220px] flex-1 overflow-auto rounded-t-[10px] border border-ink/10 bg-paper dark:border-paper/10 dark:bg-paper/[0.05]"}>
+          <table className="w-full min-w-[700px] border-collapse text-[12px]">
+            <thead className="sticky top-0 z-[10] bg-ink/[0.03] dark:bg-ink">
+              <tr className="text-left text-ink/60 dark:text-paper/60">
+                <th className={`${th} w-[200px] font-bold`}>{t("gridCorners") || "Grid Corners"}</th>
+                <th className={`${th} font-bold`}>{t("startDate") || "Start Date"}</th>
+                <th className={`${th} font-bold`}>{t("endDate") || "End Date"}</th>
+                <th className={`${th} text-center font-bold`}>SST</th>
+                <th className={`${th} text-center font-bold`}>SSH</th>
+                <th className={`${th} text-center font-bold`}>SSS</th>
+                <th className={`${th} text-center font-bold`}>SSCU</th>
+                <th className={`${th} text-center font-bold`}>SSCV</th>
+                <th className={`${th} text-right font-bold`}>{t("waterBody") || "Water Body"}</th>
               </tr>
             </thead>
             {(!isGeneratingGrid && loadedMapsCount >= parameters.length) && filteredGridData && (
@@ -409,23 +390,23 @@ export default function AllHeatMapsDashboard({ gridData, date, onSelectParameter
                   const corners = getGridCorners(row.lat, row.lng, activeResolution, t);
 
                   return (
-                    <tr key={idx} style={{ background: idx % 2 === 0 ? pal.rowA : pal.rowB }}>
-                      <td style={{ padding: "6px 8px", borderBottom: `1px solid ${pal.tableBorder}`, whiteSpace: "nowrap" }}>
-                        <div style={{ display: "grid", gridTemplateColumns: "max-content max-content", gap: "2px 8px", fontSize: "8.5px", color: pal.muted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: "-0.2px" }}>
-                           <span><b style={{opacity: 0.5, fontWeight: 800}}>{t("dirNW") || "NW"}</b> {corners.nw.lat}, {corners.nw.lng}</span>
-                           <span><b style={{opacity: 0.5, fontWeight: 800}}>{t("dirNE") || "NE"}</b> {corners.ne.lat}, {corners.ne.lng}</span>
-                           <span><b style={{opacity: 0.5, fontWeight: 800}}>{t("dirSW") || "SW"}</b> {corners.sw.lat}, {corners.sw.lng}</span>
-                           <span><b style={{opacity: 0.5, fontWeight: 800}}>{t("dirSE") || "SE"}</b> {corners.se.lat}, {corners.se.lng}</span>
+                    <tr key={idx} className={idx % 2 === 0 ? "bg-paper dark:bg-paper/[0.05]" : "bg-ink/[0.03] dark:bg-paper/[0.02]"}>
+                      <td className={`${td} whitespace-nowrap`}>
+                        <div className="grid grid-cols-[max-content_max-content] gap-x-2 gap-y-0.5 font-mono text-[8.5px] tracking-tight text-ink/60 dark:text-paper/60">
+                           <span><b className="font-bold opacity-50">{t("dirNW") || "NW"}</b> {corners.nw.lat}, {corners.nw.lng}</span>
+                           <span><b className="font-bold opacity-50">{t("dirNE") || "NE"}</b> {corners.ne.lat}, {corners.ne.lng}</span>
+                           <span><b className="font-bold opacity-50">{t("dirSW") || "SW"}</b> {corners.sw.lat}, {corners.sw.lng}</span>
+                           <span><b className="font-bold opacity-50">{t("dirSE") || "SE"}</b> {corners.se.lat}, {corners.se.lng}</span>
                         </div>
                       </td>
-                      <td style={{ padding: "6px 8px", borderBottom: `1px solid ${pal.tableBorder}`, whiteSpace: "nowrap", fontSize: "11px", color: pal.muted }}>{startDateStr}</td>
-                      <td style={{ padding: "6px 8px", borderBottom: `1px solid ${pal.tableBorder}`, whiteSpace: "nowrap", fontSize: "11px", color: pal.muted }}>{endDateStr}</td>
-                      <td style={{ padding: "6px 8px", borderBottom: `1px solid ${pal.tableBorder}`, textAlign: "center", color: pal.textMain }}>{row.sst}</td>
-                      <td style={{ padding: "6px 8px", borderBottom: `1px solid ${pal.tableBorder}`, textAlign: "center", color: pal.textMain }}>{row.ssh}</td>
-                      <td style={{ padding: "6px 8px", borderBottom: `1px solid ${pal.tableBorder}`, textAlign: "center", color: pal.textMain }}>{row.sss}</td>
-                      <td style={{ padding: "6px 8px", borderBottom: `1px solid ${pal.tableBorder}`, textAlign: "center", color: pal.textMain }}>{row.sscu}</td>
-                      <td style={{ padding: "6px 8px", borderBottom: `1px solid ${pal.tableBorder}`, textAlign: "center", color: pal.textMain }}>{row.sscv}</td>
-                      <td style={{ padding: "6px 8px", borderBottom: `1px solid ${pal.tableBorder}`, color: isLand ? pal.muted : pal.textAccent, fontWeight: "600", whiteSpace: "nowrap", fontSize: "11px", textAlign: "right" }}>{rowWaterBody}</td>
+                      <td className={`${td} whitespace-nowrap text-[11px] text-ink/60 dark:text-paper/60`}>{startDateStr}</td>
+                      <td className={`${td} whitespace-nowrap text-[11px] text-ink/60 dark:text-paper/60`}>{endDateStr}</td>
+                      <td className={`${td} text-center text-ink dark:text-paper`}>{row.sst}</td>
+                      <td className={`${td} text-center text-ink dark:text-paper`}>{row.ssh}</td>
+                      <td className={`${td} text-center text-ink dark:text-paper`}>{row.sss}</td>
+                      <td className={`${td} text-center text-ink dark:text-paper`}>{row.sscu}</td>
+                      <td className={`${td} text-center text-ink dark:text-paper`}>{row.sscv}</td>
+                      <td className={`${td} whitespace-nowrap text-right text-[11px] font-semibold ${isLand ? "text-ink/60 dark:text-paper/60" : "text-accent dark:text-paper"}`}>{rowWaterBody}</td>
                     </tr>
                   );
                 })}
@@ -435,10 +416,10 @@ export default function AllHeatMapsDashboard({ gridData, date, onSelectParameter
         </div>
 
         {(!isGeneratingGrid && loadedMapsCount >= parameters.length) && totalPages > 1 && (
-          <div className="dash-pager" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "6px 12px", background: pal.dotsBg, border: `1px solid ${pal.tableBorder}`, borderTop: "none", borderBottomLeftRadius: "10px", borderBottomRightRadius: "10px", flexShrink: 0, marginTop: "0px" }}>
-            <button className="heatmap-action-btn outline" style={{ padding: "4px 10px", fontSize: "11px", minHeight: "auto", opacity: currentPage === 1 ? 0.5 : 1, cursor: currentPage === 1 ? "not-allowed" : "pointer" }} disabled={currentPage === 1} onClick={() => setCurrentPage(p => Math.max(1, p - 1))}>Previous</button>
-            <span style={{ fontSize: "11px", fontWeight: "700", color: pal.muted }}>Page {currentPage} of {totalPages}</span>
-            <button className="heatmap-action-btn outline" style={{ padding: "4px 10px", fontSize: "11px", minHeight: "auto", opacity: currentPage === totalPages ? 0.5 : 1, cursor: currentPage === totalPages ? "not-allowed" : "pointer" }} disabled={currentPage === totalPages} onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}>Next</button>
+          <div className="flex shrink-0 items-center justify-between rounded-b-[10px] border border-t-0 border-ink/10 bg-ink/[0.03] px-3 py-1.5 dark:border-paper/10 dark:bg-paper/[0.05]">
+            <button type="button" disabled={currentPage === 1} onClick={() => setCurrentPage(p => Math.max(1, p - 1))} className="oe-focus-visible rounded-lg border border-accent px-2.5 py-1 text-[11px] text-accent disabled:cursor-not-allowed disabled:opacity-50 dark:border-paper/20 dark:text-paper">Previous</button>
+            <span className="text-[11px] font-bold text-ink/60 dark:text-paper/60">Page {currentPage} of {totalPages}</span>
+            <button type="button" disabled={currentPage === totalPages} onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} className="oe-focus-visible rounded-lg border border-accent px-2.5 py-1 text-[11px] text-accent disabled:cursor-not-allowed disabled:opacity-50 dark:border-paper/20 dark:text-paper">Next</button>
           </div>
         )}
       </div>

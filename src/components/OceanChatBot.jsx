@@ -1,8 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useTheme } from "../context/ThemeContext";
 import { useLanguage } from "../context/LanguageContext";
+import Icon from "./icons";
 import { sendOceanChat } from "../utils/oceanChat";
-import { getPalette } from "../theme";
 
 const SUGGESTIONS = [
   "What is sea surface temperature?",
@@ -12,7 +11,6 @@ const SUGGESTIONS = [
 ];
 
 export default function OceanChatBot() {
-  const { isDark } = useTheme();
   const { t } = useLanguage();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([]);
@@ -80,132 +78,27 @@ export default function OceanChatBot() {
     }
   };
 
-  // Shared theme palette (src/theme.js)
-  const pal = getPalette(isDark);
-
-  const waveBlue =
-    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='20' viewBox='0 0 56 20'%3E%3Cpath d='M0,10 Q7,0 14,10 T28,10 T42,10 T56,10 V20 H0 Z' fill='%233B82F6'/%3E%3C/svg%3E";
-  const waveMagenta =
-    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='20' viewBox='0 0 56 20'%3E%3Cpath d='M0,10 Q7,0 14,10 T28,10 T42,10 T56,10 V20 H0 Z' fill='%23E879F9'/%3E%3C/svg%3E";
-  const waveTeal =
-    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='20' viewBox='0 0 56 20'%3E%3Cpath d='M0,10 Q7,0 14,10 T28,10 T42,10 T56,10 V20 H0 Z' fill='%232DD4BF'/%3E%3C/svg%3E";
-  const waveBlend = isDark ? "screen" : "multiply";
-
   return (
     <>
-      <style>{`
-        @keyframes chatFabPulse {
-          0% { box-shadow: 0 0 0 0 rgba(34, 211, 238, 0.5); }
-          70% { box-shadow: 0 0 0 14px rgba(34, 211, 238, 0); }
-          100% { box-shadow: 0 0 0 0 rgba(34, 211, 238, 0); }
-        }
-        @keyframes chatFabSlide {
-          from { transform: translateX(0); }
-          to { transform: translateX(-56px); }
-        }
-        @keyframes chatFabBob {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-2px); }
-        }
-        @keyframes chatPanelPop {
-          from { opacity: 0; transform: translateY(16px) scale(0.97); }
-          to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        @keyframes chatDotBounce {
-          0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
-          30% { transform: translateY(-5px); opacity: 1; }
-        }
-        .chat-fab-wave {
-          position: absolute;
-          left: 0;
-          top: 50%;
-          width: 200%;
-          height: 30px;
-          margin-top: -15px;
-          background-repeat: repeat-x;
-          background-size: 56px 30px;
-          background-position: 0 0;
-          animation: chatFabSlide 3.6s linear infinite;
-        }
-        .chat-fab-wave.chat-fab-w2 {
-          height: 26px;
-          margin-top: -19px;
-          background-size: 56px 26px;
-          animation-duration: 6.4s;
-          animation-direction: reverse;
-        }
-        .chat-fab-wave.chat-fab-w3 {
-          height: 24px;
-          margin-top: -5px;
-          background-size: 56px 24px;
-          animation-duration: 5.1s;
-        }
-        .chat-thinking-dot {
-          width: 7px; height: 7px; border-radius: 50%;
-          background: currentColor;
-          animation: chatDotBounce 1.2s ease-in-out infinite;
-        }
-        .chat-thinking-dot:nth-child(2) { animation-delay: 0.15s; }
-        .chat-thinking-dot:nth-child(3) { animation-delay: 0.3s; }
-      `}</style>
-
       {open && (
         <div
-          style={{
-            position: "fixed",
-            right: "16px",
-            bottom: "84px",
-            zIndex: 60000,
-            width: "min(380px, calc(100vw - 32px))",
-            height: "min(540px, calc(100dvh - 180px))",
-            minHeight: "380px",
-            display: "flex",
-            flexDirection: "column",
-            overflow: "hidden",
-            borderRadius: "18px",
-            background: pal.panelBg,
-            border: pal.panelBorder,
-            boxShadow: isDark
-              ? "0 0 32px rgba(168, 85, 247, 0.4), 0 24px 60px rgba(0,0,0,0.6)"
-              : "0 24px 60px rgba(2, 132, 199, 0.25)",
-            backdropFilter: "blur(18px)",
-            animation: "chatPanelPop 0.25s cubic-bezier(0.16, 1, 0.3, 1)",
-            fontFamily: "Inter, Arial, sans-serif",
-          }}
+          role="dialog"
+          aria-modal="false"
+          aria-label={title}
+          className="fixed bottom-[84px] right-4 z-modal flex min-h-[380px] w-[min(380px,calc(100vw-32px))] flex-col overflow-hidden rounded-lg border font-sans
+            border-ink/10 bg-paper/95 shadow-lift backdrop-blur-lg
+            dark:border-paper/20 dark:bg-ink/95 dark:shadow-none"
+          style={{ height: "min(540px, calc(100dvh - 180px))" }}
         >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              padding: "12px 14px",
-              background: pal.headerBg,
-              flexShrink: 0,
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-              <span style={{ fontSize: "22px" }}>🌊</span>
+          <div className="flex shrink-0 items-center justify-between bg-accent px-3.5 py-3">
+            <div className="flex items-center gap-2.5">
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/15 text-white">
+                <Icon name="waves" size={16} />
+              </span>
               <div>
-                <div style={{ fontWeight: 800, fontSize: "14px", color: pal.titleColor }}>{title}</div>
-                <div
-                  style={{
-                    fontSize: "10px",
-                    fontWeight: 700,
-                    color: pal.subColor,
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "5px",
-                  }}
-                >
-                  <span
-                    style={{
-                      width: "7px",
-                      height: "7px",
-                      borderRadius: "50%",
-                      background: "#22c55e",
-                      boxShadow: "0 0 6px #22c55e",
-                    }}
-                  />
+                <div className="font-display text-[15px] font-bold text-white">{title}</div>
+                <div className="flex items-center gap-1.5 text-[11px] text-white/80">
+                  <span className="h-[6px] w-[6px] rounded-full bg-white" />
                   {subtitle}
                 </div>
               </div>
@@ -214,83 +107,44 @@ export default function OceanChatBot() {
               type="button"
               onClick={() => setOpen(false)}
               title="Close"
-              style={{
-                width: "30px",
-                height: "30px",
-                borderRadius: "50%",
-                border: "1px solid rgba(255,255,255,0.35)",
-                background: "rgba(255,255,255,0.15)",
-                color: "#fff",
-                fontSize: "15px",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+              aria-label="Close chat"
+              className="oe-focus-visible flex h-[30px] w-[30px] items-center justify-center rounded-lg bg-white/15 text-white hover:bg-white/25"
             >
-              ×
+              <Icon name="close" size={13} />
             </button>
           </div>
 
           <div
             ref={scrollRef}
-            style={{ flex: 1, overflowY: "auto", padding: "12px", display: "flex", flexDirection: "column", gap: "8px" }}
+            className="flex flex-1 flex-col gap-2 overflow-y-auto p-3"
+            aria-live="polite"
           >
             {messages.map((m, i) => (
               <div
                 key={i}
-                style={{
-                  alignSelf: m.role === "user" ? "flex-end" : "flex-start",
-                  maxWidth: "85%",
-                  padding: "9px 12px",
-                  borderRadius: m.role === "user" ? "14px 14px 4px 14px" : "14px 14px 14px 4px",
-                  background: m.role === "user" ? pal.userBg : pal.botBg,
-                  border: m.role === "user" ? "none" : pal.botBorder,
-                  color: m.role === "user" ? "#fff" : pal.botColor,
-                  fontSize: "13px",
-                  lineHeight: 1.55,
-                  whiteSpace: "pre-wrap",
-                  wordBreak: "break-word",
-                }}
+                className={m.role === "user"
+                  ? "max-w-[85%] self-end rounded-lg rounded-br bg-accent px-3 py-2 text-[13px] leading-relaxed text-white "
+                  : "max-w-[85%] self-start whitespace-pre-wrap break-words rounded-lg rounded-bl border border-ink/10 bg-ink/[0.04] px-3 py-2 text-[13px] leading-relaxed text-ink dark:border-paper/10 dark:bg-paper/[0.05] dark:text-paper"}
               >
                 {m.content}
               </div>
             ))}
             {thinking && (
-              <div
-                style={{
-                  alignSelf: "flex-start",
-                  padding: "12px 14px",
-                  borderRadius: "14px 14px 14px 4px",
-                  background: pal.botBg,
-                  border: pal.botBorder,
-                  color: isDark ? "#d8b4fe" : "#0284c7",
-                  display: "flex",
-                  gap: "5px",
-                }}
-              >
-                <span className="chat-thinking-dot" />
-                <span className="chat-thinking-dot" />
-                <span className="chat-thinking-dot" />
+              <div className="flex items-center gap-1.5 self-start rounded-lg rounded-bl border border-ink/10 bg-paper px-3.5 py-3 text-accent dark:border-paper/20 dark:bg-paper/[0.05] dark:text-paper">
+                <span className="h-[7px] w-[7px] animate-bounce rounded-full bg-current" />
+                <span className="h-[7px] w-[7px] animate-bounce rounded-full bg-current [animation-delay:0.15s]" />
+                <span className="h-[7px] w-[7px] animate-bounce rounded-full bg-current [animation-delay:0.3s]" />
               </div>
             )}
             {messages.length <= 1 && !thinking && (
-              <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginTop: "2px" }}>
+              <div className="mt-0.5 flex flex-wrap gap-1.5">
                 {SUGGESTIONS.map((s) => (
                   <button
                     key={s}
                     type="button"
                     onClick={() => send(s)}
-                    style={{
-                      padding: "6px 10px",
-                      borderRadius: "999px",
-                      background: pal.chipBg,
-                      border: pal.chipBorder,
-                      color: pal.chipColor,
-                      fontSize: "11px",
-                      fontWeight: 700,
-                      cursor: "pointer",
-                    }}
+                    className="oe-focus-visible cursor-pointer rounded-lg border border-ink/10 bg-transparent px-2.5 py-1.5 text-[12px] font-semibold text-accent hover:bg-ink/[0.04]
+                      dark:border-paper/15 dark:text-paper dark:hover:bg-paper/10"
                   >
                     {s}
                   </button>
@@ -299,7 +153,7 @@ export default function OceanChatBot() {
             )}
           </div>
 
-          <div style={{ display: "flex", gap: "8px", padding: "10px 12px", flexShrink: 0 }}>
+          <div className="flex shrink-0 gap-2 p-2.5">
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -308,40 +162,22 @@ export default function OceanChatBot() {
               }}
               placeholder={placeholder}
               disabled={thinking}
-              style={{
-                flex: 1,
-                minWidth: 0,
-                height: "42px",
-                padding: "0 14px",
-                borderRadius: "12px",
-                border: pal.inputBorder,
-                background: pal.inputBg,
-                color: pal.inputColor,
-                fontSize: "13px",
-                outline: "none",
-                boxSizing: "border-box",
-              }}
+              aria-label={placeholder}
+              className="oe-focus-visible h-[42px] min-w-0 flex-1 rounded-lg border border-ink/10 bg-paper px-3.5 text-[13px] text-ink outline-none
+                dark:border-paper/20 dark:bg-ink dark:text-paper"
             />
             <button
               type="button"
               onClick={() => send()}
               disabled={thinking || !input.trim()}
               title="Send"
-              style={{
-                width: "42px",
-                height: "42px",
-                flexShrink: 0,
-                borderRadius: "12px",
-                border: "none",
-                background: pal.fabBg,
-                color: "#fff",
-                fontSize: "17px",
-                cursor: thinking || !input.trim() ? "not-allowed" : "pointer",
-                opacity: thinking || !input.trim() ? 0.5 : 1,
-                boxShadow: pal.fabShadow,
-              }}
+              aria-label="Send message"
+              className="oe-focus-visible h-[42px] w-[42px] shrink-0 cursor-pointer rounded-lg bg-accent text-white disabled:cursor-not-allowed disabled:opacity-50
+                "
             >
-              ➤
+              <span className="flex items-center justify-center">
+                <Icon name="send" size={17} />
+              </span>
             </button>
           </div>
         </div>
@@ -351,66 +187,13 @@ export default function OceanChatBot() {
         type="button"
         onClick={() => setOpen((v) => !v)}
         title={title}
-        aria-label="Open ocean chat"
-        style={{
-          position: "fixed",
-          right: "16px",
-          bottom: "16px",
-          zIndex: 60001,
-          width: "64px",
-          height: "64px",
-          borderRadius: "50%",
-          border: "none",
-          background: "transparent",
-          padding: 0,
-          cursor: "pointer",
-          animation: open ? "none" : "chatFabPulse 2.4s ease-out infinite",
-          transition: "transform 0.2s ease",
-        }}
-        onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.08)")}
-        onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+        aria-label={open ? "Close ocean chat" : "Open ocean chat"}
+        aria-expanded={open}
+        className="oe-focus-visible fixed bottom-4 right-4 z-modal flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-ink/10 bg-accent p-0 text-white shadow-lift transition-transform hover:scale-105
+          dark:border-paper/20"
       >
-        {/* Diamond badge with equal sides + layered translucent waves */}
-        <span
-          style={{
-            position: "absolute",
-            left: "50%",
-            top: "50%",
-            width: "42px",
-            height: "42px",
-            transform: "translate(-50%, -50%) rotate(45deg)",
-            borderRadius: "9px",
-            overflow: "hidden",
-            background: isDark ? "rgba(24, 12, 52, 0.6)" : "rgba(255, 255, 255, 0.65)",
-            border: isDark ? "1px solid rgba(216, 180, 254, 0.6)" : "1px solid #CBD5E1",
-            boxShadow: isDark
-              ? "0 0 18px rgba(34, 211, 238, 0.35)"
-              : "0 4px 16px rgba(59, 130, 246, 0.35)",
-          }}
-        >
-          <span
-            style={{
-              position: "absolute",
-              left: "50%",
-              top: "50%",
-              width: "64px",
-              height: "64px",
-              transform: "translate(-50%, -50%) rotate(-45deg)",
-            }}
-          >
-            <span
-              className="chat-fab-wave chat-fab-w2"
-              style={{ backgroundImage: `url("${waveTeal}")`, opacity: 0.55, mixBlendMode: waveBlend }}
-            />
-            <span
-              className="chat-fab-wave chat-fab-w3"
-              style={{ backgroundImage: `url("${waveMagenta}")`, opacity: 0.6, mixBlendMode: waveBlend }}
-            />
-            <span
-              className="chat-fab-wave chat-fab-w1"
-              style={{ backgroundImage: `url("${waveBlue}")`, opacity: 0.8, mixBlendMode: waveBlend }}
-            />
-          </span>
+        <span className="relative flex items-center justify-center">
+          <Icon name={open ? "close" : "chat"} size={20} />
         </span>
       </button>
     </>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLanguage } from "../context/LanguageContext";
 import CustomDropdown from "./CustomDropdown";
+import Icon from "./icons";
 
 const languages = [
   { code: "en", label: "English" },
@@ -44,77 +45,62 @@ export default function LanguageSelector() {
 
   if (isMobile) {
     return (
-      <div style={{ position: "relative", width: "auto", flexShrink: 1, zIndex: 999999 }}>
+      <div className="relative w-auto shrink">
         <button
           type="button"
-          className="about-authors-nav-btn"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: "6px",
-            width: "auto",
-            whiteSpace: "nowrap",
-          }}
+          aria-haspopup="listbox"
+          aria-expanded={isOpen}
+          className="oe-focus-visible inline-flex h-9 items-center justify-between gap-1.5 whitespace-nowrap rounded-lg border border-ink/10 bg-paper px-3 text-[13px] font-semibold text-ink
+            dark:border-paper/15 dark:bg-paper/[0.05] dark:text-paper"
           onClick={() => setIsOpen(!isOpen)}
         >
-          <span>🌐 {currentLangObj.label}</span>
-          <span>▾</span>
+          <span className="flex items-center gap-1">
+            <Icon name="globe" size={13} />
+            {currentLangObj.label}
+          </span>
+          <Icon name="chevronDown" size={12} className={`opacity-75 transition-transform ${isOpen ? "rotate-180" : ""}`} />
         </button>
 
         {isOpen && (
           <>
-            <div 
-              style={{ position: "fixed", inset: 0, zIndex: 9998, background: "transparent" }} 
-              onClick={() => setIsOpen(false)} 
+            <div
+              className="fixed inset-0 z-[9998] bg-transparent"
+              onClick={() => setIsOpen(false)}
             />
-            <div 
-              className="mobile-inline-dropdown-list"
-              style={{
-                position: "absolute",
-                top: "calc(100% + 6px)",
-                right: 0,
-                left: "auto",
-                minWidth: "160px",
-                maxHeight: "168px",
-                overflowY: "auto",
-                background: "#ffffff",
-                color: "#0f172a",
-                borderRadius: "12px",
-                border: "1.5px solid #0ea5e9",
-                boxShadow: "0 25px 60px rgba(15, 23, 42, 0.5)",
-                zIndex: 999999,
-                padding: "6px 6px 14px 6px",
-                display: "flex",
-                flexDirection: "column",
-                gap: "4px",
-                WebkitOverflowScrolling: "touch",
-              }}
+            <div
+              role="listbox"
+              aria-label="Select language"
+              className="absolute right-0 top-[calc(100%+6px)] z-modal flex min-w-[160px] max-h-44 flex-col gap-1 overflow-y-auto rounded-lg border border-ink/10 bg-paper p-1.5 text-ink shadow-lift
+                dark:border-paper/20 dark:bg-paper/[0.07] dark:text-paper"
             >
-              {languages.map((lang) => (
-                <div
-                  key={lang.code}
-                  className={`mobile-inline-dropdown-item ${language === lang.code ? "selected" : ""}`}
-                  onClick={() => {
-                    setLanguage(lang.code);
-                    setIsOpen(false);
-                  }}
-                  style={{
-                    padding: "11px 14px",
-                    fontSize: "13px",
-                    fontWeight: "700",
-                    color: language === lang.code ? "#ffffff" : "#1e293b",
-                    background: language === lang.code ? "linear-gradient(135deg, #0284c7, #2563eb)" : "#f8fafc",
-                    borderRadius: "8px",
-                    cursor: "pointer",
-                    border: language === lang.code ? "1.5px solid transparent" : "1px solid #e2e8f0",
-                    whiteSpace: "nowrap",
-                    flexShrink: 0,
-                  }}
-                >
-                  {lang.label}
-                </div>
-              ))}
+              {languages.map((lang) => {
+                const isSel = language === lang.code;
+                return (
+                  <div
+                    key={lang.code}
+                    role="option"
+                    aria-selected={isSel}
+                    tabIndex={0}
+                    onClick={() => {
+                      setLanguage(lang.code);
+                      setIsOpen(false);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setLanguage(lang.code);
+                        setIsOpen(false);
+                      }
+                    }}
+                    className={`cursor-pointer whitespace-nowrap rounded-lg px-3 py-2 text-[13px] font-bold
+                      ${isSel
+                        ? "bg-accent text-white dark:bg-accent"
+                        : "bg-ink/[0.03] text-ink hover:bg-ink/[0.06] dark:bg-transparent dark:text-paper dark:hover:bg-paper/10"}`}
+                  >
+                    {lang.label}
+                  </div>
+                );
+              })}
             </div>
           </>
         )}

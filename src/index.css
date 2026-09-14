@@ -9,6 +9,15 @@ body,
   min-height: 100%;
 }
 
+/* Base type + canvas: applied even before utilities load so the app is
+   never naked unstyled HTML (tokens.css provides the vars). */
+body {
+  font-family: var(--font-sans);
+  color: var(--text-main);
+  background: var(--surface-page);
+  -webkit-font-smoothing: antialiased;
+}
+
 /* Dynamic viewport defaults (JS in viewport.js keeps --app-vh/--app-vw
    synced to the real window size; 1vh/1vw fallbacks apply pre-JS). */
 :root {

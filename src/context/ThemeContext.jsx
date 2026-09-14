@@ -14,20 +14,10 @@ export function ThemeProvider({ children }) {
     if (typeof window !== "undefined") {
       localStorage.setItem("ocean_theme", theme);
       const root = document.documentElement;
-      const body = document.body;
       const isDark = theme === "dark";
-      // `dark` drives Tailwind dark: variants (new system).
-      // `dark-cyber` drives the legacy cyberpunk.css overrides until
-      // Phase 2 removes that layer.
+      // `dark` drives Tailwind dark: variants + tokens.css `.dark` vars.
       root.classList.toggle("dark", isDark);
       root.style.colorScheme = isDark ? "dark" : "light";
-      if (isDark) {
-        root.classList.add("dark-cyber");
-        body.classList.add("dark-cyber");
-      } else {
-        root.classList.remove("dark-cyber");
-        body.classList.remove("dark-cyber");
-      }
     }
   }, [theme]);
 

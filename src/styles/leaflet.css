@@ -1,0 +1,169 @@
+/* ============================================================
+   OceanEmbed Leaflet companion — the ONLY global stylesheet besides
+   tokens.css + Tailwind. Holds styles that MUST live outside React:
+   Leaflet panes/popups/controls, the heat legend (innerHTML), the
+   location pin (divIcon HTML), and the flipped-popup rescue.
+   Palette: paper #F7F4ED · ink #132730 · accent #0C6E5E.
+   ============================================================ */
+
+.leaflet-container {
+  font-family: var(--font-sans);
+  background: #F7F4ED;
+  touch-action: pan-x pan-y;
+}
+
+.dark .leaflet-container {
+  background: #132730;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 8px;
+}
+
+.leaflet-popup-content {
+  margin: 12px 14px;
+  line-height: 1.4;
+}
+
+/* ---------- heatmap legend (GridOverlay innerHTML) ----------
+   Viridis bar is data encoding, not brand — kept as-is. */
+.heat-legend {
+  background: #F7F4ED;
+  border: 1px solid rgba(19, 39, 48, 0.14);
+  border-radius: 8px;
+  padding: 8px 10px;
+  min-width: 130px;
+  font-family: var(--font-sans);
+  pointer-events: auto;
+}
+
+.dark .heat-legend {
+  background: #132730;
+  border-color: rgba(247, 244, 237, 0.16);
+}
+
+.heat-legend-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: #132730;
+  margin-bottom: 6px;
+  text-align: center;
+}
+
+.dark .heat-legend-title {
+  color: #F7F4ED;
+}
+
+.heat-legend-bar {
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(to right, rgb(68,1,84), rgb(59,82,139), rgb(33,145,140), rgb(94,201,98), rgb(253,231,37));
+  border: 1px solid rgba(19, 39, 48, 0.2);
+}
+
+.heat-legend-scale {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+  font-size: 10px;
+  font-family: var(--font-sans);
+  font-variant-numeric: tabular-nums;
+  color: rgba(19, 39, 48, 0.62);
+}
+
+.dark .heat-legend-scale {
+  color: rgba(247, 244, 237, 0.62);
+}
+
+@media (max-width: 700px) {
+  .heat-legend {
+    min-width: 104px;
+    padding: 6px 8px;
+  }
+}
+
+/* ---------- location pin (LocationMarker divIcon) ---------- */
+.oe-pin { background: transparent; border: none; overflow: visible; }
+
+.oe-pin-wrap {
+  position: relative;
+  width: 54px;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+
+.oe-pin-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 2px solid rgba(12, 110, 94, 0.55);
+  pointer-events: none;
+  animation: oe-ring-ping 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.oe-pin-ring.r1 { width: 18px; height: 18px; animation-delay: 0s; }
+.oe-pin-ring.r2 { width: 18px; height: 18px; animation-delay: 0.8s; }
+.oe-pin-ring.r3 { width: 18px; height: 18px; animation-delay: 1.6s; }
+
+@keyframes oe-ring-ping {
+  0% { transform: scale(0.6); opacity: 1; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+
+.oe-pin-badge {
+  position: relative;
+  z-index: 2;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: #F7F4ED;
+  background: #0C6E5E;
+  user-select: none;
+  cursor: pointer;
+}
+
+.oe-pin-dot {
+  position: absolute;
+  bottom: 2px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #0C6E5E;
+  z-index: 2;
+}
+
+/* ---------- flipped popup rescue (LocationMarker) ---------- */
+.flipped-popup-right {
+  bottom: auto !important;
+  top: var(--dynamic-top-offset, 20px) !important;
+  left: 46px !important;
+  margin-left: 0 !important;
+}
+
+.flipped-popup-right .leaflet-popup-tip-container {
+  display: none !important;
+}
+
+.flipped-popup-right .leaflet-popup-content-wrapper {
+  position: relative;
+}
+
+.flipped-popup-right .leaflet-popup-content-wrapper::before {
+  content: '';
+  position: absolute;
+  left: -6px;
+  top: 14px;
+  width: 12px;
+  height: 12px;
+  background: #F7F4ED;
+  transform: rotate(45deg);
+  border-left: 1px solid rgba(19, 39, 48, 0.14);
+  border-bottom: 1px solid rgba(19, 39, 48, 0.14);
+  border-radius: 2px 0 0 0;
+  z-index: -1;
+}

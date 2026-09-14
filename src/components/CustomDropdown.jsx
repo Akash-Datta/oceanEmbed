@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useTheme } from "../context/ThemeContext";
+import Icon from "./icons";
 
 /**
  * Theme-aware custom dropdown (replaces native <select>).
@@ -16,9 +16,9 @@ export default function CustomDropdown({
   minWidth = 0,
   ariaLabel,
 }) {
-  const { isDark } = useTheme();
   const [open, setOpen] = useState(false);
   const rootRef = useRef(null);
+  const listId = useRef(`dd-list-${Math.random().toString(36).slice(2, 8)}`);
 
   useEffect(() => {
     if (!open) return;
@@ -31,75 +31,73 @@ export default function CustomDropdown({
 
   const selected = options.find((o) => String(o.value) === String(value));
 
-  const light = !isDark;
-  const triggerBg = disabled
-    ? light ? "#f1f5f9" : "rgba(30,16,64,0.6)"
-    : light ? "#ffffff" : "rgba(24, 14, 52, 0.95)";
-  const triggerBorder = light ? "1px solid #bae6fd" : "1px solid rgba(168, 85, 247, 0.5)";
-  const triggerColor = disabled
-    ? light ? "#94a3b8" : "#6d5a8f"
-    : light ? "#0f172a" : "#f5f3ff";
-
   return (
-    <div ref={rootRef} className="custom-dropdown" style={{ position: "relative", width: "100%", minWidth }}>
+    <div ref={rootRef} className="relative w-full" style={{ minWidth }}>
       {open && (
         <div
-          style={{ position: "fixed", inset: 0, zIndex: 99990, background: "transparent", cursor: "default" }}
+          className="fixed inset-0 z-dropdown cursor-default bg-transparent"
           onClick={() => setOpen(false)}
         />
       )}
       <button
         type="button"
         aria-label={ariaLabel || placeholder}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-controls={listId.current}
         disabled={disabled}
         onClick={() => setOpen((v) => !v)}
-        className={`custom-dropdown-trigger ${open ? "open" : ""} ${isDark ? "dd-dark" : "dd-light"}`}
-        style={{
-          width: "100%",
-          height,
-          padding: "0 12px",
-          borderRadius: "12px",
-          border: triggerBorder,
-          background: triggerBg,
-          color: triggerColor,
-          fontSize,
-          fontWeight: 600,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: "8px",
-          cursor: disabled ? "not-allowed" : "pointer",
-          opacity: disabled ? 0.55 : 1,
-          boxSizing: "border-box",
-          textAlign: "left",
-          position: "relative",
-          zIndex: open ? 99991 : 1,
-          transition: "border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease",
-          whiteSpace: "nowrap",
-          overflow: "hidden",
-        }}
+        style={{ height, fontSize }}
+        className="oe-focus-visible relative z-[1] flex w-full items-center justify-between gap-2 overflow-hidden whitespace-nowrap rounded-lg border px-3 text-left font-semibold transition-colors
+          border-ink/10 bg-paper text-ink hover:border-accent
+          dark:border-paper/20 dark:bg-ink dark:text-paper dark:hover:border-paper/30
+          disabled:cursor-not-allowed disabled:opacity-55"
       >
-        <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>
+        <span className="overflow-hidden text-ellipsis">
           {selected ? selected.label : placeholder}
         </span>
-        <span className="custom-dropdown-chevron" style={{ flexShrink: 0, fontSize: "11px", opacity: 0.75 }}>▾</span>
+        <Icon
+          name="chevronDown"
+          size={13}
+          className={`shrink-0 opacity-75 transition-transform ${open ? "rotate-180" : ""}`}
+        />
       </button>
 
       {open && !disabled && (
-        <div className={`custom-dropdown-list ${isDark ? "dd-dark" : "dd-light"}`}>
+        <div
+          id={listId.current}
+          role="listbox"
+          aria-label={ariaLabel || placeholder}
+          className="absolute inset-x-0 top-[calc(100%+6px)] z-dropdown max-h-44 overflow-y-auto rounded-lg border p-1.5 shadow-lift
+            border-ink/10 bg-paper
+            dark:border-paper/20 dark:bg-paper/[0.07]"
+        >
           {options.map((opt) => {
             const isSel = String(opt.value) === String(value);
             return (
               <div
                 key={String(opt.value)}
-                className={`custom-dropdown-item ${isSel ? "selected" : ""} ${isDark ? "dd-dark" : "dd-light"}`}
+                role="option"
+                aria-selected={isSel}
+                tabIndex={0}
                 onClick={() => {
                   onChange(opt.value);
                   setOpen(false);
                 }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    onChange(opt.value);
+                    setOpen(false);
+                  }
+                }}
+                className={`oe-focus-visible flex cursor-pointer items-center justify-between gap-2 rounded-lg px-3 py-2 text-[13px] font-semibold
+                  ${isSel
+                    ? "bg-accent text-white dark:bg-accent dark:text-paper"
+                    : "text-ink hover:bg-ink/[0.06] dark:text-paper dark:hover:bg-paper/10"}`}
               >
-                <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>{opt.label}</span>
-                {isSel && <span style={{ flexShrink: 0 }}>✓</span>}
+                <span className="overflow-hidden text-ellipsis">{opt.label}</span>
+                {isSel && <Icon name="check" size={14} className="shrink-0" />}
               </div>
             );
           })}

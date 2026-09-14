@@ -65,7 +65,7 @@ const depthRulerPlugin = {
     ctx.moveTo(left, yPos);
     ctx.lineTo(right, yPos);
     ctx.lineWidth = 2;
-    ctx.strokeStyle = '#334155'; 
+    ctx.strokeStyle = 'rgba(19,39,48,0.7)'; 
     ctx.stroke();
     ctx.setLineDash([]); 
 
@@ -89,7 +89,7 @@ const depthRulerPlugin = {
       ctx.beginPath();
       ctx.textAlign = 'right';
       ctx.textBaseline = 'middle';
-      ctx.font = 'bold 11px Inter, Arial, sans-serif';
+      ctx.font = 'bold 11px Public Sans, sans-serif';
       
       const labelText = `${targetDepth}`;
       const textWidth = ctx.measureText(labelText).width;
@@ -99,7 +99,7 @@ const depthRulerPlugin = {
       const boxX = left - boxWidth - 6; 
       const boxY = yPos - boxHeight / 2;
       
-      ctx.fillStyle = '#ef4444'; 
+      ctx.fillStyle = '#0C6E5E'; 
       if (ctx.roundRect) {
         ctx.roundRect(boxX, boxY, boxWidth, boxHeight, 4);
       } else {
@@ -129,21 +129,21 @@ const depthRulerPlugin = {
 
       ctx.beginPath();
       ctx.rect(dataBoxX, dataBoxY, dataBoxWidth, dataBoxHeight);
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+      ctx.fillStyle = 'rgba(247, 244, 237, 0.95)';
       ctx.fill();
       ctx.lineWidth = 1;
-      ctx.strokeStyle = '#cbd5e1';
+      ctx.strokeStyle = 'rgba(19,39,48,0.14)';
       ctx.stroke();
 
       ctx.textAlign = 'left';
       ctx.textBaseline = 'alphabetic';
 
-      ctx.fillStyle = '#0f172a';
-      ctx.font = 'bold 12px Inter, Arial, sans-serif';
+      ctx.fillStyle = '#132730';
+      ctx.font = 'bold 12px Public Sans, sans-serif';
       ctx.fillText(`Depth: ${targetDepth} m`, dataBoxX + 12, dataBoxY + 20);
 
       ctx.fillStyle = '#0000FF'; 
-      ctx.font = 'bold 11px Inter, Arial, sans-serif';
+      ctx.font = 'bold 11px Public Sans, sans-serif';
       ctx.fillText(`ARGO: ${argoTemp} °C`, dataBoxX + 12, dataBoxY + 36);
 
       ctx.fillStyle = '#FF0000'; 
@@ -240,9 +240,9 @@ export default function TemperatureProfile({
         display: false, 
       },
       tooltip: {
-        backgroundColor: "rgba(15, 23, 42, 0.95)",
-        titleColor: "#ffffff",
-        bodyColor: "#e0f2fe",
+        backgroundColor: "rgba(19, 39, 48, 0.95)",
+        titleColor: "#F7F4ED",
+        bodyColor: "rgba(247, 244, 237, 0.85)",
         padding: 12,
         cornerRadius: 8,
         caretPadding: 6,
@@ -256,25 +256,27 @@ export default function TemperatureProfile({
     },
     scales: {
       x: {
-        title: { display: true, text: "Temperature (°C)", color: "#94a3b8", font: { weight: "600" } },
-        grid: { color: "rgba(148, 163, 184, 0.1)" },
-        ticks: { color: "#64748b" },
+        title: { display: true, text: "Temperature (°C)", color: "rgba(19,39,48,0.55)", font: { weight: "600" } },
+        grid: { color: "rgba(19, 39, 48, 0.08)" },
+        ticks: { color: "rgba(19,39,48,0.62)" },
       },
       y: {
         reverse: true, 
-        title: { display: true, text: "Depth (meters)", color: "#94a3b8", font: { weight: "600" } },
-        grid: { color: "rgba(148, 163, 184, 0.1)" },
-        ticks: { color: "#64748b" },
+        title: { display: true, text: "Depth (meters)", color: "rgba(19,39,48,0.55)", font: { weight: "600" } },
+        grid: { color: "rgba(19, 39, 48, 0.08)" },
+        ticks: { color: "rgba(19,39,48,0.62)" },
       },
     },
   };
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', height: '100%', alignItems: 'center', justifyContent: 'center', gap: '10px', padding: '16px' }}>
-        <div className="cyber-loader-text">◈ Fetching live profile from backend ◈</div>
-        <div className="cyber-loader-bar" style={{ width: '80%' }} />
-        <div style={{ fontSize: '11px', color: '#64748b' }}>POST /api/profile …</div>
+      <div className="flex h-full flex-col items-center justify-center gap-2.5 p-4">
+        <div className="text-[12px] font-semibold text-ink/70 dark:text-paper/70">Fetching live profile…</div>
+        <div className="h-1 w-4/5 overflow-hidden rounded-full bg-ink/10 dark:bg-paper/10">
+          <div className="h-full w-2/5 animate-[oe-load-slide_1.2s_ease-in-out_infinite] rounded-full bg-accent" />
+        </div>
+        <div className="font-mono text-[11px] text-ink/50 dark:text-paper/50">POST /api/profile</div>
       </div>
     );
   }
@@ -282,31 +284,24 @@ export default function TemperatureProfile({
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px', flexWrap: 'wrap' }}>
-        <span
-          style={{
-            fontSize: '9px', fontWeight: 800, letterSpacing: '0.6px', textTransform: 'uppercase',
-            padding: '2px 8px', borderRadius: '999px',
-            color: isLive ? '#065f46' : '#92400e',
-            background: isLive ? 'rgba(16,185,129,0.15)' : 'rgba(245,158,11,0.15)',
-            border: `1px solid ${isLive ? 'rgba(16,185,129,0.4)' : 'rgba(245,158,11,0.4)'}`,
-          }}
-        >
-          {isLive ? `● Live · backend · ${liveData.length} levels` : '○ Fallback · dummy data'}
+        <span className={`oe-live-badge ${isLive ? "is-live" : "is-fallback"}`}>
+          {isLive ? `Live · ${liveData.length} levels` : 'Fallback · regional data'}
         </span>
         {hasUncertainty && isLive && (
-          <span style={{ fontSize: '9px', fontWeight: 700, color: '#64748b' }}>q10–q90 band shown</span>
+          <span className="text-[11px] text-ink/50 dark:text-paper/50">q10–q90 band shown</span>
         )}
       </div>
       {error && !hasLive && (
-        <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.35)', borderRadius: '8px', padding: '8px 10px', marginBottom: '6px' }}>
-          <div style={{ fontSize: '11px', fontWeight: 700, color: '#b91c1c', marginBottom: '4px' }}>
+        <div className="mb-1.5 border-l-2 border-accent pl-2.5">
+          <div className="mb-1 text-[12px] text-ink dark:text-paper">
             Backend unavailable — showing fallback. {error}
           </div>
           {onRetry && (
             <button
               type="button"
               onClick={onRetry}
-              style={{ fontSize: '11px', fontWeight: 800, color: '#fff', background: '#0284c7', border: 'none', borderRadius: '6px', padding: '5px 10px', cursor: 'pointer' }}
+              className="oe-focus-visible rounded-lg border border-ink/15 px-2.5 py-1 text-[12px] font-semibold text-ink hover:bg-ink/[0.05]
+                dark:border-paper/20 dark:text-paper dark:hover:bg-paper/10"
             >
               Retry backend
             </button>
@@ -314,24 +309,24 @@ export default function TemperatureProfile({
         </div>
       )}
       {error && hasLive && (
-        <div style={{ fontSize: '10px', color: '#b45309', marginBottom: '4px' }}>{error}</div>
+        <div className="mb-1 text-[11px] text-ink/60 dark:text-paper/60">{error}</div>
       )}
       {!hasLive && !error && (
-        <div style={{ fontSize: '10px', color: '#64748b', marginBottom: '4px' }}>
+        <div className="mb-1 text-[11px] text-ink/50 dark:text-paper/50">
           Waiting for backend data — showing regional fallback.
         </div>
       )}
       <div style={{ flexGrow: 1, minHeight: 0 }}>
         <Line data={chartData} options={chartOptions} plugins={[depthRulerPlugin]} />
       </div>
-      <div className="profile-legend">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div style={{ width: '28px', height: '4px', backgroundColor: '#0000FF', borderRadius: '2px' }}></div>
-          <span style={{ fontSize: '12px', fontWeight: '800', color: '#475569' }}>ARGO Actual</span>
+      <div className="flex items-center gap-4 pt-1">
+        <div className="flex items-center gap-2">
+          <div className="h-1 w-7 rounded-sm bg-blue-700"></div>
+          <span className="text-[12px] font-semibold text-ink/70 dark:text-paper/70">ARGO Actual</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div style={{ width: '28px', height: '0px', borderTop: '4px dashed #FF0000' }}></div>
-          <span style={{ fontSize: '12px', fontWeight: '800', color: '#475569' }}>Transformer Prediction</span>
+        <div className="flex items-center gap-2">
+          <div className="h-0 w-7 border-t-4 border-dashed border-red-600"></div>
+          <span className="text-[12px] font-semibold text-ink/70 dark:text-paper/70">Transformer Prediction</span>
         </div>
       </div>
     </div>

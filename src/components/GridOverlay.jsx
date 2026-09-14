@@ -283,7 +283,7 @@ export default function GridOverlay({ gridData, parameter, onGridClick, selected
             key={`${cell.lat}-${cell.lng}-${idx}`}
             bounds={bounds}
             pathOptions={{
-              color: isSelected ? "#0284c7" : "#64748b",
+              color: isSelected ? "#0C6E5E" : "#132730",
               weight: isSelected ? 2 : 0.6,
               fillColor: hasColor ? getViridisColor(cell.value, scale.min, scale.max) : "transparent",
               fillOpacity: isSelected ? 0.9 : 0.62,
@@ -312,9 +312,9 @@ export default function GridOverlay({ gridData, parameter, onGridClick, selected
           >
             {showTooltip && (
               <Tooltip direction="top" offset={[0, -10]} opacity={1}>
-                <div style={{ textAlign: "center", fontWeight: "bold", fontFamily: "Inter, sans-serif" }}>
+                <div style={{ textAlign: "center", fontWeight: "bold", fontFamily: "'Public Sans', sans-serif" }}>
                   <div>Lat: {cell.lat.toFixed(2)}°, Lng: {cell.lng.toFixed(2)}°</div>
-                  <div style={{ color: "#0284c7" }}>
+                  <div style={{ color: "#0C6E5E" }}>
                     {parameter.toUpperCase()}: {displayValue}
                     {isCombined ? " (avg)" : ""}
                   </div>

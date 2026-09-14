@@ -1,8 +1,53 @@
-import React, { useRef, useEffect, useState } from "react";
-import L from "leaflet";
+import React, { useEffect, useState } from "react";
 import CoordinateInput from "./CoordinateInput";
 import CustomDropdown from "./CustomDropdown";
+import Icon from "./icons";
 import { useLanguage } from "../context/LanguageContext";
+
+function MobileMenu({ items, selectedValue, onSelect, placeholder }) {
+  return (
+    <div
+      role="listbox"
+      aria-label={placeholder}
+      className="absolute inset-x-0 top-[calc(100%+4px)] z-dropdown max-h-[168px] overflow-y-auto rounded-lg border border-ink/10 bg-paper p-1.5 shadow-lift
+        dark:border-paper/20 dark:bg-paper/[0.07]"
+    >
+      <div
+        role="option"
+        aria-selected={selectedValue === ""}
+        tabIndex={0}
+        onClick={() => onSelect("")}
+        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onSelect(""); } }}
+        className={`oe-focus-visible flex h-[42px] cursor-pointer items-center rounded-lg px-3 text-[13px] font-semibold
+          ${selectedValue === ""
+            ? "bg-accent text-white dark:bg-accent"
+            : "text-ink hover:bg-ink/[0.06] dark:text-paper dark:hover:bg-paper/10"}`}
+      >
+        {placeholder}
+      </div>
+      {items.map((item) => {
+        const isSel = String(selectedValue) === String(item.value);
+        return (
+          <div
+            key={String(item.value)}
+            role="option"
+            aria-selected={isSel}
+            tabIndex={0}
+            onClick={() => onSelect(item.value)}
+            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onSelect(item.value); } }}
+            className={`oe-focus-visible flex h-[42px] cursor-pointer items-center justify-between rounded-lg px-3 text-[13px] font-semibold
+              ${isSel
+                ? "bg-accent text-white dark:bg-accent"
+                : "text-ink hover:bg-ink/[0.06] dark:text-paper dark:hover:bg-paper/10"}`}
+          >
+            <span>{item.label}</span>
+            {isSel && <Icon name="check" size={14} />}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 export default function ControlBar({
   date,
@@ -26,7 +71,6 @@ export default function ControlBar({
   triggerNotification
 }) {
   const { t, language } = useLanguage();
-  const controlRef = useRef(null);
 
   const [isMobile, setIsMobile] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(null);
@@ -38,12 +82,6 @@ export default function ControlBar({
     check();
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
-  }, []);
-
-  useEffect(() => {
-    if (!controlRef.current) return;
-    L.DomEvent.disableClickPropagation(controlRef.current);
-    L.DomEvent.disableScrollPropagation(controlRef.current);
   }, []);
 
   const depthOptions = [];
@@ -68,7 +106,7 @@ export default function ControlBar({
   const isParameterSelected = Boolean(parameter);
   const isDepthSelected = Boolean(depth);
   const isTypingLocation = latitude !== "" || longitude !== "";
-  
+
   const hasCoordinates = isSidePanelOpen || isTypingLocation;
 
   useEffect(() => {
@@ -94,8 +132,6 @@ export default function ControlBar({
 
     if (val) {
       setParameter("");
-      // FIXED: Removed setLatitude("") and setLongitude("") from here.
-      // Selecting a depth will no longer erase your coordinates!
     }
 
     setOpenDropdown(null);
@@ -110,11 +146,9 @@ export default function ControlBar({
   const isParameterDisabled =
     !date || isDepthSelected || isSidePanelOpen;
 
-  // Disabled while typing location until the side panel opens
   const isDepthDisabled =
     !date || isParameterSelected || (isTypingLocation && !isSidePanelOpen);
 
-  // FIXED: Coordinates are only disabled if Parameter is selected OR if Depth is selected BEFORE typing coordinates
   const areCoordinatesDisabled =
     isParameterSelected || (isDepthSelected && !hasCoordinates);
 
@@ -130,240 +164,80 @@ export default function ControlBar({
   const showResolutionDropdown =
     isParameterSelected && date && !hasSubmitted;
 
-  const strictItemStyle = {
-    height: "42px",
-    minHeight: "42px",
-    display: "flex",
-    alignItems: "center",
-    boxSizing: "border-box",
-    padding: "0 12px",
-    width: "100%"
-  };
+  const controlBtn = "oe-focus-visible inline-flex h-[42px] items-center justify-between gap-2 rounded-lg border px-3 text-left text-[13px] font-semibold transition-colors cursor-pointer border-ink/10 bg-paper text-ink hover:border-accent dark:border-paper/20 dark:bg-ink dark:text-paper dark:hover:border-paper/30 disabled:cursor-not-allowed disabled:opacity-50";
 
-  const mobileControlStyle = {
-    left: "10px",
-    right: "10px",
-    width: "100%",
-    padding: "10px",
-    boxSizing: "border-box",
-    display: "flex",
-    flexWrap: "wrap",
-    gap: "8px",
-    background: "rgba(255, 255, 255, 0.95)",
-    backdropFilter: "blur(16px)",
-    borderRadius: "16px",
-    position: "relative",
-    zIndex: openDropdown ? 99999 : 1000,
-    overflow: "visible"
-  };
-
-  const desktopControlStyle = {
-    left: "10px",
-    right: "10px",
-    width: "auto",
-    maxWidth: "calc(100% - 20px)",
-    height: "auto",
-    minHeight: "min-content",
-    padding: "8px",
-    boxSizing: "border-box",
-    display: "flex",
-    flexWrap: "wrap",
-    alignItems: "center",
-    justifyContent: "flex-start",
-    gap: "8px",
-    overflow: "visible",
-    position: "relative",
-    zIndex: 9999 // Guaranteed elevated z-index for dropdown suggestions to break out cleanly
-  };
+  const renderMobileTrigger = (key, display, disabled) => (
+    <button
+      type="button"
+      className={`${controlBtn} w-full`}
+      disabled={disabled}
+      aria-haspopup="listbox"
+      aria-expanded={openDropdown === key}
+      onClick={() => setOpenDropdown(openDropdown === key ? null : key)}
+    >
+      <span className="overflow-hidden text-ellipsis">{display}</span>
+      <Icon name="chevronDown" size={13} className={`shrink-0 opacity-75 transition-transform ${openDropdown === key ? "rotate-180" : ""}`} />
+    </button>
+  );
 
   return (
     <div
-      ref={controlRef}
-      className="ocean-controls"
-      style={isMobile ? mobileControlStyle : desktopControlStyle}
+      className="flex flex-wrap items-center gap-2 rounded-lg border border-ink/10/80 bg-paper/95 p-2 backdrop-blur-md
+        dark:border-paper/10 dark:bg-ink/95 dark:shadow-none"
     >
       {isMobile && openDropdown && (
         <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            zIndex: 99990,
-            background: "transparent"
-          }}
+          className="fixed inset-0 z-[99990] bg-transparent"
           onClick={() => setOpenDropdown(null)}
         />
       )}
 
-      {/* ========================================================
-          1. RECENTER / REFRESH BUTTON
-      ======================================================== */}
+      {/* Recenter */}
       <button
         type="button"
-        className="ocean-control recenter-btn"
         onClick={handleRecenter}
         title={t("recenterToDataset") || t("mapRefreshed") || "Recenter to Dataset"}
-        style={
-          isMobile
-            ? {
-                flex: "1 1 60px",
-                minWidth: "60px",
-                height: "44px",
-                padding: "0 12px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "6px",
-                boxSizing: "border-box",
-                borderRadius: "10px",
-              }
-            : {
-                flexGrow: 1,
-                flexShrink: 1,
-                flexBasis: "90px",
-                minWidth: "90px",
-                height: "42px",
-                padding: "0 12px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "6px",
-                boxSizing: "border-box",
-              }
-        }
-      >
-        <span style={{ fontSize: "20px", lineHeight: 1 }}>↺</span>
-        <span style={{ fontSize: "13px", fontWeight: 800, letterSpacing: "0.3px", whiteSpace: "nowrap" }}>{t("reset")}</span>
+        className="oe-focus-visible inline-flex h-[42px] min-w-[60px] flex-1 items-center justify-center gap-1.5 rounded-lg bg-accent px-3 text-[13px] font-semibold text-white transition-colors hover:brightness-95 sm:flex-none sm:basis-[90px]"
+        >
+          <Icon name="reset" size={14} />
+        <span className="whitespace-nowrap">{t("reset")}</span>
       </button>
 
-      {/* ========================================================
-          2. DATE FIELD WRAPPER
-      ======================================================== */}
-      <div
-        style={
-          isMobile
-            ? { flex: "1 1 auto", boxSizing: "border-box" }
-            : {
-                flexGrow: 0,
-                flexShrink: 0,
-                flexBasis: "120px",
-                width: "120px",
-                minWidth: "120px",
-                boxSizing: "border-box"
-              }
-        }
-      >
-        <input
-          type="date"
-          className="ocean-control"
-          value={date}
-          min={minDate}
-          max={maxDate}
-          onChange={(e) => {
-            setDate(e.target.value);
-            setHasSubmitted(false);
-          }}
-          title={t("chooseDate") || "Select Date"}
-          style={{
-            width: "100%",
-            minWidth: "100%",
-            margin: 0,
-            padding: "0 8px",
-            fontSize: "13px",
-            boxSizing: "border-box"
-          }}
-        />
-      </div>
+      {/* Date */}
+      <input
+        type="date"
+        value={date}
+        min={minDate}
+        max={maxDate}
+        onChange={(e) => {
+          setDate(e.target.value);
+          setHasSubmitted(false);
+        }}
+        title={t("chooseDate") || "Select Date"}
+        aria-label={t("chooseDate") || "Select Date"}
+        className="oe-focus-visible h-[42px] w-full rounded-lg border border-ink/10 bg-paper px-2 text-[13px] font-semibold text-ink sm:w-[120px] sm:min-w-[120px] sm:flex-none
+          dark:border-paper/20 dark:bg-ink dark:text-paper"
+      />
 
-      {/* ========================================================
-          3. PARAMETER SELECTION
-      ======================================================== */}
+      {/* Parameter */}
       {isMobile ? (
-        <div
-          style={{
-            position: "relative",
-            width: "100%",
-            zIndex: openDropdown === "parameter" ? 100000 : 1
-          }}
-        >
-          <button
-            type="button"
-            className="ocean-control"
-            disabled={isParameterDisabled}
-            style={{
-              width: "100%",
-              opacity: isParameterDisabled ? 0.4 : 1,
-              cursor: isParameterDisabled ? "not-allowed" : "pointer",
-              textAlign: "left",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              position: "relative",
-              zIndex: openDropdown === "parameter" ? 100001 : 1
-            }}
-            onClick={() =>
-              setOpenDropdown(
-                openDropdown === "parameter" ? null : "parameter"
-              )
-            }
-          >
-            <span>
-              {parameter
-                ? parameterOptions.find((p) => p.id === parameter)?.label
-                : t("chooseParameter") || "Select Parameter"}
-            </span>
-            <span>▾</span>
-          </button>
-
+        <div className="relative w-full">
+          {renderMobileTrigger(
+            "parameter",
+            parameter ? parameterOptions.find((p) => p.id === parameter)?.label : t("chooseParameter") || "Select Parameter",
+            isParameterDisabled
+          )}
           {openDropdown === "parameter" && (
-            <div
-              className="mobile-inline-dropdown-list"
-              style={{
-                position: "absolute",
-                left: 0,
-                right: 0,
-                top: "calc(100% + 4px)",
-                zIndex: 100002,
-                pointerEvents: "auto",
-                maxHeight: "126px",
-                overflowY: "auto"
-              }}
-            >
-              <div
-                className={`mobile-inline-dropdown-item ${
-                  parameter === "" ? "selected" : ""
-                }`}
-                style={strictItemStyle}
-                onClick={() => handleParameterChange("")}
-              >
-                {t("chooseParameter") || "Select Parameter"}
-              </div>
-
-              {parameterOptions.map((param) => (
-                <div
-                  key={param.id}
-                  className={`mobile-inline-dropdown-item ${
-                    parameter === param.id ? "selected" : ""
-                  }`}
-                  style={strictItemStyle}
-                  onClick={() => handleParameterChange(param.id)}
-                >
-                  {param.label}
-                </div>
-              ))}
-            </div>
+            <MobileMenu
+              items={parameterOptions.map((p) => ({ value: p.id, label: p.label }))}
+              selectedValue={parameter}
+              placeholder={t("chooseParameter") || "Select Parameter"}
+              onSelect={handleParameterChange}
+            />
           )}
         </div>
       ) : (
-        <div
-          style={{
-            flexGrow: 1,
-            flexShrink: 0,
-            flexBasis: "170px",
-            minWidth: "170px",
-            opacity: isParameterDisabled ? 0.4 : 1,
-            boxSizing: "border-box",
-          }}
-        >
+        <div className={`min-w-[170px] flex-1 basis-[170px] ${isParameterDisabled ? "opacity-40" : ""}`}>
           <CustomDropdown
             value={parameter}
             placeholder={t("chooseParameter") || "Select Parameter"}
@@ -378,96 +252,35 @@ export default function ControlBar({
         </div>
       )}
 
-      {/* ========================================================
-          4. RESOLUTION SELECTION
-      ======================================================== */}
+      {/* Resolution */}
       {showResolutionDropdown &&
         (isMobile ? (
-          <div
-            style={{
-              position: "relative",
-              width: "100%",
-              zIndex: openDropdown === "resolution" ? 100000 : 1
-            }}
-          >
-            <button
-              type="button"
-              className="ocean-control"
-              disabled={!isCurrentLocationOutside}
-              style={{
-                width: "100%",
-                opacity: !isCurrentLocationOutside ? 0.6 : 1,
-                cursor: !isCurrentLocationOutside ? "not-allowed" : "pointer",
-                textAlign: "left",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                position: "relative",
-                zIndex: openDropdown === "resolution" ? 100001 : 1
-              }}
-              onClick={() =>
-                setOpenDropdown(
-                  openDropdown === "resolution" ? null : "resolution"
-                )
-              }
-            >
-              <span>
-                {isCurrentLocationOutside && userResolution
-                  ? `${userResolution}°`
-                  : !isCurrentLocationOutside
-                  ? `0.25° (${t("fixed")})`
-                  : t("selectResolution") || "Select Resolution"}
-              </span>
-              <span>▾</span>
-            </button>
-
+          <div className="relative w-full">
+            {renderMobileTrigger(
+              "resolution",
+              isCurrentLocationOutside && userResolution
+                ? `${userResolution}°`
+                : !isCurrentLocationOutside
+                ? `0.25° (${t("fixed")})`
+                : t("selectResolution") || "Select Resolution",
+              !isCurrentLocationOutside
+            )}
             {openDropdown === "resolution" && isCurrentLocationOutside && (
-              <div
-                className="mobile-inline-dropdown-list"
-                style={{
-                  position: "absolute",
-                  left: 0,
-                  right: 0,
-                  top: "calc(100% + 4px)",
-                  zIndex: 100002,
-                  pointerEvents: "auto",
-                  maxHeight: "168px",
-                  overflowY: "auto"
+              <MobileMenu
+                items={resolutionOptions.map((res) => ({ value: res, label: `${res}°` }))}
+                selectedValue={userResolution}
+                placeholder={t("selectResolution") || "Select Resolution"}
+                onSelect={(res) => {
+                  setUserResolution(res);
+                  const template = t("resUpdated") || "Resolution updated to {res}°";
+                  triggerNotification(template.replace("{res}", res));
+                  setOpenDropdown(null);
                 }}
-              >
-                {resolutionOptions.map((res) => (
-                  <div
-                    key={res}
-                    className={`mobile-inline-dropdown-item ${
-                      userResolution === res ? "selected" : ""
-                    }`}
-                    style={strictItemStyle}
-                    onClick={() => {
-                      setUserResolution(res);
-                      const template =
-                        t("resUpdated") || "Resolution updated to {res}°";
-                      triggerNotification(template.replace("{res}", res));
-                      setOpenDropdown(null);
-                    }}
-                  >
-                    {res}°
-                  </div>
-                ))}
-              </div>
+              />
             )}
           </div>
         ) : (
-          <div
-            style={{
-              flexGrow: 1,
-              flexShrink: 0,
-              flexBasis: "110px",
-              minWidth: "110px",
-              opacity: !isCurrentLocationOutside ? 0.6 : 1,
-              boxSizing: "border-box",
-              animation: "fadeIn 0.3s ease",
-            }}
-          >
+          <div className={`min-w-[110px] flex-1 basis-[110px] ${!isCurrentLocationOutside ? "opacity-60" : ""}`}>
             <CustomDropdown
               value={isCurrentLocationOutside ? userResolution : "0.25"}
               placeholder={t("selectResolution") || "Select Resolution"}
@@ -489,94 +302,25 @@ export default function ControlBar({
           </div>
         ))}
 
-      {/* ========================================================
-          5. DEPTH SELECTION
-      ======================================================== */}
+      {/* Depth */}
       {isMobile ? (
-        <div
-          style={{
-            position: "relative",
-            width: "100%",
-            zIndex: openDropdown === "depth" ? 100000 : 1
-          }}
-        >
-          <button
-            type="button"
-            className="ocean-control"
-            disabled={isDepthDisabled}
-            style={{
-              width: "100%",
-              opacity: isDepthDisabled ? 0.4 : 1,
-              cursor: isDepthDisabled ? "not-allowed" : "pointer",
-              textAlign: "left",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              position: "relative",
-              zIndex: openDropdown === "depth" ? 100001 : 1
-            }}
-            onClick={() =>
-              setOpenDropdown(openDropdown === "depth" ? null : "depth")
-            }
-          >
-            <span>
-              {depth !== ""
-                ? `${depth} m`
-                : t("chooseDepth") || "Select Depth"}
-            </span>
-            <span>▾</span>
-          </button>
-
+        <div className="relative w-full">
+          {renderMobileTrigger(
+            "depth",
+            depth !== "" ? `${depth} m` : t("chooseDepth") || "Select Depth",
+            isDepthDisabled
+          )}
           {openDropdown === "depth" && (
-            <div
-              className="mobile-inline-dropdown-list"
-              style={{
-                position: "absolute",
-                left: 0,
-                right: 0,
-                top: "calc(100% + 4px)",
-                zIndex: 100002,
-                pointerEvents: "auto",
-                maxHeight: "84px",
-                overflowY: "auto"
-              }}
-            >
-              <div
-                className={`mobile-inline-dropdown-item ${
-                  depth === "" ? "selected" : ""
-                }`}
-                style={strictItemStyle}
-                onClick={() => handleDepthChange("")}
-              >
-                {t("chooseDepth") || "Select Depth"}
-              </div>
-
-              {depthOptions.map((val) => (
-                <div
-                  key={val}
-                  className={`mobile-inline-dropdown-item ${
-                    depth === String(val) ? "selected" : ""
-                  }`}
-                  style={strictItemStyle}
-                  onClick={() => handleDepthChange(String(val))}
-                >
-                  {val} m
-                </div>
-              ))}
-            </div>
+            <MobileMenu
+              items={depthOptions.map((val) => ({ value: String(val), label: `${val} m` }))}
+              selectedValue={depth}
+              placeholder={t("chooseDepth") || "Select Depth"}
+              onSelect={handleDepthChange}
+            />
           )}
         </div>
       ) : (
-        <div
-          style={{
-            flexGrow: 1,
-            flexShrink: 0,
-            flexBasis: "130px",
-            minWidth: "130px",
-            opacity: isDepthDisabled ? 0.4 : 1,
-            boxSizing: "border-box",
-          }}
-        >
+        <div className={`min-w-[130px] flex-1 basis-[130px] ${isDepthDisabled ? "opacity-40" : ""}`}>
           <CustomDropdown
             value={depth}
             placeholder={t("chooseDepth") || "Select Depth"}
@@ -591,96 +335,31 @@ export default function ControlBar({
         </div>
       )}
 
-      {/* ========================================================
-          6. COORDINATE INPUTS
-      ======================================================== */}
+      {/* Coordinates */}
       <div
-        style={
-          isMobile
-            ? {
-                display: "flex",
-                gap: "8px",
-                width: "100%",
-                opacity: areCoordinatesDisabled ? 0.4 : 1,
-                pointerEvents: areCoordinatesDisabled ? "none" : undefined,
-                boxSizing: "border-box",
-                overflow: "visible"
-              }
-            : {
-                flexGrow: 2,
-                flexShrink: 0,
-                flexBasis: "240px",
-                minWidth: "240px",
-                opacity: areCoordinatesDisabled ? 0.4 : 1,
-                pointerEvents: areCoordinatesDisabled ? "none" : undefined,
-                display: "flex",
-                gap: "6px",
-                boxSizing: "border-box",
-                overflow: "visible"
-              }
-        }
+        className={`flex w-full gap-1.5 sm:min-w-[240px] sm:flex-1 sm:basis-[240px] ${areCoordinatesDisabled ? "pointer-events-none opacity-40" : ""}`}
       >
-        <div
-          style={{
-            flex: 1,
-            overflow: "visible",
-            position: "relative",
-            zIndex: 99999
-          }}
-        >
-          <CoordinateInput
-            type="latitude"
-            value={latitude}
-            setValue={setLatitude}
-            language={language}
-          />
-        </div>
-
-        <div
-          style={{
-            flex: 1,
-            overflow: "visible",
-            position: "relative",
-            zIndex: 99999
-          }}
-        >
-          <CoordinateInput
-            type="longitude"
-            value={longitude}
-            setValue={setLongitude}
-            language={language}
-          />
-        </div>
+        <CoordinateInput
+          type="latitude"
+          value={latitude}
+          setValue={setLatitude}
+          language={language}
+        />
+        <CoordinateInput
+          type="longitude"
+          value={longitude}
+          setValue={setLongitude}
+          language={language}
+        />
       </div>
 
-      {/* ========================================================
-          7. GO BUTTON
-      ======================================================== */}
+      {/* GO */}
       <button
         type="button"
-        className="ocean-go"
         onClick={onGoClick}
         disabled={isGoDisabled}
-        style={
-          isMobile
-            ? {
-                width: "100%",
-                height: "42px",
-                opacity: isGoDisabled ? 0.5 : 1,
-                cursor: isGoDisabled ? "not-allowed" : "pointer",
-                boxSizing: "border-box"
-              }
-            : {
-                flexGrow: 1,
-                flexShrink: 0,
-                flexBasis: "60px",
-                minWidth: "60px",
-                opacity: isGoDisabled ? 0.5 : 1,
-                cursor: isGoDisabled ? "not-allowed" : "pointer",
-                boxSizing: "border-box"
-              }
-        }
-      >
+        className="oe-focus-visible h-[42px] w-full rounded-lg bg-accent text-[13px] font-semibold text-white transition-colors hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:min-w-[60px] sm:flex-1"
+        >
         {t("go")}
       </button>
     </div>

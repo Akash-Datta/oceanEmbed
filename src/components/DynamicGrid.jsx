@@ -91,13 +91,22 @@ export default function DynamicGrid() {
     return { vertical, horizontal, specialVertical, specialHorizontal };
   }, [bounds, t]);
 
+  const vLine = "absolute top-0 bottom-0 w-px bg-ink/[0.03]0/20 dark:bg-paper/10";
+  const hLine = "absolute left-0 right-0 h-px bg-ink/[0.03]0/20 dark:bg-paper/10";
+  const vSpecial = "absolute top-0 bottom-0 w-[2px] bg-accent/60 dark:bg-accent/70";
+  const hSpecial = "absolute left-0 right-0 h-[2px] bg-accent/60 dark:bg-accent/70";
+  const lngLabel =
+    "absolute -translate-x-1/2 rounded bg-paper/90 px-1 py-px font-mono text-[9px] font-bold text-ink/80 backdrop-blur-sm dark:bg-ink/85 dark:text-paper/60";
+  const latLabel =
+    "absolute -translate-y-1/2 rounded bg-paper/90 px-1 py-px font-mono text-[9px] font-bold text-ink/80 backdrop-blur-sm dark:bg-ink/85 dark:text-paper/60";
+
   return (
-    <div className="dynamic-grid">
+    <div className="pointer-events-none absolute inset-0 z-[500]">
       {grid.vertical.map((item, index) => (
         <React.Fragment key={`lng-${index}`}>
-          <div className="grid-vertical-line" style={{ left: `${item.x}%` }} />
+          <div className={vLine} style={{ left: `${item.x}%` }} />
           <div
-            className="longitude-label"
+            className={lngLabel}
             style={{ left: `${item.x}%`, bottom: "5px", top: "auto" }}
           >
             {formatLongitude(item.longitude, language)}
@@ -107,8 +116,11 @@ export default function DynamicGrid() {
 
       {grid.horizontal.map((item, index) => (
         <React.Fragment key={`lat-${index}`}>
-          <div className="grid-horizontal-line" style={{ top: `${item.y}%` }} />
-          <div className="latitude-label" style={{ top: `${item.y}%` }}>
+          <div className={hLine} style={{ top: `${item.y}%` }} />
+          <div
+            className={latLabel}
+            style={{ top: `${item.y}%` }}
+          >
             {formatLatitude(item.latitude, language)}
           </div>
         </React.Fragment>
@@ -117,11 +129,11 @@ export default function DynamicGrid() {
       {grid.specialVertical.map((item, index) => (
         <React.Fragment key={`special-lng-${index}`}>
           <div
-            className="grid-vertical-line special-line"
+            className={vSpecial}
             style={{ left: `${item.x}%` }}
           />
           <div
-            className="longitude-label special-label"
+            className={`${lngLabel} font-sans font-bold text-accent dark:text-paper`}
             style={{ left: `${item.x}%`, bottom: "26px", top: "auto" }}
           >
             {item.label}
@@ -132,11 +144,11 @@ export default function DynamicGrid() {
       {grid.specialHorizontal.map((item, index) => (
         <React.Fragment key={`special-lat-${index}`}>
           <div
-            className="grid-horizontal-line special-line"
+            className={hSpecial}
             style={{ top: `${item.y}%` }}
           />
           <div
-            className="latitude-label special-label"
+            className={`${latLabel} font-sans font-bold text-accent dark:text-paper`}
             style={{ top: `${item.y}%`, left: "7px" }}
           >
             {item.label}

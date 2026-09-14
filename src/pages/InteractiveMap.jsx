@@ -9,6 +9,7 @@ import ControlBar from "../components/ControlBar";
 import DynamicGrid from "../components/DynamicGrid";
 import LocationMarker, { MapController, MapTouchController } from "../components/LocationMarker";
 import DataSidePanel from "../components/DataSidePanel";
+import Icon from "../components/icons";
 import ParameterDashboard from "../components/ParameterDashboard";
 import AllHeatMapsDashboard from "../components/allHeatMapsDashboard";
 import SpatialDistribution from "../components/SpatialDistribution";
@@ -21,8 +22,6 @@ import { fetchVerticalProfile } from "../utils/profileApi";
 import { fetchSurfacePoint } from "../utils/surfaceApi";
 import { fetchAllSurfaceMaps } from "../utils/surfaceMapApi";
 import { getTileUrl } from "../utils/mapTiles";
-import "../styles/ocean.css";
-import "../styles/cyberpunk.css";
 
 const getFormattedDate = (dateObj) => {
   const year = dateObj.getFullYear();
@@ -501,19 +500,58 @@ export default function InteractiveMap({ onMapLoaded }) {
   function renderNavbarAndNotification() {
     return (
       <>
-        <nav className="ocean-navbar">
-          <div className="navbar-brand">
-            <h2 className="ocean-title">{t("title")}</h2>
-            <div className="ocean-subtitle">{t("subtitle")}</div>
+        <nav
+          aria-label="Primary"
+          className="flex flex-wrap items-center justify-between gap-2 border-b border-ink/10 bg-paper/90 px-3 py-2 backdrop-blur-md sm:px-4
+            dark:border-paper/10 dark:bg-ink/95"
+        >
+          <div className="flex min-w-0 items-center gap-2.5">
+            <span
+              aria-hidden="true"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent text-white"
+            >
+              <Icon name="waves" size={16} />
+            </span>
+            <div className="min-w-0">
+              <h2 className="truncate font-display text-base font-bold leading-tight text-ink dark:text-paper sm:text-lg">
+                {t("title")}
+              </h2>
+              <div className="truncate text-[10px] font-semibold text-accent dark:text-paper/80">
+                {t("subtitle")}
+              </div>
+            </div>
           </div>
-          <div className="navbar-actions">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <ThemeToggle />
             <LanguageSelector />
-            <button className="about-authors-nav-btn" onClick={() => setShowGuidelinesPanel(true)}>{t("webGuidelines")}</button>
-            <button className="about-authors-nav-btn" onClick={() => setShowAboutPanel(true)}>{t("aboutAuthors")}</button>
+            <button
+              type="button"
+              className="oe-focus-visible inline-flex h-9 items-center rounded-lg border border-ink/10 bg-paper px-3 text-[13px] font-semibold text-ink transition-colors hover:bg-ink/[0.06] sm:inline-flex
+                dark:border-paper/15 dark:bg-paper/[0.05] dark:text-paper dark:hover:bg-paper/10"
+              onClick={() => setShowGuidelinesPanel(true)}
+            >
+              {t("webGuidelines")}
+            </button>
+            <button
+              type="button"
+              className="oe-focus-visible inline-flex h-9 items-center rounded-lg border border-ink/10 bg-paper px-3 text-[13px] font-semibold text-ink transition-colors hover:bg-ink/[0.06] sm:inline-flex
+                dark:border-paper/15 dark:bg-paper/[0.05] dark:text-paper dark:hover:bg-paper/10"
+              onClick={() => setShowAboutPanel(true)}
+            >
+              {t("aboutAuthors")}
+            </button>
           </div>
         </nav>
-        {notification && <div className="ocean-notification-banner"><span>⚠️ {notification}</span></div>}
+        {notification && (
+          <div
+            role="status"
+            className="flex items-center gap-2 border-b border-ink/10 bg-paper px-4 py-2 text-[13px] text-ink
+              dark:border-paper/15 dark:bg-ink dark:text-paper"
+          >
+            <Icon name="alert" size={14} />
+            <span>{notification}</span>
+          </div>
+        )}
         {showAboutPanel && <AboutAuthors onClose={() => setShowAboutPanel(false)} />}
         {showGuidelinesPanel && <WebGuidelines onClose={() => setShowGuidelinesPanel(false)} />}
       </>
@@ -522,7 +560,7 @@ export default function InteractiveMap({ onMapLoaded }) {
 
   if (showAllMapsView) {
     return (
-      <div className={`ocean-page ${isDark ? "dark-cyber" : ""}`}>
+      <div className="mx-auto box-border flex h-dvh w-full max-w-[1800px] flex-col overflow-hidden bg-paper p-2 font-sans text-ink isolate dark:bg-ink sm:p-3">
         {renderNavbarAndNotification()}
         <AllHeatMapsDashboard 
           date={date}
@@ -542,7 +580,7 @@ export default function InteractiveMap({ onMapLoaded }) {
 
   if (submittedParameter) {
     return (
-      <div className={`ocean-page ${isDark ? "dark-cyber" : ""}`}>
+      <div className="mx-auto box-border flex h-dvh w-full max-w-[1800px] flex-col overflow-hidden bg-paper p-2 font-sans text-ink isolate dark:bg-ink sm:p-3">
         {renderNavbarAndNotification()}
         <ParameterDashboard 
           date={date}
@@ -565,7 +603,7 @@ export default function InteractiveMap({ onMapLoaded }) {
 
   if (showVisualization) {
     return (
-      <div className={`ocean-page ${isDark ? "dark-cyber" : ""}`}>
+      <div className="mx-auto box-border flex h-dvh w-full max-w-[1800px] flex-col overflow-hidden bg-paper p-2 font-sans text-ink isolate dark:bg-ink sm:p-3">
         {renderNavbarAndNotification()}
         <SpatialDistribution
           depth={depth}
@@ -580,48 +618,12 @@ export default function InteractiveMap({ onMapLoaded }) {
   }
 
   return (
-    <div className={`ocean-page ${isDark ? "dark-cyber" : ""}`}>
+    <div className="mx-auto box-border flex h-dvh w-full max-w-[1800px] flex-col overflow-hidden bg-paper p-2 font-sans text-ink isolate dark:bg-ink sm:p-3">
       {renderNavbarAndNotification()}
-
-      {/* GLOBAL UNIFORM MOBILE BUTTON SIZING OVERRIDE */}
-      <style>{`
-        @media (max-width: 700px) {
-          .navbar-actions {
-            display: flex !important;
-            align-items: center !important;
-            gap: 6px !important;
-          }
-          .navbar-actions .language-selector-container,
-          .navbar-actions .about-authors-nav-btn {
-            height: 34px !important;
-            min-height: 34px !important;
-            max-height: 34px !important;
-            box-sizing: border-box !important;
-            display: inline-flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            padding: 0 10px !important;
-            font-size: 11px !important;
-            border-radius: 8px !important;
-            line-height: normal !important;
-            vertical-align: middle !important;
-          }
-          .navbar-actions select,
-          .navbar-actions .language-dropdown,
-          .navbar-actions button {
-            height: 100% !important;
-            min-height: 34px !important;
-            max-height: 34px !important;
-            font-size: 11px !important;
-            padding: 0 8px !important;
-            margin: 0 !important;
-          }
-        }
-      `}</style>
 
       {/* MOBILE SPECIFIC: ControlBar OUTSIDE map wrapper */}
       {isMobile && !isPanelExpanded && !showVisualization && (
-        <div className="mobile-controls-wrapper">
+        <div className="px-2 pt-2">
           <ControlBar
             isSidePanelOpen={!!position} date={date} setDate={setDate} depth={depth} userResolution={userResolution}
             setUserResolution={setUserResolution} isCurrentLocationOutside={isCurrentLocationOutside} triggerNotification={triggerNotification}
@@ -638,28 +640,9 @@ export default function InteractiveMap({ onMapLoaded }) {
         </div>
       )}
 
-      {/* MOBILE MAP STABILITY CSS (dynamic: tracks real window height) */}
-      <style>{`
-        @media (max-width: 700px) {
-          .ocean-map-wrapper {
-            flex: 1; /* Automatically absorb available vertical space precisely */
-            position: relative;
-            display: block;
-            min-height: calc(var(--app-vh, 1vh) * 40); /* Reduced to prevent over-extension causing gap below */
-            min-height: 40dvh;
-          }
-          .ocean-map {
-            position: absolute !important;
-            inset: 0;
-            height: 100% !important;
-            width: 100% !important;
-          }
-        }
-      `}</style>
-
       {/* THE MAP INSTANCE */}
-      <div className="ocean-map-wrapper">
-        <MapContainer center={[activeCenter.lat, activeCenter.lng]} zoom={5} className="ocean-map" minZoom={3} maxZoom={12} zoomControl={false} attributionControl={false}>
+      <div className="relative block min-h-[40dvh] w-full flex-1 overflow-hidden rounded-lg border border-ink/15 bg-ink/[0.06] isolate dark:border-paper/10 dark:bg-ink sm:min-h-0">
+        <MapContainer center={[activeCenter.lat, activeCenter.lng]} zoom={5} className="h-full w-full" minZoom={3} maxZoom={12} zoomControl={false} attributionControl={false}>
           <TileLayer url={getTileUrl(isDark)} />
           <MobileBoundsController isMobile={isMobile} isCurrentLocationOutside={isCurrentLocationOutside} />
           <MapTouchController />
@@ -677,6 +660,7 @@ export default function InteractiveMap({ onMapLoaded }) {
 
         {/* DESKTOP SPECIFIC: ControlBar INSIDE map wrapper */}
         {!isMobile && !isPanelExpanded && !showVisualization && (
+          <div className="absolute inset-x-4 top-4 z-control">
           <ControlBar
             isSidePanelOpen={!!position} date={date} setDate={setDate} depth={depth} userResolution={userResolution}
             setUserResolution={setUserResolution} isCurrentLocationOutside={isCurrentLocationOutside} triggerNotification={triggerNotification}
@@ -690,12 +674,17 @@ export default function InteractiveMap({ onMapLoaded }) {
             longitude={longitude} setLongitude={(val) => { setLongitude(val); if (val) setDepth(""); }}
             handleGo={handleGo} handleRecenter={handleRecenter} minDate={minDate} maxDate={maxDate}
           />
+          </div>
         )}
 
         {mapInstance && !showVisualization && (
-          <div className="custom-zoom-controls" onClick={(e) => e.stopPropagation()}>
-            <button className="custom-zoom-btn" type="button" disabled={isMapZoomLocked} onClick={() => mapInstance.zoomIn()} style={{ opacity: isMapZoomLocked ? 0.4 : 1, cursor: isMapZoomLocked ? "not-allowed" : "pointer" }} title={isMapZoomLocked ? (t("zoomLocked") || "Zoom locked while parameter/depth is selected") : undefined}>+</button>
-            <button className="custom-zoom-btn" type="button" disabled={isMapZoomLocked} onClick={() => mapInstance.zoomOut()} style={{ opacity: isMapZoomLocked ? 0.4 : 1, cursor: isMapZoomLocked ? "not-allowed" : "pointer" }} title={isMapZoomLocked ? (t("zoomLocked") || "Zoom locked while parameter/depth is selected") : undefined}>−</button>
+          <div
+            className="absolute bottom-6 left-6 z-[3500] flex flex-col gap-1.5 rounded-lg border border-white/90 bg-paper/90 p-1.5 shadow-lift backdrop-blur
+              dark:border-paper/10 dark:bg-ink/85"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button className="oe-focus-visible flex h-[38px] w-[38px] items-center justify-center rounded-lg border border-ink/10 bg-paper text-[18px] text-ink transition-colors hover:bg-accent hover:text-white disabled:cursor-not-allowed disabled:opacity-40 dark:border-paper/15 dark:bg-paper/10 dark:text-paper dark:hover:bg-accent" type="button" disabled={isMapZoomLocked} onClick={() => mapInstance.zoomIn()} title={isMapZoomLocked ? (t("zoomLocked") || "Zoom locked while parameter/depth is selected") : "Zoom in"} aria-label="Zoom in">+</button>
+            <button className="oe-focus-visible flex h-[38px] w-[38px] items-center justify-center rounded-lg border border-ink/10 bg-paper text-[18px] text-ink transition-colors hover:bg-accent hover:text-white disabled:cursor-not-allowed disabled:opacity-40 dark:border-paper/15 dark:bg-paper/10 dark:text-paper dark:hover:bg-accent" type="button" disabled={isMapZoomLocked} onClick={() => mapInstance.zoomOut()} title={isMapZoomLocked ? (t("zoomLocked") || "Zoom locked while parameter/depth is selected") : "Zoom out"} aria-label="Zoom out">−</button>
           </div>
         )}
 

@@ -18,15 +18,19 @@ const formatExact = (val, isLat, t) => {
 };
 
 const pointerIcon = L.divIcon({
-  className: "custom-pointer",
+  className: "oe-pin",
   html: `
-    <div class="cyber-pin-wrap">
-      <div class="cyber-pin-scan"></div>
-      <div class="cyber-pin-ring r1"></div>
-      <div class="cyber-pin-ring r2"></div>
-      <div class="cyber-pin-ring r3"></div>
-      <div class="cyber-pin-emoji">📍</div>
-      <div class="cyber-pin-dot"></div>
+    <div class="oe-pin-wrap">
+      <div class="oe-pin-ring r1"></div>
+      <div class="oe-pin-ring r2"></div>
+      <div class="oe-pin-ring r3"></div>
+      <div class="oe-pin-badge">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 21.5s-7-6.2-7-11.3a7 7 0 0 1 14 0c0 5.1-7 11.3-7 11.3Z"></path>
+          <circle cx="12" cy="10" r="2.5"></circle>
+        </svg>
+      </div>
+      <div class="oe-pin-dot"></div>
     </div>
   `,
   iconSize: [54, 54],
@@ -186,41 +190,6 @@ export default function LocationMarker({
 
   return (
     <>
-      <style>{`
-        /* Flipped state (Right side shift with dynamically calculated downward offset) */
-        .flipped-popup-right {
-          bottom: auto !important;     
-          top: var(--dynamic-top-offset, 20px) !important; /* Fully dynamic auto-adjustment */
-          left: 46px !important;       /* Shifts the popup entirely to the right, fully clearing the pin */
-          margin-left: 0 !important;   
-        }
-        
-        /* Hide the default Leaflet tip container entirely */
-        .flipped-popup-right .leaflet-popup-tip-container {
-          display: none !important;
-        }
-
-        /* Generate a crisp tip projecting from the left edge pointing at the pin */
-        .flipped-popup-right .leaflet-popup-content-wrapper {
-          position: relative;
-        }
-        .flipped-popup-right .leaflet-popup-content-wrapper::before {
-          content: '';
-          position: absolute;
-          left: -6px;           
-          top: 14px;            /* Scales cleanly with the dynamic container */
-          width: 12px;
-          height: 12px;
-          background: #ffffff;
-          transform: rotate(45deg);
-          border-left: 1px solid #cbd5e1;
-          border-bottom: 1px solid #cbd5e1;
-          border-radius: 2px 0 0 0;
-          z-index: -1;          
-          box-shadow: -2px 2px 4px rgba(0,0,0,0.04);
-        }
-      `}</style>
-
       <Marker
         key={`${position.lat}-${position.lng}`}
         ref={markerRef}
@@ -241,61 +210,29 @@ export default function LocationMarker({
         }}
       >
         <Popup autoPan={false} closeButton={true} style={{ zIndex: 9999 }}>
-          <div className="map-popup-body" style={{ 
-            minWidth: isMobile ? "160px" : "240px", 
-            maxWidth: isMobile ? "220px" : "none", 
-            padding: isMobile ? "2px" : "4px", 
-            textAlign: "center", 
-            fontFamily: "Inter, Arial, sans-serif" 
-          }}>
-            
-            <div className="map-popup-title" style={{ fontSize: isMobile ? "13px" : "16px", fontWeight: "800", marginBottom: "4px", color: "#075985" }}>
-              {t("exactLocation") || "📍 Location"}
+          <div className={`min-w-[160px] p-0.5 text-center font-sans sm:min-w-[240px] sm:p-1`}>
+
+            <div className="mb-1 font-display text-[15px] font-bold text-ink sm:text-[17px]">
+              {t("exactLocation") || "Location"}
             </div>
 
             <div
-              className="map-popup-sea"
-              style={{
-                fontSize: isMobile ? "10px" : "12px",
-                fontWeight: "700",
-                color: "#0ea5e9",
-                marginBottom: isMobile ? "8px" : "14px",
-                textTransform: "uppercase",
-                letterSpacing: "0.5px",
-                wordWrap: "break-word"
-              }}
+              className="mb-2 text-[12px] text-ink/60 sm:mb-3.5"
             >
               {seaName}
             </div>
 
-            <div className="map-popup-coord-box" style={{ 
-              background: "linear-gradient(135deg, rgba(241, 245, 249, 0.9), rgba(226, 232, 240, 0.6))", 
-              padding: isMobile ? "6px" : "10px", 
-              borderRadius: "10px", 
-              border: "1px solid #cbd5e1",
-              boxShadow: "inset 0 1px 3px rgba(255,255,255,0.8), 0 2px 5px rgba(0,0,0,0.05)"
-            }}>
-              <div className="map-popup-coord-label" style={{ fontWeight: "800", marginBottom: isMobile ? "4px" : "8px", color: "#475569", fontSize: isMobile ? "8.5px" : "10px", letterSpacing: "0.8px", textTransform: "uppercase" }}>
+            <div className="rounded-lg border border-ink/15 bg-ink/[0.03] p-1.5 sm:p-2.5">
+              <div className="mb-1 text-[8.5px] font-bold text-ink/60 sm:mb-2 sm:text-[10px]">
                 {t("exactCoordinate") || "EXACT COORDINATE"}
               </div>
-              
-              <div className="map-popup-coord-inner" style={{ 
-                display: "inline-flex", 
-                alignItems: "center", 
-                justifyContent: "center",
-                background: "#ffffff", 
-                padding: isMobile ? "4px 8px" : "6px 12px", 
-                borderRadius: "8px", 
-                border: "1px solid #e2e8f0", 
-                boxShadow: "0 1px 2px rgba(0,0,0,0.02)",
-                width: "100%",
-                boxSizing: "border-box"
-              }}>
-                <span className="map-popup-coord-value" style={{ fontWeight: "700", fontSize: isMobile ? "11px" : "13px", color: "#0f172a", fontFamily: "'JetBrains Mono', monospace", letterSpacing: "-0.3px" }}>
+
+              <div className="inline-flex w-full items-center justify-center rounded-lg border border-ink/10 bg-paper px-2 py-1 sm:px-3 sm:py-1.5">
+                <span className="font-mono text-[11px] font-bold tracking-tight text-ink sm:text-[13px]">
                   {formatExact(position.lat, true, t)}
                 </span>
-                <span className="map-popup-coord-sep" style={{ color: "#94a3b8", fontWeight: "800", margin: isMobile ? "0 3px" : "0 6px" }}>,</span>
-                <span className="map-popup-coord-value" style={{ fontWeight: "700", fontSize: isMobile ? "11px" : "13px", color: "#0f172a", fontFamily: "'JetBrains Mono', monospace", letterSpacing: "-0.3px" }}>
+                <span className="mx-[3px] font-bold text-ink/45 sm:mx-1.5">,</span>
+                <span className="font-mono text-[11px] font-bold tracking-tight text-ink sm:text-[13px]">
                   {formatExact(position.lng, false, t)}
                 </span>
               </div>
